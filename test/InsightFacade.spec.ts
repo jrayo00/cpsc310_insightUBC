@@ -23,7 +23,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     };
     let datasets: { [id: string]: string } = {};
     let insightFacade: InsightFacade;
-    const cacheDir = __dirname + "/../../data";
+    const cacheDir = __dirname + "/../data";
 
     before(function () {
         // This section runs once and loads all datasets specified in the datasetsToLoad object
@@ -126,11 +126,11 @@ describe("InsightFacade PerformQuery", () => {
     it("Should run test queries", function () {
         describe("Dynamic InsightFacade PerformQuery tests", function () {
             for (const test of testQueries) {
-                it(`[${test.filename}] ${test.title}`, function () {
-                    return insightFacade.performQuery(test.query).then((result) => {
-                        TestUtil.checkQueryResult(test, result);
+                it(`[${test.filename}] ${test.title}`, function (done) {
+                    insightFacade.performQuery(test.query).then((result) => {
+                        TestUtil.checkQueryResult(test, result, done);
                     }).catch((err) => {
-                        TestUtil.checkQueryResult(test, err);
+                        TestUtil.checkQueryResult(test, err, done);
                     });
                 });
             }
