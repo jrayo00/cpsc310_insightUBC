@@ -96,10 +96,13 @@ export interface IInsightFacade {
      * @return Promise <any[]>
      *
      * The promise should fulfill with an array of results.
-     * The promise should reject with an InsightError describing the error. test
+     * The promise should reject with an InsightError describing the error.
      */
     performQuery(query: any): Promise<any[]>;
 
+    /**
+     * Test push to Deliverable 0 branch.
+     */
     /**
      * List all currently added datasets, their types, and number of rows.
      *
