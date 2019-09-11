@@ -96,7 +96,7 @@ export interface IInsightFacade {
      * @return Promise <any[]>
      *
      * The promise should fulfill with an array of results.
-     * The promise should reject with an InsightError describing the error.
+     * The promise should reject with an InsightError describing the error. test
      */
     performQuery(query: any): Promise<any[]>;
 
