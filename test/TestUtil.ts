@@ -8,15 +8,21 @@ export default class TestUtil {
 
     // To students: There is no need or expectation for you to understand or modify this file
     // However checkQueryResult below may be of interest.
-    public static checkQueryResult(test: ITestQuery, response: any): void {
-        if (test.isQueryValid) {
-            expect(response).to.deep.equal(test.result);
-        } else {
-            if (test.result === "ResultTooLargeError") {
-                expect(response).to.be.instanceOf(ResultTooLargeError);
+    public static checkQueryResult(test: ITestQuery, response: any, done: any): void {
+        try {
+            if (test.isQueryValid) {
+                expect(response).to.deep.equal(test.result);
+                done();
             } else {
-                expect(response).to.be.instanceOf(InsightError);
+                if (test.result === "ResultTooLargeError") {
+                    expect(response).to.be.instanceOf(ResultTooLargeError);
+                } else {
+                    expect(response).to.be.instanceOf(InsightError);
+                }
             }
+            done();
+        } catch (e) {
+            done(e);
         }
     }
 
