@@ -1,9 +1,10 @@
 import { expect } from "chai";
 import * as fs from "fs-extra";
-import {InsightDatasetKind} from "../src/controller/IInsightFacade";
+import {InsightDatasetKind, InsightError, NotFoundError} from "../src/controller/IInsightFacade";
 import InsightFacade from "../src/controller/InsightFacade";
 import Log from "../src/Util";
 import TestUtil from "./TestUtil";
+import * as assert from "assert";
 
 // This should match the schema given to TestUtil.validate(..) in TestUtil.readTestQueries(..)
 // except 'filename' which is injected when the file is read.
@@ -64,7 +65,87 @@ describe("InsightFacade Add/Remove Dataset", function () {
         }).catch((err: any) => {
             expect.fail(err, expected, "Should not have rejected");
         });
+    });
 
+    it("Should add a valid dataset: testing Rooms dataset kind", function () {
+        const id: string = "courses2";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms).then((result: string[]) => {
+            expect(result).to.deep.equal(expected);
+        }).catch((err: any) => {
+            expect.fail(err, expected, "Should not have rejected");
+        });
+    });
+
+    it("Should not add a duplicate dataset with same id", function () {
+        const id: string = "courses";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, expected, "Should not have been accepted");
+            // tslint:disable-next-line:no-empty
+        }).catch((err: any) => {
+        });
+    });
+
+    it("Should not add a dataset with underscore in id", function () {
+        const id: string = "courses_with_underscore";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, expected, "Should not have been accepted");
+            // tslint:disable-next-line:no-empty
+        }).catch((err: any) => {
+        });
+    });
+
+    it("Should not add a dataset with all whitespaces for id", function () {
+        const id: string = "    ";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, expected, "Should not have been accepted");
+            // tslint:disable-next-line:no-empty
+        }).catch((err: any) => {
+        });
+    });
+    // Testing remove dataset function
+    it("Should remove a valid dataset", function () {
+        const id: string = "courses2";
+        const expected: string = id;
+        return insightFacade.removeDataset(id).then((result: string) => {
+            expect(result).to.deep.equal(expected);
+        }).catch((err: any) => {
+            expect.fail(err, expected, "Should not have rejected");
+        });
+    });
+
+    it("Removing dataset should reject with a NotFoundError", function () {
+        const id: string = "courses3";
+        const expected: string = id;
+        return insightFacade.removeDataset(id).then((result: string) => {
+            expect.fail(result, expected, "Should not have removed dataset whose id DNE");
+        }).catch((err: any) => {
+            // **TODO: FIGURE OUT HOW TO VALIDATE A CERTAIN EXCEPTION WAS THROWN
+            expect(insightFacade.removeDataset(id)).to.throw(new NotFoundError());
+        });
+    });
+    it("Removing dataset should reject with a InsightError: underscore in id", function () {
+        const id: string = "invalid_id";
+        const expected: string = id;
+        return insightFacade.removeDataset(id).then((result: string) => {
+            expect.fail(result, expected, "Should not have removed dataset whose id DNE");
+        }).catch((err: any) => {
+            // **TODO: FIGURE OUT HOW TO VALIDATE A CERTAIN EXCEPTION WAS THROWN
+            expect(insightFacade.removeDataset(id)).to.throw(new InsightError());
+        });
+    });
+    it("Removing dataset should reject with a InsightError: all whitespaces for id", function () {
+        const id: string = "    ";
+        const expected: string = id;
+        return insightFacade.removeDataset(id).then((result: string) => {
+            expect.fail(result, expected, "Should not have removed dataset whose id DNE");
+        }).catch((err: any) => {
+            // **TODO: FIGURE OUT HOW TO VALIDATE A CERTAIN EXCEPTION WAS THROWN
+            expect(insightFacade.removeDataset(id)).to.throw(new InsightError());
+        });
     });
 });
 
