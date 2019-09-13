@@ -21,6 +21,9 @@ describe("InsightFacade Add/Remove Dataset", function () {
     // automatically be loaded in the 'before' hook.
     const datasetsToLoad: { [id: string]: string } = {
         courses: "./test/data/courses.zip",
+        courses2: "./test/data/courses2.zip",
+        courses3: "./test/data/courses3.zip",
+        courses_with_underscore: "./test/data/courses_with_underscore.zip",
     };
     let datasets: { [id: string]: string } = {};
     let insightFacade: InsightFacade;
@@ -88,6 +91,17 @@ describe("InsightFacade Add/Remove Dataset", function () {
         });
     });
 
+    it("Should not add a dataset without valid a valid json file", function () {
+        const id: string = "courses3";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, expected, "Should not have been accepted");
+            // tslint:disable-next-line:no-empty
+        }).catch((err: any) => {
+            expect(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses)).to.throw();
+        });
+    });
+
     it("Should not add a dataset with underscore in id", function () {
         const id: string = "courses_with_underscore";
         const expected: string[] = [id];
@@ -100,7 +114,27 @@ describe("InsightFacade Add/Remove Dataset", function () {
     });
 
     it("Should not add a dataset with all whitespaces for id", function () {
-        const id: string = "    ";
+        const id: string = "   ";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, expected, "Should not have been accepted");
+            // tslint:disable-next-line:no-empty
+        }).catch((err: any) => {
+            expect(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses)).to.throw();
+        });
+    });
+    it("Should not add a dataset id null", function () {
+        const id: string = null;
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, expected, "Should not have been accepted");
+            // tslint:disable-next-line:no-empty
+        }).catch((err: any) => {
+            expect(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses)).to.throw();
+        });
+    });
+    it("Should not add a dataset id undefined", function () {
+        const id: string = undefined;
         const expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             expect.fail(result, expected, "Should not have been accepted");
@@ -146,6 +180,24 @@ describe("InsightFacade Add/Remove Dataset", function () {
         }).catch((err: any) => {
             // **TODO: FIGURE OUT HOW TO VALIDATE A CERTAIN EXCEPTION WAS THROWN
             expect(insightFacade.removeDataset(id)).to.throw(new InsightError());
+        });
+    });
+    it("Removing dataset with id null", function () {
+        const id: string = null;
+        const expected: string = id;
+        return insightFacade.removeDataset(id).then((result: string) => {
+            expect.fail(result, expected, "Should not have removed dataset whose id null");
+        }).catch((err: any) => {
+            expect(insightFacade.removeDataset(id)).to.throw();
+        });
+    });
+    it("Removing dataset with id undefined", function () {
+        const id: string = undefined;
+        const expected: string = id;
+        return insightFacade.removeDataset(id).then((result: string) => {
+            expect.fail(result, expected, "Should not have removed dataset whose id undefined");
+        }).catch((err: any) => {
+            expect(insightFacade.removeDataset(id)).to.throw();
         });
     });
 });
