@@ -84,6 +84,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect.fail(result, expected, "Should not have been accepted");
             // tslint:disable-next-line:no-empty
         }).catch((err: any) => {
+            expect(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses)).to.throw();
         });
     });
 
@@ -94,6 +95,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect.fail(result, expected, "Should not have been accepted");
             // tslint:disable-next-line:no-empty
         }).catch((err: any) => {
+            expect(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses)).to.throw();
         });
     });
 
@@ -104,6 +106,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect.fail(result, expected, "Should not have been accepted");
             // tslint:disable-next-line:no-empty
         }).catch((err: any) => {
+            expect(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses)).to.throw();
         });
     });
     // Testing remove dataset function
@@ -123,7 +126,6 @@ describe("InsightFacade Add/Remove Dataset", function () {
         return insightFacade.removeDataset(id).then((result: string) => {
             expect.fail(result, expected, "Should not have removed dataset whose id DNE");
         }).catch((err: any) => {
-            // **TODO: FIGURE OUT HOW TO VALIDATE A CERTAIN EXCEPTION WAS THROWN
             expect(insightFacade.removeDataset(id)).to.throw(new NotFoundError());
         });
     });
@@ -133,7 +135,6 @@ describe("InsightFacade Add/Remove Dataset", function () {
         return insightFacade.removeDataset(id).then((result: string) => {
             expect.fail(result, expected, "Should not have removed dataset whose id DNE");
         }).catch((err: any) => {
-            // **TODO: FIGURE OUT HOW TO VALIDATE A CERTAIN EXCEPTION WAS THROWN
             expect(insightFacade.removeDataset(id)).to.throw(new InsightError());
         });
     });
@@ -148,6 +149,8 @@ describe("InsightFacade Add/Remove Dataset", function () {
         });
     });
 });
+// TODO: add unit tests for ids with null or undefined
+// TODO: add the zip files for the necessary datasets being added/removed
 
 /*
  * This test suite dynamically generates tests from the JSON files in test/queries.
