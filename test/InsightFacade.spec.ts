@@ -23,7 +23,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         courses: "./test/data/courses.zip",
         courses2: "./test/data/courses2.zip",
         courses3: "./test/data/courses3.zip",
-        courses_with_underscore: "./test/data/courses_with_underscore.zip",
+        courses_with_underscore: "./test/data/courses_with_underscore.zip"
     };
     let datasets: { [id: string]: string } = {};
     let insightFacade: InsightFacade;
@@ -87,7 +87,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect.fail(result, expected, "Should not have been accepted");
             // tslint:disable-next-line:no-empty
         }).catch((err: any) => {
-            expect(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses)).to.throw();
+            expect(err).to.throw();
         });
     });
 
