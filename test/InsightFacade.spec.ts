@@ -83,11 +83,12 @@ describe("InsightFacade Add/Remove Dataset", function () {
     it("Should not add a duplicate dataset with same id", function () {
         const id: string = "courses";
         const expected: string[] = [id];
+        // Adding dataset the first time
+        insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             expect.fail(result, expected, "Should not have been accepted");
-            // tslint:disable-next-line:no-empty
         }).catch((err: any) => {
-            expect(err).to.throw();
+            expect(err).to.be.instanceOf(InsightError);
         });
     });
 
@@ -96,9 +97,8 @@ describe("InsightFacade Add/Remove Dataset", function () {
         const expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             expect.fail(result, expected, "Should not have been accepted");
-            // tslint:disable-next-line:no-empty
         }).catch((err: any) => {
-            expect(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses)).to.throw();
+            expect(err).to.be.instanceOf(InsightError);
         });
     });
 
@@ -107,9 +107,8 @@ describe("InsightFacade Add/Remove Dataset", function () {
         const expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             expect.fail(result, expected, "Should not have been accepted");
-            // tslint:disable-next-line:no-empty
         }).catch((err: any) => {
-            expect(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses)).to.throw();
+            expect(err).to.be.instanceOf(InsightError);
         });
     });
 
@@ -120,7 +119,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect.fail(result, expected, "Should not have been accepted");
             // tslint:disable-next-line:no-empty
         }).catch((err: any) => {
-            expect(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses)).to.throw();
+            expect(err).to.be.instanceOf(InsightError);
         });
     });
     it("Should not add a dataset id null", function () {
@@ -130,7 +129,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect.fail(result, expected, "Should not have been accepted");
             // tslint:disable-next-line:no-empty
         }).catch((err: any) => {
-            expect(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses)).to.throw();
+            expect(err).to.be.instanceOf(InsightError);
         });
     });
     it("Should not add a dataset id undefined", function () {
@@ -138,9 +137,8 @@ describe("InsightFacade Add/Remove Dataset", function () {
         const expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             expect.fail(result, expected, "Should not have been accepted");
-            // tslint:disable-next-line:no-empty
         }).catch((err: any) => {
-            expect(insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses)).to.throw();
+            expect(err).to.be.instanceOf(InsightError);
         });
     });
     // Testing remove dataset function
@@ -161,7 +159,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         return insightFacade.removeDataset(id).then((result: string) => {
             expect.fail(result, expected, "Should not have removed dataset whose id DNE");
         }).catch((err: any) => {
-            expect(insightFacade.removeDataset(id)).to.throw(new NotFoundError());
+            expect(err).to.be.instanceOf(NotFoundError);
         });
     });
     it("Removing dataset should reject with a InsightError: underscore in id", function () {
@@ -170,7 +168,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         return insightFacade.removeDataset(id).then((result: string) => {
             expect.fail(result, expected, "Should not have removed dataset whose id DNE");
         }).catch((err: any) => {
-            expect(insightFacade.removeDataset(id)).to.throw(new InsightError());
+            expect(err).to.be.instanceOf(InsightError);
         });
     });
     it("Removing dataset should reject with a InsightError: all whitespaces for id", function () {
@@ -180,7 +178,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect.fail(result, expected, "Should not have removed dataset whose id DNE");
         }).catch((err: any) => {
             // **TODO: FIGURE OUT HOW TO VALIDATE A CERTAIN EXCEPTION WAS THROWN
-            expect(insightFacade.removeDataset(id)).to.throw(new InsightError());
+            expect(err).to.be.instanceOf(InsightError);
         });
     });
     it("Removing dataset with id null", function () {
@@ -198,7 +196,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         return insightFacade.removeDataset(id).then((result: string) => {
             expect.fail(result, expected, "Should not have removed dataset whose id undefined");
         }).catch((err: any) => {
-            expect(insightFacade.removeDataset(id)).to.throw();
+            expect(err).to.be.instanceOf(InsightError);
         });
     });
 });
