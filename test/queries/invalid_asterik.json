@@ -3,7 +3,7 @@
     "query": {
         "WHERE": {
             "IS": {
-                "courses_id": "210"
+                "courses_id": "210**"
             }
         },
         "OPTIONS": {
@@ -14,8 +14,7 @@
 
         }
     },
-    "isQueryValid": true,
+    "isQueryValid": false,
 
-    "result" : [{"courses_dept":"fmst","courses_id":"210"},{"courses_dept":"fmst","courses_id":"210"},{"courses_dept":"fmst","courses_id":"210"}]
-
+    "result" :"InsightError"
 }

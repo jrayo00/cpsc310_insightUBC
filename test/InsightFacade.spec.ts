@@ -187,7 +187,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         return insightFacade.removeDataset(id).then((result: string) => {
             expect.fail(result, expected, "Should not have removed dataset whose id null");
         }).catch((err: any) => {
-            expect(insightFacade.removeDataset(id)).to.throw();
+            expect(err).to.be.instanceOf(InsightError);
         });
     });
     it("Removing dataset with id undefined", function () {
