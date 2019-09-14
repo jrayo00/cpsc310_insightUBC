@@ -200,7 +200,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         });
     });
 });
-// TODO: add unit tests for ids with null or undefined
+// TODO: add unit tests for ids with datasetkinds.room
 // TODO: add the zip files for the necessary datasets being added/removed
 
 /*
