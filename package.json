@@ -39,7 +39,7 @@
     "scripts": {
         "postinstall": "git config core.hooksPath .githooks",
         "cover": "nyc --reporter text --reporter html yarn run test",
-        "build": "tsc && tslint -c tslint.json 'src/**/*.ts' 'test/**/*.ts'",
+        "build": "tsc && tslint --project tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
         "test": "mocha --require ts-node/register --timeout 10000"
     }
 }

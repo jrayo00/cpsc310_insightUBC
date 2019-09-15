@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import * as fs from "fs-extra";
-import {InsightDatasetKind, InsightError, NotFoundError} from "../src/controller/IInsightFacade";
+import {InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "../src/controller/IInsightFacade";
 import InsightFacade from "../src/controller/InsightFacade";
 import Log from "../src/Util";
 import TestUtil from "./TestUtil";
@@ -23,7 +23,8 @@ describe("InsightFacade Add/Remove Dataset", function () {
         courses: "./test/data/courses.zip",
         courses2: "./test/data/courses2.zip",
         courses3: "./test/data/courses3.zip",
-        courses_with_underscore: "./test/data/courses_with_underscore.zip"
+        courses_with_underscore: "./test/data/courses_with_underscore.zip",
+        coursestxt: "./test/data/coursestxt.zip"
     };
     let datasets: { [id: string]: string } = {};
     let insightFacade: InsightFacade;
@@ -69,6 +70,15 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect.fail(err, expected, "Should not have rejected");
         });
     });
+    it("Should add a valid dataset", function () {
+        const id: string = "coursestxt";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            expect(result).to.deep.equal(expected);
+        }).catch((err: any) => {
+            expect.fail(err, expected, "Should not have rejected");
+        });
+    });
 
     it("Should add a valid dataset: testing Rooms dataset kind", function () {
         const id: string = "courses2";
@@ -102,6 +112,46 @@ describe("InsightFacade Add/Remove Dataset", function () {
         });
     });
 
+    it("Should not add a dataset- null content parameter", function () {
+        const id: string = "courses3";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, null, InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, expected, "Should not have been accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(InsightError);
+        });
+    });
+
+    it("Should not add a dataset -null kind parameter", function () {
+        const id: string = "courses3";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], null).then((result: string[]) => {
+            expect.fail(result, expected, "Should not have been accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(InsightError);
+        });
+    });
+
+    it("Should not add a dataset- undefined content parameter", function () {
+        const id: string = "courses3";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, undefined, InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, expected, "Should not have been accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(InsightError);
+        });
+    });
+
+    it("Should not add a dataset - undefined kind parameter", function () {
+        const id: string = "courses3";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], undefined).then((result: string[]) => {
+            expect.fail(result, expected, "Should not have been accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(InsightError);
+        });
+    });
+
     it("Should not add a dataset with underscore in id", function () {
         const id: string = "courses_with_underscore";
         const expected: string[] = [id];
@@ -117,7 +167,6 @@ describe("InsightFacade Add/Remove Dataset", function () {
         const expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             expect.fail(result, expected, "Should not have been accepted");
-            // tslint:disable-next-line:no-empty
         }).catch((err: any) => {
             expect(err).to.be.instanceOf(InsightError);
         });
@@ -127,7 +176,6 @@ describe("InsightFacade Add/Remove Dataset", function () {
         const expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             expect.fail(result, expected, "Should not have been accepted");
-            // tslint:disable-next-line:no-empty
         }).catch((err: any) => {
             expect(err).to.be.instanceOf(InsightError);
         });
@@ -200,8 +248,6 @@ describe("InsightFacade Add/Remove Dataset", function () {
         });
     });
 });
-// TODO: add unit tests for ids with datasetkinds.room
-// TODO: add the zip files for the necessary datasets being added/removed
 
 /*
  * This test suite dynamically generates tests from the JSON files in test/queries.
@@ -274,3 +320,61 @@ describe("InsightFacade PerformQuery", () => {
 });
 
 // TODO: Add unit tests for the listDatasets query
+describe("InsightFacade list Datasets", function () {
+    // Reference any datasets you've added to test/data here and they will
+    // automatically be loaded in the 'before' hook.
+    const datasetsToLoad: { [id: string]: string } = {
+        courses: "./test/data/courses.zip"
+    };
+    let datasets: { [id: string]: string } = {};
+    let insightFacade: InsightFacade;
+    const cacheDir = __dirname + "/../data";
+
+    before(function () {
+        // This section runs once and loads all datasets specified in the datasetsToLoad object
+        // into the datasets object
+        Log.test(`Before all`);
+        for (const id of Object.keys(datasetsToLoad)) {
+            datasets[id] = fs.readFileSync(datasetsToLoad[id]).toString("base64");
+        }
+    });
+
+    beforeEach(function () {
+        // This section resets the data directory (removing any cached data) and resets the InsightFacade instance
+        // This runs before each test, which should make each test independent from the previous one
+        Log.test(`BeforeTest: ${this.currentTest.title}`);
+        try {
+            fs.removeSync(cacheDir);
+            fs.mkdirSync(cacheDir);
+            insightFacade = new InsightFacade();
+        } catch (err) {
+            Log.error(err);
+        }
+    });
+
+    after(function () {
+        Log.test(`After: ${this.test.parent.title}`);
+    });
+
+    afterEach(function () {
+        Log.test(`AfterTest: ${this.currentTest.title}`);
+    });
+    it("Should list all the data sets currently added", function () {
+        const id: string = "courses";
+        insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+
+        return insightFacade.listDatasets().then((result: InsightDataset[]) => {
+            expect(result[0]).to.deep.equal(insightFacade);
+        }).catch((err: any) => {
+            expect.fail(err, insightFacade, "Should not have rejected");
+        });
+    });
+
+    it("Should fulfill even with empty datasets", function () {
+        return insightFacade.listDatasets().then((result: InsightDataset[]) => {
+            expect(result[0]).to.deep.equal(null);
+        }).catch((err: any) => {
+            expect.fail(err, insightFacade, "Should not have rejected");
+        });
+    });
+});
