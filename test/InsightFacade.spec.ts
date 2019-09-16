@@ -113,7 +113,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     });
 
     it("Should not add a dataset- null content parameter", function () {
-        const id: string = "courses3";
+        const id: string = "courses";
         const expected: string[] = [id];
         return insightFacade.addDataset(id, null, InsightDatasetKind.Courses).then((result: string[]) => {
             expect.fail(result, expected, "Should not have been accepted");
@@ -123,7 +123,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     });
 
     it("Should not add a dataset -null kind parameter", function () {
-        const id: string = "courses3";
+        const id: string = "courses";
         const expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], null).then((result: string[]) => {
             expect.fail(result, expected, "Should not have been accepted");
@@ -133,7 +133,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     });
 
     it("Should not add a dataset- undefined content parameter", function () {
-        const id: string = "courses3";
+        const id: string = "courses";
         const expected: string[] = [id];
         return insightFacade.addDataset(id, undefined, InsightDatasetKind.Courses).then((result: string[]) => {
             expect.fail(result, expected, "Should not have been accepted");
@@ -143,7 +143,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     });
 
     it("Should not add a dataset - undefined kind parameter", function () {
-        const id: string = "courses3";
+        const id: string = "courses";
         const expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], undefined).then((result: string[]) => {
             expect.fail(result, expected, "Should not have been accepted");
