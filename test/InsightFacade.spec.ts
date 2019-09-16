@@ -24,6 +24,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         courses2: "./test/data/courses2.zip",
         courses3: "./test/data/courses3.zip",
         courses_with_underscore: "./test/data/courses_with_underscore.zip",
+        invalidsections: "./test/data/invalidsections.zip",
         coursestxt: "./test/data/coursestxt.zip"
     };
     let datasets: { [id: string]: string } = {};
@@ -72,6 +73,15 @@ describe("InsightFacade Add/Remove Dataset", function () {
     });
     it("Should add a valid dataset", function () {
         const id: string = "coursestxt";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            expect(result).to.deep.equal(expected);
+        }).catch((err: any) => {
+            expect.fail(err, expected, "Should not have rejected");
+        });
+    });
+    it("Should add a valid dataset with invalid sections", function () {
+        const id: string = "invalidsections";
         const expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             expect(result).to.deep.equal(expected);
@@ -154,6 +164,15 @@ describe("InsightFacade Add/Remove Dataset", function () {
 
     it("Should not add a dataset with underscore in id", function () {
         const id: string = "courses_with_underscore";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, expected, "Should not have been accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(InsightError);
+        });
+    });
+    it("Should not add a dataset with no zip file", function () {
+        const id: string = "courseswithoutzip";
         const expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             expect.fail(result, expected, "Should not have been accepted");
