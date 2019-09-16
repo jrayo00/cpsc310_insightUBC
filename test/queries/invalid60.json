@@ -1,0 +1,21 @@
+{
+    "title": "SELECT dept, avg WHERE avg > 97",
+    "query":{
+        "OPTIONS": {
+            "ORDER": "courses_dept",
+            "ORDER": "courses_avg",
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg",
+                "courses_uuid",
+                "courses_instructor"
+            ]
+        },
+        "WHERE": {
+            "NOT": {}
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

@@ -1,0 +1,40 @@
+{
+    "title": "SELECT dept, id, avg WHERE avg == 95 || avg > 90 && dept == 'adhe' ORDER BY avg",
+    "query": {
+        "OPTIONS": {
+            "ORDER": "courses_dept",
+            "ORDER": "courses_avg",
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg",
+                "courses_uuid",
+                "courses_instructor"
+            ]
+        },
+        "WHERE": {
+            "OR": [
+                {
+                    "AND": [
+                        {
+                            "EQ": {
+                                "courses_year": 2017
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_instructor": ""
+                            }
+                        }
+                    ]
+                },
+                {
+                    "GT": {
+                        "courses_avg": 98
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": true,
+"result":[{"courses_dept":"epse","courses_id":"421","courses_avg":98.08,"courses_uuid":"33779","courses_instructor":"cole, kenneth"},{"courses_dept":"nurs","courses_id":"509","courses_avg":98.21,"courses_uuid":"73639","courses_instructor":""},{"courses_dept":"nurs","courses_id":"509","courses_avg":98.21,"courses_uuid":"73638","courses_instructor":"krist, jennifer"},{"courses_dept":"epse","courses_id":"421","courses_avg":98.36,"courses_uuid":"33781","courses_instructor":""},{"courses_dept":"epse","courses_id":"519","courses_avg":98.45,"courses_uuid":"49678","courses_instructor":""},{"courses_dept":"epse","courses_id":"519","courses_avg":98.45,"courses_uuid":"49677","courses_instructor":"cannon, joanna"},{"courses_dept":"nurs","courses_id":"578","courses_avg":98.5,"courses_uuid":"88152","courses_instructor":""},{"courses_dept":"nurs","courses_id":"578","courses_avg":98.5,"courses_uuid":"88151","courses_instructor":"burrows, marlene;harding, jillian;krist, jennifer;mccuaig, fairleth"},{"courses_dept":"epse","courses_id":"449","courses_avg":98.58,"courses_uuid":"29255","courses_instructor":"grow, laura"},{"courses_dept":"epse","courses_id":"449","courses_avg":98.58,"courses_uuid":"29256","courses_instructor":""},{"courses_dept":"nurs","courses_id":"578","courses_avg":98.58,"courses_uuid":"96250","courses_instructor":""},{"courses_dept":"nurs","courses_id":"578","courses_avg":98.58,"courses_uuid":"96251","courses_instructor":""},{"courses_dept":"epse","courses_id":"421","courses_avg":98.7,"courses_uuid":"33780","courses_instructor":"cole, kenneth"},{"courses_dept":"nurs","courses_id":"509","courses_avg":98.71,"courses_uuid":"15343","courses_instructor":"brew, nancy"},{"courses_dept":"nurs","courses_id":"509","courses_avg":98.71,"courses_uuid":"15344","courses_instructor":""},{"courses_dept":"eece","courses_id":"541","courses_avg":98.75,"courses_uuid":"10235","courses_instructor":"coria, lino"},{"courses_dept":"eece","courses_id":"541","courses_avg":98.75,"courses_uuid":"10236","courses_instructor":""},{"courses_dept":"epse","courses_id":"449","courses_avg":98.76,"courses_uuid":"44817","courses_instructor":""},{"courses_dept":"epse","courses_id":"449","courses_avg":98.76,"courses_uuid":"44816","courses_instructor":"grow, laura"},{"courses_dept":"epse","courses_id":"449","courses_avg":98.8,"courses_uuid":"6320","courses_instructor":"grow, laura"},{"courses_dept":"spph","courses_id":"300","courses_avg":98.98,"courses_uuid":"65069","courses_instructor":"frank, erica"},{"courses_dept":"spph","courses_id":"300","courses_avg":98.98,"courses_uuid":"65070","courses_instructor":""},{"courses_dept":"cnps","courses_id":"574","courses_avg":99.19,"courses_uuid":"26777","courses_instructor":"cox, daniel"},{"courses_dept":"math","courses_id":"527","courses_avg":99.78,"courses_uuid":"5374","courses_instructor":""},{"courses_dept":"math","courses_id":"527","courses_avg":99.78,"courses_uuid":"5373","courses_instructor":"gomez, jose"}]}
