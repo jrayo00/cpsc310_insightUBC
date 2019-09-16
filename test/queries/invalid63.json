@@ -1,0 +1,36 @@
+{
+    "title": "SELECT dept, avg WHERE avg > 97",
+    "query":{
+        "OPTIONS": {
+            "COLUMNS": [
+                ""
+            ],
+            "ORDER": "courses_avg"
+        },
+        "WHERE": {
+            "OR": [
+                {
+                    "AND": [
+                        {
+                            "EQ": {
+                                "courses_year": 2017
+                            }
+                        },
+                        {
+                            "IS": {
+                                "courses_instructor": ""
+                            }
+                        }
+                    ]
+                },
+                {
+                    "GT": {
+                        "courses_avg": 98
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}
