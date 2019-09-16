@@ -384,6 +384,8 @@ describe("InsightFacade list Datasets", function () {
 
         return insightFacade.listDatasets().then((result: InsightDataset[]) => {
             expect(result[0]).to.deep.equal(insightFacade);
+            expect(result[0].kind).to.equal(InsightDatasetKind.Courses);
+            expect(result[0].numRows).to.equal(64612);
         }).catch((err: any) => {
             expect.fail(err, insightFacade, "Should not have rejected");
         });
