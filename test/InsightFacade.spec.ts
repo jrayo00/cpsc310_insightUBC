@@ -199,6 +199,15 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect(err).to.be.instanceOf(InsightError);
         });
     });
+    it("Should not add a dataset id empty string", function () {
+        const id: string = "";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, expected, "Should not have been accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(InsightError);
+        });
+    });
     it("Should not add a dataset id undefined", function () {
         const id: string = undefined;
         const expected: string[] = [id];
@@ -231,6 +240,15 @@ describe("InsightFacade Add/Remove Dataset", function () {
     });
     it("Removing dataset should reject with a InsightError: underscore in id", function () {
         const id: string = "invalid_id";
+        const expected: string = id;
+        return insightFacade.removeDataset(id).then((result: string) => {
+            expect.fail(result, expected, "Should not have removed dataset whose id DNE");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(InsightError);
+        });
+    });
+    it("Removing dataset should reject with a InsightError: empty string id", function () {
+        const id: string = "";
         const expected: string = id;
         return insightFacade.removeDataset(id).then((result: string) => {
             expect.fail(result, expected, "Should not have removed dataset whose id DNE");
@@ -391,7 +409,7 @@ describe("InsightFacade list Datasets", function () {
         });
     });
 
-    it("Should fulfill even with empty datasets", function () {
+    it("Should fulfill even with empty dataset", function () {
         return insightFacade.listDatasets().then((result: InsightDataset[]) => {
             expect(result[0]).to.deep.equal(null);
         }).catch((err: any) => {
