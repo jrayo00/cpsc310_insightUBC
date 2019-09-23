@@ -14,6 +14,20 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
+        if (id.includes("_")) {
+            return Promise.reject(new InsightError("id cannot contain underscore(s)"));
+        }
+
+        let allWhiteSpace: boolean = true;
+        for (let i = 0; i <= id.length; i++) {
+            if (id.charAt(i) !== " ") {
+                allWhiteSpace = false;
+                break;
+            }
+        }
+        if(allWhiteSpace)
+            return Promise.reject(new InsightError("id cannot be all whitespaces"));
+
         return Promise.reject("Not implemented.");
     }
 
