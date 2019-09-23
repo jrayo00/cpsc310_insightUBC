@@ -14,6 +14,45 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
+        if (id === null || id === undefined) {
+            return Promise.reject(new InsightError("id cannot be null or undefined"));
+        }
+        if (content === null || content === undefined) {
+            return Promise.reject(new InsightError("content cannot be null or undefined"));
+        }
+        if (kind === null || kind === undefined) {
+            return Promise.reject(new InsightError("kind cannot be null or undefined"));
+        }
+        if (id.includes("_")) {
+            return Promise.reject(new InsightError("id cannot contain underscore(s)"));
+        }
+        // Test if given id is all whitespaces
+        let allWhiteSpace: boolean = true;
+        for (let i: number = 0; i <= id.length; i++) {
+            if (id.charAt(i) !== " ") {
+                allWhiteSpace = false;
+                break;
+            }
+        }
+        if (allWhiteSpace) {
+            return Promise.reject(new InsightError("id cannot be all whitespaces"));
+        }
+
+        // Test if dataset is a valid zip file
+        let fs = require("fs");
+        let JSZip = require("jszip");
+
+        // read a zip file
+        fs.readFile(content, function (err: NodeJS.ErrnoException, data: Buffer) {
+            if (err) throw err;
+            JSZip.loadAsync(data).then(function () {
+                // TODO: INSERT FUNCTION CALL TO PARSE DATASET
+                Log.test("got here");
+            }).catch((err: any) => {
+                return Promise.reject(new InsightError("invalid zip file"));
+            });
+        });
+
         return Promise.reject("Not implemented.");
     }
 
