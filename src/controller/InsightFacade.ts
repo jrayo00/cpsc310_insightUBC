@@ -1,6 +1,8 @@
 import Log from "../Util";
 import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
 import {InsightError, NotFoundError} from "./IInsightFacade";
+import * as JSZip from "jszip";
+import * as fs from "fs";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -39,21 +41,18 @@ export default class InsightFacade implements IInsightFacade {
         }
 
         // Test if dataset is a valid zip file
-        let fs = require("fs");
-        let JSZip = require("jszip");
 
         // read a zip file
-        fs.readFile(content, function (err: NodeJS.ErrnoException, data: Buffer) {
-            if (err) throw err;
-            JSZip.loadAsync(data).then(function () {
+
+        JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
                 // TODO: INSERT FUNCTION CALL TO PARSE DATASET
                 Log.test("got here");
             }).catch((err: any) => {
                 return Promise.reject(new InsightError("invalid zip file"));
             });
-        });
 
-        return Promise.reject("Not implemented.");
+
+     //   return Promise.reject("Not implemented.");
     }
 
     public removeDataset(id: string): Promise<string> {
