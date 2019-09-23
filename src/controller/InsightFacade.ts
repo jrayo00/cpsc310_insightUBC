@@ -14,19 +14,28 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
+        if (id === null || id === undefined) {
+            return Promise.reject(new InsightError("id cannot be null or undefined"));
+        }
+        if (content === null || content === undefined) {
+            return Promise.reject(new InsightError("content cannot be null or undefined"));
+        }
+        if (kind === null || kind === undefined) {
+            return Promise.reject(new InsightError("kind cannot be null or undefined"));
+        }
         if (id.includes("_")) {
             return Promise.reject(new InsightError("id cannot contain underscore(s)"));
         }
-
         let allWhiteSpace: boolean = true;
-        for (let i = 0; i <= id.length; i++) {
+        for (let i: number = 0; i <= id.length; i++) {
             if (id.charAt(i) !== " ") {
                 allWhiteSpace = false;
                 break;
             }
         }
-        if(allWhiteSpace)
+        if (allWhiteSpace) {
             return Promise.reject(new InsightError("id cannot be all whitespaces"));
+        }
 
         return Promise.reject("Not implemented.");
     }
