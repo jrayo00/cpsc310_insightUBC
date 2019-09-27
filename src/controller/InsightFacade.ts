@@ -12,12 +12,15 @@ import {JSZipObject} from "jszip";
  */
 export default class InsightFacade implements IInsightFacade {
 
-    private datasets: Dataset[] = [];
+    protected datasets: Dataset[] = new Array();
+    protected datasetsString: string[] = new Array();
+
     constructor() {
         Log.trace("InsightFacadeImpl::init()");
     }
 
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
+        // TODO: refactor cases below
         if (id === null || id === undefined) {
             return Promise.reject(new InsightError("id cannot be null or undefined"));
         }
@@ -36,17 +39,22 @@ export default class InsightFacade implements IInsightFacade {
         }
         // read a zip file
         JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
-                // TODO: INSERT FUNCTION CALL TO PARSE DATASET
-               // JSON.parse(JSON.stringify(zip));
-                zip.file("courses/CPSC210").async("text").then(function (data: string) {
-                    Log.test(data);
+            let newDataset: Dataset = new Dataset(id);
+            zip.folder(id).forEach(function (relativePath, currentFile) {
+                currentFile.async("text").then(function (data: string) {
+                    newDataset.parseData(data);
+                }).catch((err: any) => {
+                    Log.error("error thrown !");
                 });
-                Log.test("got here");
+            });
+            this.datasets.push(newDataset);
+            this.datasetsString.push(id);
+            Log.test(this.datasetsString);
+            return Promise.resolve(this.datasetsString);
         }).catch((err: any) => {
                 Log.error("error thrown !");
                 return Promise.reject(new InsightError("invalid zip file"));
         });
-     //   return Promise.reject("Not implemented.");
     }
 
     public removeDataset(id: string): Promise<string> {

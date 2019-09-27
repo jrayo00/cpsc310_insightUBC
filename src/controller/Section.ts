@@ -1,7 +1,7 @@
 import Log from "../Util";
 
 export class Section {
-    private sectionInfo = {
+    public info = {
         Subject : "",
         Course : "",
         Avg : -1,
@@ -16,5 +16,6 @@ export class Section {
 
     constructor() {
         Log.trace("Section::init()");
+
     }
 }

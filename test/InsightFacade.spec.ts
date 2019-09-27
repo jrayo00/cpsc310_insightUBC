@@ -62,17 +62,8 @@ describe("InsightFacade Add/Remove Dataset", function () {
     });
 
     // This is a unit test. You should create more like this!
-    it("Should add a valid dataset", function () {
-        const id: string = "courses";
-        const expected: string[] = [id];
-        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
-            expect(result).to.deep.equal(expected);
-        }).catch((err: any) => {
-            expect.fail(err, expected, "Should not have rejected");
-        });
-    });
     // it("Should add a valid dataset", function () {
-    //     const id: string = "coursestxt";
+    //     const id: string = "courses";
     //     const expected: string[] = [id];
     //     return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
     //         expect(result).to.deep.equal(expected);
@@ -80,6 +71,16 @@ describe("InsightFacade Add/Remove Dataset", function () {
     //         expect.fail(err, expected, "Should not have rejected");
     //     });
     // });
+
+    it("Should add a valid dataset", function () {
+        const id: string = "coursestxt";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            expect(result).to.deep.equal(expected);
+        }).catch((err: any) => {
+            expect.fail(err, expected, "Should not have rejected");
+        });
+    });
     it("Should add a valid dataset with invalid sections", function () {
         const id: string = "invalidsections";
         const expected: string[] = [id];
