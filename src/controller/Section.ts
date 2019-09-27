@@ -15,7 +15,6 @@ export class Section {
     };
 
     constructor() {
-        Log.trace("Section::init()");
-
+        // Log.trace("Section::init()");
     }
 }
