@@ -54,13 +54,14 @@ export default class InsightFacade implements IInsightFacade {
                 // this.datasetsString.push(id);
                 // Log.test(this.datasetsString);
                 Log.test("Got here");
-
+                Log.test(JSON.stringify(a));
+                //TODO: fix writing to file bug
                 // Write to file only after all promises have been resolved
                 fs.writeFile("test.txt", JSON.stringify(a), (err) => {
                     if (err) throw err;
                     Log.test("The file has been saved!");
+                    return Promise.resolve();
                 });
-                return Promise.resolve();
             });
         }).catch((err: any) => {
                 Log.error("error thrown !");
