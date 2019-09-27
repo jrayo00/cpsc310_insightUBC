@@ -1,8 +1,9 @@
 import Log from "../Util";
-import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
-import {InsightError, NotFoundError} from "./IInsightFacade";
+import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
 import * as JSZip from "jszip";
+import {Dataset} from "./Dataset";
 import * as fs from "fs";
+import {JSZipObject} from "jszip";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -11,6 +12,7 @@ import * as fs from "fs";
  */
 export default class InsightFacade implements IInsightFacade {
 
+    private datasets: Dataset[] = [];
     constructor() {
         Log.trace("InsightFacadeImpl::init()");
     }
@@ -29,29 +31,21 @@ export default class InsightFacade implements IInsightFacade {
             return Promise.reject(new InsightError("id cannot contain underscore(s)"));
         }
         // Test if given id is all whitespaces
-        let allWhiteSpace: boolean = true;
-        for (let i: number = 0; i <= id.length; i++) {
-            if (id.charAt(i) !== " ") {
-                allWhiteSpace = false;
-                break;
-            }
-        }
-        if (allWhiteSpace) {
+        if (this.allWhitespaces(id)) {
             return Promise.reject(new InsightError("id cannot be all whitespaces"));
         }
-
-        // Test if dataset is a valid zip file
-
         // read a zip file
-
         JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
                 // TODO: INSERT FUNCTION CALL TO PARSE DATASET
+               // JSON.parse(JSON.stringify(zip));
+                zip.file("courses/CPSC210").async("text").then(function (data: string) {
+                    Log.test(data);
+                });
                 Log.test("got here");
-            }).catch((err: any) => {
+        }).catch((err: any) => {
+                Log.error("error thrown !");
                 return Promise.reject(new InsightError("invalid zip file"));
-            });
-
-
+        });
      //   return Promise.reject("Not implemented.");
     }
 
@@ -65,5 +59,13 @@ export default class InsightFacade implements IInsightFacade {
 
     public listDatasets(): Promise<InsightDataset[]> {
         return Promise.reject("Not implemented.");
+    }
+    private allWhitespaces(id: string): boolean {
+        for (let i: number = 0; i <= id.length; i++) {
+            if (id.charAt(i) !== " ") {
+                return false;
+            }
+        }
+        return true;
     }
 }
