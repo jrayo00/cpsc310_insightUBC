@@ -17,4 +17,9 @@ export class Section {
     constructor() {
         // Log.trace("Section::init()");
     }
+
+    public validateKeys(): boolean{
+        const allTheValues = Object.values(this.info);
+        return true;
+    }
 }

@@ -4,6 +4,7 @@ import {Section} from "./Section";
 export class Dataset {
     public allSections: Section[] = [];
     public name: string;
+    public numRows: number = 0;
     constructor(id: string) {
         Log.trace("Dataset::init()");
         this.name = id;
@@ -26,7 +27,10 @@ export class Dataset {
                 newSection.info.Audit = item.Audit;
                 newSection.info.id = item.id;
                 newSection.info.Year = item.Year;
-                this.allSections.push(newSection);
+                if (newSection.validateKeys()) {
+                    this.allSections.push(newSection);
+                    this.numRows++;
+                }
             }
         } catch (err) {
             throw new SyntaxError("invalid JSON");

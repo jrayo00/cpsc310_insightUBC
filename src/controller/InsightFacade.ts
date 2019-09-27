@@ -12,8 +12,8 @@ import {JSZipObject} from "jszip";
  */
 export default class InsightFacade implements IInsightFacade {
 
-    protected datasets: Dataset[] = new Array();
-    protected datasetsString: string[] = new Array();
+    public datasets: Dataset[] = new Array();
+    public datasetsString: string[] = new Array();
 
     constructor() {
         Log.trace("InsightFacadeImpl::init()");
@@ -38,26 +38,30 @@ export default class InsightFacade implements IInsightFacade {
             return Promise.reject(new InsightError("id cannot be all whitespaces"));
         }
         // read a zip file
+        let a: Dataset[] = this.datasets;
         JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
             let newDataset: Dataset = new Dataset(id);
+            const promises: Array<Promise<void>> = [];
             zip.folder(id).forEach(function (relativePath, currentFile) {
-                currentFile.async("text").then(function (data: string) {
+                promises.push (currentFile.async("text").then(function (data: string) {
                     newDataset.parseData(data);
                 }).catch((err: any) => {
                     Log.error("error thrown, file not valid JSON!");
-                });
+                }));
             });
-            this.datasets.push(newDataset);
-            this.datasetsString.push(id);
-            Log.test(this.datasetsString);
-            Log.test("Got here");
+            Promise.all(promises).then(function () {
+                a.push(newDataset);
+                // this.datasetsString.push(id);
+                // Log.test(this.datasetsString);
+                Log.test("Got here");
 
-            //Write to file only after all promises have been resolved
-            fs.writeFile("test.txt", JSON.stringify(this.datasets), (err) => {
-                if (err) throw err;
-                Log.test("The file has been saved!");
+                // Write to file only after all promises have been resolved
+                fs.writeFile("test.txt", JSON.stringify(a), (err) => {
+                    if (err) throw err;
+                    Log.test("The file has been saved!");
+                });
+                return Promise.resolve();
             });
-            return Promise.resolve(this.datasetsString);
         }).catch((err: any) => {
                 Log.error("error thrown !");
                 return Promise.reject(new InsightError("invalid zip file"));
