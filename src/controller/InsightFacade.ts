@@ -57,8 +57,8 @@ export default class InsightFacade implements IInsightFacade {
                 datasetsReference.push(newDataset);
                 // this.datasetsString.push(id);
                 // Log.test(this.datasetsString);
-                Log.test("Got here");
-                Log.test(JSON.stringify(datasetsReference));
+                // Log.test("Got here");
+                // Log.test(JSON.stringify(datasetsReference));
                 // Write to file only after all promises have been resolved
                 fs.writeFile("test.txt", JSON.stringify(datasetsReference), (err) => {
                     if (err) {throw err; }
