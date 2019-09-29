@@ -399,20 +399,21 @@ describe("InsightFacade list Datasets", function () {
     });
     it("Should list all the data sets currently added", function () {
         const id: string = "courses";
-        insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
-
-        return insightFacade.listDatasets().then((result: InsightDataset[]) => {
-            expect(result[0]).to.deep.equal(insightFacade);
-            expect(result[0].kind).to.equal(InsightDatasetKind.Courses);
-            expect(result[0].numRows).to.equal(64612);
-        }).catch((err: any) => {
-            expect.fail(err, insightFacade, "Should not have rejected");
+        insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((tmp: string[]) => {
+            return insightFacade.listDatasets().then((result: InsightDataset[]) => {
+                expect(result[0]).to.deep.equal(id);
+                expect(result[0].kind).to.equal(InsightDatasetKind.Courses);
+                expect(result[0].numRows).to.equal(64612);
+            }).catch((err: any) => {
+                expect.fail(err, insightFacade, "Should not have rejected");
+            });
         });
     });
 
     it("Should fulfill even with empty dataset", function () {
+        let expected: InsightDataset[] = [];
         return insightFacade.listDatasets().then((result: InsightDataset[]) => {
-            expect(result[0]).to.deep.equal(null);
+            expect(result).to.deep.equal(expected);
         }).catch((err: any) => {
             expect.fail(err, insightFacade, "Should not have rejected");
         });
