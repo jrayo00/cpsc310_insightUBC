@@ -60,7 +60,7 @@ export default class InsightFacade implements IInsightFacade {
                 // Log.test("Got here");
                 // Log.test(JSON.stringify(datasetsReference));
                 // Write to file only after all promises have been resolved
-                fs.writeFile("test.txt", JSON.stringify(datasetsReference), (err) => {
+                fs.writeFile(id + ".txt", JSON.stringify(datasetsReference), (err) => {
                     if (err) {throw err; }
                     Log.test("The file has been saved!");
                 });
