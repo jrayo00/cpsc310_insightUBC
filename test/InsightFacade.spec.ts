@@ -73,7 +73,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     // });
 
     it("Should add a valid dataset", function () {
-        const id: string = "coursestxt";
+        const id: string = "courses";
         const expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
             expect(result).to.deep.equal(expected);
