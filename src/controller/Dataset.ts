@@ -30,6 +30,9 @@ export class Dataset implements InsightDataset {
                 newSection.info.audit = item.Audit;
                 newSection.info.uuid = item.id;
                 newSection.info.year = item.Year;
+                if (item.Section === "overall") {
+                    newSection.info.year = 1900;
+                }
                 if (newSection.validateKeys()) {
                     this.allSections.push(newSection);
                     this.numRows++;
