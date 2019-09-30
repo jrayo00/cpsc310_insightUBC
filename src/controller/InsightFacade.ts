@@ -42,10 +42,12 @@ export default class InsightFacade implements IInsightFacade {
                 promises.push (currentFile.async("text").then(function (data: string) {
                     if (kind === InsightDatasetKind.Courses) {
                         newDataset.parseDataCourses(data);
+                    } else if (kind === InsightDatasetKind.Rooms) {
+                        return Promise.reject("Not Implemented");
                     }
                 }).catch((err: any) => {
                     Log.error("error thrown, file not valid JSON!");
-                    Promise.reject(new InsightError("invalid file"));
+                    // Promise.reject(new InsightError("invalid file"));
                 }));
             });
             return Promise.all(promises).then(function () {
@@ -56,10 +58,14 @@ export default class InsightFacade implements IInsightFacade {
                     return Promise.reject(new InsightError("No valid sections were found in given zip"));
                 }
                 // Write to file only after all promises have been resolved
-                fs.writeFile(id + ".txt", JSON.stringify(datasetsReference), (err) => {
-                    if (err) {throw err; }
-                    Log.test("The file has been saved!");
-                });
+                try {
+                    fs.writeFile(id + ".txt", JSON.stringify(datasetsReference), (err) => {
+                        if (err) {throw err; }
+                        Log.test("The file has been saved!");
+                    });
+                } catch (err) {
+                    Log.error("Error in creating file");
+                }
                 return Promise.resolve(datasetsStringReference);
             }).catch(() => {
                 return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
