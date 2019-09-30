@@ -114,6 +114,7 @@ export default class InsightFacade implements IInsightFacade {
             }
             counter++;
         }
+        return Promise.reject();
     }
 
     public performQuery(query: any): Promise <any[]> {
