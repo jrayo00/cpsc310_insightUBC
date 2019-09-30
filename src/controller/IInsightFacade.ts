@@ -93,7 +93,7 @@ export interface IInsightFacade {
      * If a query is incorrectly formatted, references a dataset not added (in memory or on disk),
      * or references multiple datasets, it should be rejected.
      *
-     * @return Promise <any[]>
+     * @return Promise <any[]>rejected
      *
      * The promise should fulfill with an array of results.
      * The promise should reject with an InsightError describing the error.

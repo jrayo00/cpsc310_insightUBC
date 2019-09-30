@@ -38,10 +38,11 @@ export default class InsightFacade implements IInsightFacade {
             return Promise.reject(new InsightError("id cannot be all whitespaces"));
         }
         // read a zip file
+        let datasetsReference: Dataset[] = this.datasets;
         let a: Dataset[] = this.datasets;
         let b: string[] = this.datasetsString;
-        JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
-            let newDataset: Dataset = new Dataset(id);
+        return JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
+            let newDataset: Dataset = new Dataset(id, kind);
             const promises: Array<Promise<void>> = [];
             zip.folder(id).forEach(function (relativePath, currentFile) {
                 promises.push (currentFile.async("text").then(function (data: string) {
@@ -50,16 +51,17 @@ export default class InsightFacade implements IInsightFacade {
                     Log.error("error thrown, file not valid JSON!");
                 }));
             });
-            Promise.all(promises).then(function () {
+            return Promise.all(promises).then(function () {
                 a.push(newDataset);
                 b.push(id);
+                datasetsReference.push(newDataset);
+                // this.datasetsString.push(id);
                 // Log.test(this.datasetsString);
-                Log.test("Got here");
-                // Log.test(JSON.stringify(a));
-                //TODO: fix writing to file bug
+                // Log.test("Got here");
+                // Log.test(JSON.stringify(datasetsReference));
                 // Write to file only after all promises have been resolved
-                fs.writeFile("test.txt", JSON.stringify(a), (err) => {
-                    if (err) throw err;
+                fs.writeFile(id + ".txt", JSON.stringify(datasetsReference), (err) => {
+                    if (err) {throw err; }
                     Log.test("The file has been saved!");
                 });
                 return Promise.resolve(b);
@@ -79,7 +81,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public listDatasets(): Promise<InsightDataset[]> {
-        return Promise.reject("Not implemented.");
+        return Promise.resolve(this.datasets);
     }
     private allWhitespaces(id: string): boolean {
         for (let i: number = 0; i <= id.length; i++) {

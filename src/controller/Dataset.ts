@@ -1,13 +1,16 @@
 import Log from "../Util";
 import {Section} from "./Section";
+import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
 
-export class Dataset {
+export class Dataset implements InsightDataset {
     public allSections: Section[] = [];
-    public name: string;
+    public id: string;
     public numRows: number = 0;
-    constructor(id: string) {
+    public kind: InsightDatasetKind;
+    constructor(id: string, datasetType: InsightDatasetKind) {
         Log.trace("Dataset::init()");
-        this.name = id;
+        this.id = id;
+        this.kind = datasetType;
     }
 
     public parseData(data: string) {
@@ -17,16 +20,16 @@ export class Dataset {
             for (let item of obj.result) {
                 // iterate through result array and get the key value pairs
                 let newSection: Section = new Section();
-                newSection.info.Subject = item.Subject;
-                newSection.info.Course = item.Course;
-                newSection.info.Avg = item.Avg;
-                newSection.info.Professor = item.Professor;
-                newSection.info.Title = item.Title;
-                newSection.info.Pass = item.Pass;
-                newSection.info.Fail = item.Fail;
-                newSection.info.Audit = item.Audit;
-                newSection.info.id = item.id;
-                newSection.info.Year = item.Year;
+                newSection.info.dept = item.Subject;
+                newSection.info.id = item.Course;
+                newSection.info.avg = item.Avg;
+                newSection.info.instructor = item.Professor;
+                newSection.info.title = item.Title;
+                newSection.info.pass = item.Pass;
+                newSection.info.fail = item.Fail;
+                newSection.info.audit = item.Audit;
+                newSection.info.uuid = item.id;
+                newSection.info.year = item.Year;
                 if (newSection.validateKeys()) {
                     this.allSections.push(newSection);
                     this.numRows++;
