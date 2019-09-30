@@ -47,7 +47,7 @@ export class Dataset implements InsightDataset {
 
     public writeToFile() {
         try {
-            fs.writeFile(this.id + ".txt", JSON.stringify(this), (err) => {
+            fs.writeFile("data/" + this.id + ".txt", JSON.stringify(this), (err) => {
                 if (err) {throw err; }
                 Log.test("The file has been saved!");
             });

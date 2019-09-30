@@ -44,6 +44,8 @@ export default class InsightFacade implements IInsightFacade {
                         newDataset.parseDataCourses(data);
                     } else if (kind === InsightDatasetKind.Rooms) {
                         return Promise.reject("Not Implemented");
+                    } else {
+                        return Promise.reject(new InsightError("Invalid kind given: " + kind));
                     }
                 }).catch((err: any) => {
                     Log.error("error thrown, file not valid JSON!");
