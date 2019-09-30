@@ -4,7 +4,6 @@ import * as JSZip from "jszip";
 import {Dataset} from "./Dataset";
 import * as fs from "fs";
 
-
 /**
  * This is the main programmatic entry point for the project.
  * Method documentation is in IInsightFacade
