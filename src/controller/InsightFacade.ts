@@ -40,12 +40,10 @@ export default class InsightFacade implements IInsightFacade {
         return JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
             let newDataset: Dataset = new Dataset(id, kind);
             const promises: Array<Promise<void>> = [];
-            zip.folder(id).forEach(function (relativePath, currentFile) {
+            zip.folder("courses").forEach(function (relativePath, currentFile) {
                 promises.push (currentFile.async("text").then(function (data: string) {
                     if (kind === InsightDatasetKind.Courses) {
                         newDataset.parseDataCourses(data);
-                    } else {
-                        return Promise.reject(new InsightError("Invalid kind given: " + kind));
                     }
                 }).catch((err: any) => {
                     Log.error("error thrown, file not valid JSON!");
@@ -60,8 +58,11 @@ export default class InsightFacade implements IInsightFacade {
                     return Promise.reject(new InsightError("No valid sections were found in given zip"));
                 }
                 // Write to file only after all promises have been resolved
-                newDataset.writeToFile();
-                return Promise.resolve(datasetsStringReference);
+                return newDataset.writeToFile().then(() => {
+                    return Promise.resolve(datasetsStringReference);
+                }).catch((err: any) => {
+                    return Promise.reject(new InsightError("Could not write dataset to disk"));
+                });
             }).catch((err: any) => {
                 return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
             });

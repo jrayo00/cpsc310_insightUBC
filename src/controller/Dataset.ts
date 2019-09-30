@@ -45,14 +45,19 @@ export class Dataset implements InsightDataset {
         // Log.test("STOP");
     }
 
-    public writeToFile() {
-        try {
-            fs.writeFile(__dirname + "/../../data/" + this.id + ".txt", JSON.stringify(this), (err) => {
-                if (err) {throw err; }
-                Log.test("The file has been saved!");
-            });
+    public writeToFile(): Promise<any> {
+            try {
+                 const myNewPromise = new Promise((resolve, reject) => {
+                    fs.writeFile(__dirname + "/../../data/" + this.id + ".txt", JSON.stringify(this),  (err) => {
+                        if (err) {throw err; }
+                        Log.test("The file has been saved!");
+                        return Promise.resolve();
+                    });
+                });
+                return myNewPromise;
         } catch (err) {
             Log.error("Error in creating file");
+            Promise.reject();
         }
     }
 }
