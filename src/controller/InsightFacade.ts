@@ -61,6 +61,8 @@ export default class InsightFacade implements IInsightFacade {
                     Log.test("The file has been saved!");
                 });
                 return Promise.resolve(datasetsStringReference);
+            }).catch(() => {
+                return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
             });
         }).catch((err: any) => {
                 Log.error("error thrown !");
