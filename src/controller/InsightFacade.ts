@@ -59,7 +59,7 @@ export default class InsightFacade implements IInsightFacade {
                 // Write to file only after all promises have been resolved
                 newDataset.writeToFile();
                 return Promise.resolve(datasetsStringReference);
-            }).catch(() => {
+            }).catch((err: any) => {
                 return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
             });
         }).catch((err: any) => {
