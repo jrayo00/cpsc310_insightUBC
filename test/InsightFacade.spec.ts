@@ -76,6 +76,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         const id: string = "coursestxt";
         const expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            Log.test("got here123");
             expect(result).to.deep.equal(expected);
         }).catch((err: any) => {
             expect.fail(err, expected, "Should not have rejected");

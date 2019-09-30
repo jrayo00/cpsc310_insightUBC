@@ -39,6 +39,7 @@ export default class InsightFacade implements IInsightFacade {
         }
         // read a zip file
         let a: Dataset[] = this.datasets;
+        let b: string[] = this.datasetsString;
         JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
             let newDataset: Dataset = new Dataset(id);
             const promises: Array<Promise<void>> = [];
@@ -51,17 +52,17 @@ export default class InsightFacade implements IInsightFacade {
             });
             Promise.all(promises).then(function () {
                 a.push(newDataset);
-                // this.datasetsString.push(id);
+                b.push(id);
                 // Log.test(this.datasetsString);
                 Log.test("Got here");
-                Log.test(JSON.stringify(a));
+                // Log.test(JSON.stringify(a));
                 //TODO: fix writing to file bug
                 // Write to file only after all promises have been resolved
                 fs.writeFile("test.txt", JSON.stringify(a), (err) => {
                     if (err) throw err;
                     Log.test("The file has been saved!");
-                    return Promise.resolve();
                 });
+                return Promise.resolve(b);
             });
         }).catch((err: any) => {
                 Log.error("error thrown !");
