@@ -72,16 +72,16 @@ describe("InsightFacade Add/Remove Dataset", function () {
     //     });
     // });
 
-    // it("Should add a valid dataset", function () {
-    //     const id: string = "courses";
-    //     const expected: string[] = [id];
-    //     return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
-    //         Log.test("got here123");
-    //         expect(result).to.deep.equal(expected);
-    //     }).catch((err: any) => {
-    //         expect.fail(err, expected, "Should not have rejected");
-    //     });
-    // });
+    it("Should add a valid dataset", function () {
+        const id: string = "courses";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            Log.test("got here123");
+            expect(result).to.deep.equal(expected);
+        }).catch((err: any) => {
+            expect.fail(err, expected, "Should not have rejected");
+        });
+    });
     it("Should add a valid dataset with invalid sections", function () {
         const id: string = "invalidsections";
         const expected: string[] = [id];
