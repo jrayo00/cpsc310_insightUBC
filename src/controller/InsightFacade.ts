@@ -2,7 +2,6 @@ import Log from "../Util";
 import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
 import * as JSZip from "jszip";
 import {Dataset} from "./Dataset";
-import * as fs from "fs";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -32,6 +31,9 @@ export default class InsightFacade implements IInsightFacade {
         if (this.allWhitespaces(id)) {
             return Promise.reject(new InsightError("id cannot be all whitespaces"));
         }
+        if (kind === InsightDatasetKind.Rooms) {
+            return Promise.reject("Not implemented");
+        }
         // read a zip file
         let datasetsReference: Dataset[] = this.datasets;
         let datasetsStringReference: string[] = this.datasetsString;
@@ -42,13 +44,12 @@ export default class InsightFacade implements IInsightFacade {
                 promises.push (currentFile.async("text").then(function (data: string) {
                     if (kind === InsightDatasetKind.Courses) {
                         newDataset.parseDataCourses(data);
-                    } else if (kind === InsightDatasetKind.Rooms) {
-                        return Promise.reject("Not Implemented");
                     } else {
                         return Promise.reject(new InsightError("Invalid kind given: " + kind));
                     }
                 }).catch((err: any) => {
                     Log.error("error thrown, file not valid JSON!");
+                   // Promise.reject("Not valid json");
                 }));
             });
             return Promise.all(promises).then(function () {
