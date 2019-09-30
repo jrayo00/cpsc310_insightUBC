@@ -45,6 +45,7 @@ export default class InsightFacade implements IInsightFacade {
                     }
                 }).catch((err: any) => {
                     Log.error("error thrown, file not valid JSON!");
+                    Promise.reject(new InsightError("invalid file"));
                 }));
             });
             return Promise.all(promises).then(function () {
