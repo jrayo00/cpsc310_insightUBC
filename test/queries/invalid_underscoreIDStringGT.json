@@ -1,0 +1,19 @@
+{
+    "title": "Invalid query: Underscore in the idstring of Mkey in GT.",
+    "query": {
+        "WHERE": {
+            "GT": {
+                "_courses_avg": 95
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

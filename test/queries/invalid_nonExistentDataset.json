@@ -1,0 +1,17 @@
+{
+    "title": "Invalid query: Referenced dataset 'rooms' not added yet.",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "rooms_id": "300"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "rooms_id"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

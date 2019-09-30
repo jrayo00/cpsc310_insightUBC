@@ -1,0 +1,19 @@
+{
+    "title": "Invalid query: Number for string in IS.",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_dept": 0
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

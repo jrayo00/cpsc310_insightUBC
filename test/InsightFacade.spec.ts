@@ -1,6 +1,9 @@
 import { expect } from "chai";
 import * as fs from "fs-extra";
 import {InsightDatasetKind} from "../src/controller/IInsightFacade";
+import {InsightError} from "../src/controller/IInsightFacade";
+import {NotFoundError} from "../src/controller/IInsightFacade";
+import {InsightDataset} from "../src/controller/IInsightFacade";
 import InsightFacade from "../src/controller/InsightFacade";
 import Log from "../src/Util";
 import TestUtil from "./TestUtil";
@@ -20,6 +23,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
     // automatically be loaded in the 'before' hook.
     const datasetsToLoad: { [id: string]: string } = {
         courses: "./test/data/courses.zip",
+        invalid: "./test/data/invalid.zip",
     };
     let datasets: { [id: string]: string } = {};
     let insightFacade: InsightFacade;
@@ -66,8 +70,123 @@ describe("InsightFacade Add/Remove Dataset", function () {
         });
 
     });
+
+    // TODO: Add more unit tests
+    it("Should reject when adding a dataset with a whitespace id", function () {
+        const id: string = " ";
+        const content = datasets["courses"];
+        const expected = InsightError;
+        return insightFacade.addDataset(id, content, InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, new InsightError(), "Should not have accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(expected);
+        });
+    });
+
+    it("Should reject when adding a dataset with an id that contains an underscore", function () {
+        const id: string = "courses_";
+        const dataset = datasets["courses"];
+        const expected = InsightError;
+        return insightFacade.addDataset(id, dataset, InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, new InsightError(), "Should not have accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(expected);
+        });
+    });
+
+    it("Should reject when adding a dataset with an invalid file path", function () {
+        const id: string = "courses";
+        const expected = InsightError;
+        return insightFacade.addDataset(id, " ", InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, new InsightError(), "Should not have accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(expected);
+        });
+    });
+
+    it("Should reject when adding a dataset with a zip file with no valid course", function () {
+        const id: string = "courses";
+        const dataset = datasets["invalid"];
+        const expected = InsightError;
+        return insightFacade.addDataset(id, dataset, InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, new InsightError(), "Should not have accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(expected);
+        });
+    });
+
+    it("Should reject when adding a dataset with a duplicated name", function () {
+        const id: string = "courses";
+        const dataset = datasets["courses"];
+        const expected = InsightError;
+        // Add the same dataset twice
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
+        }).then((result: string[]) => {
+            expect.fail(result, new InsightError(), "Should not have accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(expected);
+        });
+    });
+
+    // Tests for RemoveDataset()
+    it("Should remove a valid dataset", function () {
+        const id: string = "courses";
+        const expected: string = id;
+        // Add the dataset, and then remove it
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            return insightFacade.removeDataset(id);
+        }).then((result: string) => {
+            expect(result).to.deep.equal(expected);
+        }).catch((err: any) => {
+            expect.fail(err, expected, "Should not have rejected");
+        });
+    });
+
+    it("Should reject when removing a non-existent dataset", function () {
+        const id: string = "courses";
+        const expected = NotFoundError;
+        return insightFacade.removeDataset(id).then((result: string) => {
+            expect.fail(result, new NotFoundError(), "Should not have accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(expected);
+        });
+    });
+
+    it("Should reject when removing a dataset with an invalid id", function () {
+        const id: string = "courses_";
+        const expected = InsightError;
+        return insightFacade.removeDataset(id).then((result: string) => {
+            expect.fail(result, new InsightError(), "Should not have accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(expected);
+        });
+    });
+
+    // Tests for listDatasets()
+    it("Should return an empty array", function () {
+        let expected: InsightDataset[];
+        return insightFacade.listDatasets().then((result: InsightDataset[]) => {
+            expect(result).to.deep.equal(expected);
+        }).catch((err: any) => {
+            expect.fail(err, expected, "Should not have rejected");
+        });
+    });
+
+    it("Should return the id of the first dataset on the returned array", function () {
+        const id: string = "courses";
+        // Add a dataset, and then retrieve the list
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            return insightFacade.listDatasets();
+        }).then((result: InsightDataset[]) => {
+            expect(result.pop().id).to.deep.equal(id);
+        }).catch((err: any) => {
+            expect.fail(err, id, "Should not have rejected");
+        });
+    });
 });
 
+// TODO: Add more .json query files
 /*
  * This test suite dynamically generates tests from the JSON files in test/queries.
  * You should not need to modify it; instead, add additional files to the queries directory.
@@ -77,7 +196,7 @@ describe("InsightFacade PerformQuery", () => {
     const datasetsToQuery: { [id: string]: any } = {
         courses: {id: "courses", path: "./test/data/courses.zip", kind: InsightDatasetKind.Courses},
     };
-    let insightFacade: InsightFacade;
+    let insightFacade: InsightFacade = new InsightFacade();
     let testQueries: ITestQuery[] = [];
 
     // Load all the test queries, and call addDataset on the insightFacade instance for all the datasets
@@ -95,7 +214,6 @@ describe("InsightFacade PerformQuery", () => {
         // Load the datasets specified in datasetsToQuery and add them to InsightFacade.
         // Will fail* if there is a problem reading ANY dataset.
         const loadDatasetPromises: Array<Promise<string[]>> = [];
-        insightFacade = new InsightFacade();
         for (const key of Object.keys(datasetsToQuery)) {
             const ds = datasetsToQuery[key];
             const data = fs.readFileSync(ds.path).toString("base64");

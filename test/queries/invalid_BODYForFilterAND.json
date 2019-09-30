@@ -1,0 +1,21 @@
+{
+    "title": "Invalid query: Non-filter field in AND.",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "WHERE": {}
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

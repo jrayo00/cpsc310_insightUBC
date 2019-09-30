@@ -1,0 +1,18 @@
+{
+    "title": "Invalid query: Semantic checking, keys in WHERE are from multiple datasets.",
+    "query": {
+        "WHERE": {
+            "GT": {
+                "*_avg": 99.5
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

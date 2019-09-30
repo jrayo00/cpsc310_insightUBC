@@ -1,0 +1,19 @@
+{
+    "title": "Invalid query: Asterisk in the inputstring of IS.",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_dept": "c**c"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

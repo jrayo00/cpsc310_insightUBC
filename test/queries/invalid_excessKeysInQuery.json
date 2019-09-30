@@ -1,0 +1,21 @@
+{
+    "title": "Invalid query: Excess keys in QUERY.",
+    "query": {
+        "WHERE": {
+            "GT": {
+                "courses_avg": 99.5
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        },
+        "GT": {
+            "courses_avg": 99.5
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}
