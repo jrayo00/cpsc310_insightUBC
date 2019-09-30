@@ -47,7 +47,6 @@ export default class InsightFacade implements IInsightFacade {
                     }
                 }).catch((err: any) => {
                     Log.error("error thrown, file not valid JSON!");
-                    // Promise.reject(new InsightError("invalid file"));
                 }));
             });
             return Promise.all(promises).then(function () {
@@ -58,14 +57,7 @@ export default class InsightFacade implements IInsightFacade {
                     return Promise.reject(new InsightError("No valid sections were found in given zip"));
                 }
                 // Write to file only after all promises have been resolved
-                try {
-                    fs.writeFile(id + ".txt", JSON.stringify(datasetsReference), (err) => {
-                        if (err) {throw err; }
-                        Log.test("The file has been saved!");
-                    });
-                } catch (err) {
-                    Log.error("Error in creating file");
-                }
+                newDataset.writeToFile();
                 return Promise.resolve(datasetsStringReference);
             }).catch(() => {
                 return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));

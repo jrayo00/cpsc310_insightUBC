@@ -1,6 +1,7 @@
 import Log from "../Util";
 import {Section} from "./Section";
 import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
+import * as fs from "fs";
 
 export class Dataset implements InsightDataset {
     public allSections: Section[] = [];
@@ -42,5 +43,16 @@ export class Dataset implements InsightDataset {
             throw new SyntaxError("invalid JSON");
         }
         // Log.test("STOP");
+    }
+
+    public writeToFile() {
+        try {
+            fs.writeFile(this.id + ".txt", JSON.stringify(this), (err) => {
+                if (err) {throw err; }
+                Log.test("The file has been saved!");
+            });
+        } catch (err) {
+            Log.error("Error in creating file");
+        }
     }
 }
