@@ -106,11 +106,12 @@ describe("InsightFacade Add/Remove Dataset", function () {
         const id: string = "courses";
         const expected: string[] = [id];
         // Adding dataset the first time
-        insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
-        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
-            expect.fail(result, expected, "Should not have been accepted");
-        }).catch((err: any) => {
-            expect(err).to.be.instanceOf(InsightError);
+        insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then(() => {
+            return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+                expect.fail(result, expected, "Should not have been accepted");
+            }).catch((err: any) => {
+                expect(err).to.be.instanceOf(InsightError);
+            });
         });
     });
 
@@ -223,11 +224,12 @@ describe("InsightFacade Add/Remove Dataset", function () {
     it("Should remove a valid dataset", function () {
         const id: string = "courses2";
         const expected: string = id;
-        insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses);
-        return insightFacade.removeDataset(id).then((result: string) => {
-            expect(result).to.deep.equal(expected);
-        }).catch((err: any) => {
-            expect.fail(err, expected, "Should not have rejected");
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then(() => {
+            insightFacade.removeDataset(id).then((result: string) => {
+                expect(result).to.deep.equal(expected);
+            }).catch((err: any) => {
+                expect.fail(err, expected, "Should not have rejected");
+            });
         });
     });
 

@@ -1,9 +1,9 @@
 import Log from "../Util";
-import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
+import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
 import * as JSZip from "jszip";
 import {Dataset} from "./Dataset";
 import * as fs from "fs";
-import {JSZipObject} from "jszip";
+
 
 /**
  * This is the main programmatic entry point for the project.
@@ -20,18 +20,14 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-        // TODO: refactor cases below
-        if (id === null || id === undefined) {
-            return Promise.reject(new InsightError("id cannot be null or undefined"));
+        if (!this.verifyParameters(id, content, kind)) {
+            return Promise.reject(new InsightError("addDataset parameters cannot be null or undefined"));
         }
-        if (content === null || content === undefined) {
-            return Promise.reject(new InsightError("content cannot be null or undefined"));
-        }
-        if (kind === null || kind === undefined) {
-            return Promise.reject(new InsightError("kind cannot be null or undefined"));
-        }
-        if (id.includes("_")) {
+        if (this.idContainsUnderscore(id)) {
             return Promise.reject(new InsightError("id cannot contain underscore(s)"));
+        }
+        if (this.datasetsString.includes(id)) {
+            return Promise.reject(new InsightError("dataset with id: " + id + "already exists"));
         }
         // Test if given id is all whitespaces
         if (this.allWhitespaces(id)) {
@@ -39,32 +35,32 @@ export default class InsightFacade implements IInsightFacade {
         }
         // read a zip file
         let datasetsReference: Dataset[] = this.datasets;
-        let a: Dataset[] = this.datasets;
-        let b: string[] = this.datasetsString;
+        let datasetsStringReference: string[] = this.datasetsString;
         return JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
             let newDataset: Dataset = new Dataset(id, kind);
             const promises: Array<Promise<void>> = [];
             zip.folder(id).forEach(function (relativePath, currentFile) {
                 promises.push (currentFile.async("text").then(function (data: string) {
-                    newDataset.parseData(data);
+                    if (kind === InsightDatasetKind.Courses) {
+                        newDataset.parseDataCourses(data);
+                    }
                 }).catch((err: any) => {
                     Log.error("error thrown, file not valid JSON!");
                 }));
             });
             return Promise.all(promises).then(function () {
-                a.push(newDataset);
-                b.push(id);
-                datasetsReference.push(newDataset);
-                // this.datasetsString.push(id);
-                // Log.test(this.datasetsString);
-                // Log.test("Got here");
-                // Log.test(JSON.stringify(datasetsReference));
+                if (newDataset.numRows > 0) {
+                    datasetsStringReference.push(id);
+                    datasetsReference.push(newDataset);
+                } else {
+                    return Promise.reject(new InsightError("No valid sections were found in given zip"));
+                }
                 // Write to file only after all promises have been resolved
                 fs.writeFile(id + ".txt", JSON.stringify(datasetsReference), (err) => {
                     if (err) {throw err; }
                     Log.test("The file has been saved!");
                 });
-                return Promise.resolve(b);
+                return Promise.resolve(datasetsStringReference);
             });
         }).catch((err: any) => {
                 Log.error("error thrown !");
@@ -72,8 +68,48 @@ export default class InsightFacade implements IInsightFacade {
         });
     }
 
+    private idContainsUnderscore(id: string) {
+        return id.includes("_");
+    }
+
+    private verifyParameters(id: string, content: string, kind: InsightDatasetKind): boolean {
+        if (id === null || id === undefined) {
+            return false;
+        }
+        if (content === null || content === undefined) {
+            return false;
+        }
+        if (kind === null || kind === undefined) {
+            return false;
+        }
+
+        return true;
+    }
+
     public removeDataset(id: string): Promise<string> {
-        return Promise.reject("Not implemented.");
+        if (id == null) {
+            return Promise.reject(new InsightError("id cannot be null or undefined"));
+        }
+        if (this.idContainsUnderscore(id)) {
+            return Promise.reject(new InsightError("id cannot contain underscore(s)"));
+        }
+        // Test if given id is all whitespaces
+        if (this.allWhitespaces(id)) {
+            return Promise.reject(new InsightError("id cannot be all whitespaces"));
+        }
+        if (!this.datasetsString.includes(id)) {
+            return Promise.reject(new NotFoundError("dataset with id: " + id + "has not yet been added"));
+        }
+        let counter: number = 0;
+        for (let dataset of this.datasets) {
+            if (dataset.id === id) {
+                this.datasets.slice(counter, 1);
+                let index: number = this.datasetsString.indexOf(id);
+                this.datasetsString.splice(index, 1);
+                return Promise.resolve(id);
+            }
+            counter++;
+        }
     }
 
     public performQuery(query: any): Promise <any[]> {
@@ -84,11 +120,12 @@ export default class InsightFacade implements IInsightFacade {
         return Promise.resolve(this.datasets);
     }
     private allWhitespaces(id: string): boolean {
-        for (let i: number = 0; i <= id.length; i++) {
+        for (let i: number = 0; i < id.length; i++) {
             if (id.charAt(i) !== " ") {
                 return false;
             }
         }
         return true;
     }
+
 }

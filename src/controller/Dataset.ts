@@ -13,7 +13,7 @@ export class Dataset implements InsightDataset {
         this.kind = datasetType;
     }
 
-    public parseData(data: string) {
+    public parseDataCourses(data: string) {
         try {
             let obj = JSON.parse(data);
             // Log.test(obj.result.length);
