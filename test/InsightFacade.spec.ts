@@ -92,7 +92,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         });
     });
 
-    it("Should add a valid dataset: testing Rooms dataset kind", function () {
+    it("Should not add a valid dataset: testing Rooms dataset kind", function () {
         const id: string = "courses2";
         const expected: string[] = [id];
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms).then((result: string[]) => {
