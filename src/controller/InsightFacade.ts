@@ -70,7 +70,6 @@ export default class InsightFacade implements IInsightFacade {
         }).catch((err: any) => {
                 return Promise.reject(new InsightError("invalid zip file"));
         });
-        return Promise.reject(new InsightError());
     }
 
     private idContainsUnderscore(id: string) {
