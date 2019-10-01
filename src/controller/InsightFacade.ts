@@ -2,7 +2,6 @@ import Log from "../Util";
 import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
 import * as JSZip from "jszip";
 import {Dataset} from "./Dataset";
-import * as fs from "fs";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -32,19 +31,24 @@ export default class InsightFacade implements IInsightFacade {
         if (this.allWhitespaces(id)) {
             return Promise.reject(new InsightError("id cannot be all whitespaces"));
         }
-        // read a zip file
+        if (kind === InsightDatasetKind.Rooms) {
+            return Promise.reject("Not implemented");
+        }
+        // Reference variables used b/c Promise.all can't find the member variables.
         let datasetsReference: Dataset[] = this.datasets;
         let datasetsStringReference: string[] = this.datasetsString;
+        // read a zip file
         return JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
             let newDataset: Dataset = new Dataset(id, kind);
-            const promises: Array<Promise<void>> = [];
-            zip.folder(id).forEach(function (relativePath, currentFile) {
+            const promises: Array<Promise<any>> = [];
+            zip.folder("courses").forEach(function (relativePath, currentFile) {
                 promises.push (currentFile.async("text").then(function (data: string) {
                     if (kind === InsightDatasetKind.Courses) {
                         newDataset.parseDataCourses(data);
                     }
                 }).catch((err: any) => {
                     Log.error("error thrown, file not valid JSON!");
+                   // Promise.reject("Not valid json");
                 }));
             });
             return Promise.all(promises).then(function () {
@@ -55,16 +59,18 @@ export default class InsightFacade implements IInsightFacade {
                     return Promise.reject(new InsightError("No valid sections were found in given zip"));
                 }
                 // Write to file only after all promises have been resolved
-                fs.writeFile(id + ".txt", JSON.stringify(datasetsReference), (err) => {
-                    if (err) {throw err; }
-                    Log.test("The file has been saved!");
-                });
-                return Promise.resolve(datasetsStringReference);
+                if (newDataset.writeToFile()) {
+                     return Promise.resolve(datasetsStringReference);
+                 } else {
+                     return Promise.reject(new InsightError("Could not write dataset to file"));
+                 }
+            }).catch((err: any) => {
+                return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
             });
         }).catch((err: any) => {
-                Log.error("error thrown !");
                 return Promise.reject(new InsightError("invalid zip file"));
         });
+        return Promise.reject(new InsightError());
     }
 
     private idContainsUnderscore(id: string) {
@@ -109,6 +115,7 @@ export default class InsightFacade implements IInsightFacade {
             }
             counter++;
         }
+        return Promise.reject();
     }
 
     public performQuery(query: any): Promise <any[]> {

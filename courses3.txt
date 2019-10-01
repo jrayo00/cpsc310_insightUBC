@@ -1,1 +1,1 @@
-[]
+[{"allSections":[],"numRows":0,"id":"courses3","kind":"courses"},{"allSections":[],"numRows":0,"id":"courses3","kind":"courses"}]
