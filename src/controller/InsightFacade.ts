@@ -105,19 +105,12 @@ export default class InsightFacade implements IInsightFacade {
         if (!this.datasetsString.includes(id)) {
             return Promise.reject(new NotFoundError("dataset with id: " + id + "has not yet been added"));
         } else {
-            let counter: number = 0;
-            for (let dataset of this.datasets) {
-                if (dataset.id === id) {
-                    this.datasets.slice(counter, 1);
-                    let index: number = this.datasetsString.indexOf(id);
-                    this.datasetsString.splice(index, 1);
-                    this.datasets.splice(index, 1);
-                    fs.rmdirSync(__dirname + "/../../data/" + id + ".txt");
-                    return Promise.resolve(id);
-                }
-                counter++;
+            let index: number = this.datasetsString.indexOf(id);
+            this.datasetsString.splice(index, 1);
+            this.datasets.splice(index, 1);
+            fs.unlinkSync(__dirname + "/../../data/" + id + ".txt");
+            return Promise.resolve(id);
             }
-        }
     }
 
     public performQuery(query: any): Promise <any[]> {
