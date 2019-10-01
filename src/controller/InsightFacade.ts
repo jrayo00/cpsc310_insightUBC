@@ -39,7 +39,7 @@ export default class InsightFacade implements IInsightFacade {
         let datasetsStringReference: string[] = this.datasetsString;
         return JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
             let newDataset: Dataset = new Dataset(id, kind);
-            const promises: Array<Promise<void>> = [];
+            const promises: Array<Promise<any>> = [];
             zip.folder("courses").forEach(function (relativePath, currentFile) {
                 promises.push (currentFile.async("text").then(function (data: string) {
                     if (kind === InsightDatasetKind.Courses) {
@@ -50,7 +50,7 @@ export default class InsightFacade implements IInsightFacade {
                    // Promise.reject("Not valid json");
                 }));
             });
-            return Promise.all(promises).then(function () {
+            return Promise.all<Dataset[]>(promises).then(function () {
                 if (newDataset.numRows > 0) {
                     datasetsStringReference.push(id);
                     datasetsReference.push(newDataset);
@@ -58,16 +58,17 @@ export default class InsightFacade implements IInsightFacade {
                     return Promise.reject(new InsightError("No valid sections were found in given zip"));
                 }
                 // Write to file only after all promises have been resolved
-                return newDataset.writeToFile().then(() => {
-                    return Promise.resolve(datasetsStringReference);
-                }).catch((err: any) => {
-                    return Promise.reject(new InsightError("Could not write dataset to disk"));
+                return new Promise<string[]>((resolve, reject) => {
+                    return newDataset.writeToFile().then((promise: Promise<any>) => {
+                        return Promise.resolve(datasetsStringReference);
+                    }).catch((err: any) => {
+                        return Promise.reject(new InsightError("Could not write dataset to disk"));
+                    });
                 });
             }).catch((err: any) => {
                 return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
             });
         }).catch((err: any) => {
-                Log.error("error thrown !");
                 return Promise.reject(new InsightError("invalid zip file"));
         });
         return Promise.reject(new InsightError());
