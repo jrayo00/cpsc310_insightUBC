@@ -311,7 +311,7 @@ describe("InsightFacade list Datasets", function () {
         const id: string = "courses";
         return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((tmp: string[]) => {
             return insightFacade.listDatasets().then((result: InsightDataset[]) => {
-                expect(result[0]).to.deep.equal(id);
+                expect(result[0].id).to.equal(id);
                 expect(result[0].kind).to.equal(InsightDatasetKind.Courses);
                 expect(result[0].numRows).to.equal(64612);
             }).catch((err: any) => {
