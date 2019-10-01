@@ -2,6 +2,7 @@ import Log from "../Util";
 import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
 import * as JSZip from "jszip";
 import {Dataset} from "./Dataset";
+import * as fs from "fs";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -91,31 +92,32 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public removeDataset(id: string): Promise<string> {
-        // if (id == null) {
-        //     return Promise.reject(new InsightError("id cannot be null or undefined"));
-        // }
-        // if (this.idContainsUnderscore(id)) {
-        //     return Promise.reject(new InsightError("id cannot contain underscore(s)"));
-        // }
-        // // Test if given id is all whitespaces
-        // if (this.allWhitespaces(id)) {
-        //     return Promise.reject(new InsightError("id cannot be all whitespaces"));
-        // }
-        // if (!this.datasetsString.includes(id)) {
-        //     return Promise.reject(new NotFoundError("dataset with id: " + id + "has not yet been added"));
-        // }
-        // let counter: number = 0;
-        // for (let dataset of this.datasets) {
-        //     if (dataset.id === id) {
-        //         this.datasets.slice(counter, 1);
-        //         let index: number = this.datasetsString.indexOf(id);
-        //         this.datasetsString.splice(index, 1);
-        //         return Promise.resolve(id);
-        //     }
-        //     counter++;
-        // }
-        // return Promise.reject();
-        return Promise.reject("Not implemented");
+        if (id == null) {
+            return Promise.reject(new InsightError("id cannot be null or undefined"));
+        }
+        if (this.idContainsUnderscore(id)) {
+            return Promise.reject(new InsightError("id cannot contain underscore(s)"));
+        }
+        // Test if given id is all whitespaces
+        if (this.allWhitespaces(id)) {
+            return Promise.reject(new InsightError("id cannot be all whitespaces"));
+        }
+        if (!this.datasetsString.includes(id)) {
+            return Promise.reject(new NotFoundError("dataset with id: " + id + "has not yet been added"));
+        } else {
+            let counter: number = 0;
+            for (let dataset of this.datasets) {
+                if (dataset.id === id) {
+                    this.datasets.slice(counter, 1);
+                    let index: number = this.datasetsString.indexOf(id);
+                    this.datasetsString.splice(index, 1);
+                    this.datasets.splice(index, 1);
+                    fs.rmdirSync(__dirname + "/../../data/" + id + ".txt");
+                    return Promise.resolve(id);
+                }
+                counter++;
+            }
+        }
     }
 
     public performQuery(query: any): Promise <any[]> {
