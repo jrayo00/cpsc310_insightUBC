@@ -123,8 +123,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public listDatasets(): Promise<InsightDataset[]> {
-        // return Promise.resolve(this.datasets);
-        return Promise.reject("Not implemented");
+        return Promise.resolve(this.datasets);
     }
     private allWhitespaces(id: string): boolean {
         for (let i: number = 0; i < id.length; i++) {
