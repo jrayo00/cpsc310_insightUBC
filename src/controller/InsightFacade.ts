@@ -91,30 +91,31 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public removeDataset(id: string): Promise<string> {
-        if (id == null) {
-            return Promise.reject(new InsightError("id cannot be null or undefined"));
-        }
-        if (this.idContainsUnderscore(id)) {
-            return Promise.reject(new InsightError("id cannot contain underscore(s)"));
-        }
-        // Test if given id is all whitespaces
-        if (this.allWhitespaces(id)) {
-            return Promise.reject(new InsightError("id cannot be all whitespaces"));
-        }
-        if (!this.datasetsString.includes(id)) {
-            return Promise.reject(new NotFoundError("dataset with id: " + id + "has not yet been added"));
-        }
-        let counter: number = 0;
-        for (let dataset of this.datasets) {
-            if (dataset.id === id) {
-                this.datasets.slice(counter, 1);
-                let index: number = this.datasetsString.indexOf(id);
-                this.datasetsString.splice(index, 1);
-                return Promise.resolve(id);
-            }
-            counter++;
-        }
-        return Promise.reject();
+        // if (id == null) {
+        //     return Promise.reject(new InsightError("id cannot be null or undefined"));
+        // }
+        // if (this.idContainsUnderscore(id)) {
+        //     return Promise.reject(new InsightError("id cannot contain underscore(s)"));
+        // }
+        // // Test if given id is all whitespaces
+        // if (this.allWhitespaces(id)) {
+        //     return Promise.reject(new InsightError("id cannot be all whitespaces"));
+        // }
+        // if (!this.datasetsString.includes(id)) {
+        //     return Promise.reject(new NotFoundError("dataset with id: " + id + "has not yet been added"));
+        // }
+        // let counter: number = 0;
+        // for (let dataset of this.datasets) {
+        //     if (dataset.id === id) {
+        //         this.datasets.slice(counter, 1);
+        //         let index: number = this.datasetsString.indexOf(id);
+        //         this.datasetsString.splice(index, 1);
+        //         return Promise.resolve(id);
+        //     }
+        //     counter++;
+        // }
+        // return Promise.reject();
+        return Promise.reject("Not implemented");
     }
 
     public performQuery(query: any): Promise <any[]> {
@@ -122,7 +123,8 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public listDatasets(): Promise<InsightDataset[]> {
-        return Promise.resolve(this.datasets);
+        // return Promise.resolve(this.datasets);
+        return Promise.reject("Not implemented");
     }
     private allWhitespaces(id: string): boolean {
         for (let i: number = 0; i < id.length; i++) {
