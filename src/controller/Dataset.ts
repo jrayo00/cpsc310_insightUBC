@@ -45,20 +45,14 @@ export class Dataset implements InsightDataset {
         // Log.test("STOP");
     }
 
-    public writeToFile(): Promise<any> {
-            try {const promises: Array<Promise<any>> = [];
-                 const myNewPromise = new Promise((resolve, reject) => {
-                     fs.writeFileSync(__dirname + "/../../data/" + this.id + ".txt", JSON.stringify(this));
-                     Log.test("The file has been saved!");
-                     Promise.resolve();
-                });
-                 promises.push(myNewPromise);
-                 return Promise.all(promises).then(function () {
-                    return Promise.resolve("Dataset written to file !");
-                }).catch((err2: any) => {
-                    return Promise.reject(new InsightError("Could not write dataset to file"));
-                }); } catch (err) {
+    public writeToFile(): boolean {
+            try {
+                    fs.writeFileSync(__dirname + "/../../data/" + this.id + ".txt", JSON.stringify(this));
+                    Log.test("The file has been saved!");
+                    return true;
+                } catch (err) {
                 Log.error("Error in creating file");
-        }
+                return false;
+            }
     }
 }

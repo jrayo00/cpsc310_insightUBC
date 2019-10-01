@@ -58,11 +58,11 @@ export default class InsightFacade implements IInsightFacade {
                     return Promise.reject(new InsightError("No valid sections were found in given zip"));
                 }
                 // Write to file only after all promises have been resolved
-                return newDataset.writeToFile().then((promise: Promise<any>) => {
-                        return Promise.resolve(datasetsStringReference);
-                    }).catch((err: any) => {
-                        return Promise.reject(new InsightError("Could not write dataset to disk"));
-                    });
+                if (newDataset.writeToFile()) {
+                     return Promise.resolve(datasetsStringReference);
+                 } else {
+                     return Promise.reject(new InsightError("Could not write dataset to file"));
+                 }
             }).catch((err: any) => {
                 return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
             });
