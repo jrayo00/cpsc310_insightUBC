@@ -34,9 +34,10 @@ export default class InsightFacade implements IInsightFacade {
         if (kind === InsightDatasetKind.Rooms) {
             return Promise.reject("Not implemented");
         }
-        // read a zip file
+        // Reference variables used b/c Promise.all can't find the member variables.
         let datasetsReference: Dataset[] = this.datasets;
         let datasetsStringReference: string[] = this.datasetsString;
+        // read a zip file
         return JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
             let newDataset: Dataset = new Dataset(id, kind);
             const promises: Array<Promise<any>> = [];
