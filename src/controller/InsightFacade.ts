@@ -109,6 +109,7 @@ export default class InsightFacade implements IInsightFacade {
             this.datasetsString.splice(index, 1);
             this.datasets.splice(index, 1);
             fs.unlinkSync(__dirname + "/../../data/" + id + ".txt");
+            Log.test("Dataset removed from disk");
             return Promise.resolve(id);
             }
     }
