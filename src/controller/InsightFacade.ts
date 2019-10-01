@@ -50,7 +50,7 @@ export default class InsightFacade implements IInsightFacade {
                    // Promise.reject("Not valid json");
                 }));
             });
-            return Promise.all<Dataset[]>(promises).then(function () {
+            return Promise.all(promises).then(function () {
                 if (newDataset.numRows > 0) {
                     datasetsStringReference.push(id);
                     datasetsReference.push(newDataset);
@@ -58,13 +58,11 @@ export default class InsightFacade implements IInsightFacade {
                     return Promise.reject(new InsightError("No valid sections were found in given zip"));
                 }
                 // Write to file only after all promises have been resolved
-                return new Promise<string[]>((resolve, reject) => {
-                    return newDataset.writeToFile().then((promise: Promise<any>) => {
+                return newDataset.writeToFile().then((promise: Promise<any>) => {
                         return Promise.resolve(datasetsStringReference);
                     }).catch((err: any) => {
                         return Promise.reject(new InsightError("Could not write dataset to disk"));
                     });
-                });
             }).catch((err: any) => {
                 return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
             });

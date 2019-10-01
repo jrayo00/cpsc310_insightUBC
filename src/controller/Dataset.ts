@@ -48,13 +48,9 @@ export class Dataset implements InsightDataset {
     public writeToFile(): Promise<any> {
             try {const promises: Array<Promise<any>> = [];
                  const myNewPromise = new Promise((resolve, reject) => {
-                    fs.writeFile(__dirname + "/../../data/" + this.id + ".txt", JSON.stringify(this),  (err) => {
-                        if (err) {
-                            throw err;
-                        }
-                        Log.test("The file has been saved!");
-                        // Promise.resolve();
-                    });
+                     fs.writeFileSync(__dirname + "/../../data/" + this.id + ".txt", JSON.stringify(this));
+                     Log.test("The file has been saved!");
+                     Promise.resolve();
                 });
                  promises.push(myNewPromise);
                  return Promise.all(promises).then(function () {
