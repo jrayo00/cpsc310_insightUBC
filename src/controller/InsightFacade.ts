@@ -94,7 +94,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public removeDataset(id: string): Promise<string> {
-        if (id == null) {
+        if (id == null || id === undefined) {
             return Promise.reject(new InsightError("id cannot be null or undefined"));
         }
         if (this.idContainsUnderscore(id)) {
