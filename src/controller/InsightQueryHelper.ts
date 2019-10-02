@@ -175,7 +175,6 @@ export default class InsightQueryHelper implements IInsightQueryHelper {
     // Helpers for fetching starts here
     public getDataset(datasetId: string): any[] {
         const cacheDir = __dirname + "/../../data/";
-        // const cacheDir = __dirname + "/../../data/"+ datasetId + ".txt"
         // Todo: Go to cache dir "/../data" and call JSON.parse(obj)
         const dataset = fs.readFileSync(cacheDir + datasetId + ".txt", "utf8");
         return JSON.parse(dataset);

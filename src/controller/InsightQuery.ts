@@ -47,6 +47,7 @@ export default class InsightQuery implements IInsightQuery {
                 // Semantic checking only if the query is syntactically valid
                 if (isValid) {
                     isValid = this.semanticCheck(query, datasetIds);
+                    if (!isValid) {return reject(new NotFoundError()); }
                 } else {
                     return reject(new InsightError("Query doesn't pass syntactic checking."));
                 }
@@ -165,10 +166,11 @@ export default class InsightQuery implements IInsightQuery {
         datasets = this.insightQueryHelper.getDatasetIDInWHERE(query["WHERE"], datasets);
         datasets = this.insightQueryHelper.getDatasetIDInOPTIONS(query["OPTIONS"], datasets);
         // Todo: Need to check if the dataset has been added, call listDatasets()
-        // let isValid = this.insightQueryHelper.isAdded(datasets[0], datasetIds);
-        // if (isValid) {} else {return isValid; }
-        let isValid = !this.insightQueryHelper.areMultipleDatasets(datasets);
-        this.datasetCalled = datasets[0];
+        let isValid = this.insightQueryHelper.isAdded(datasets[0], datasetIds);
+        if (isValid) {
+            isValid = !this.insightQueryHelper.areMultipleDatasets(datasets);
+            this.datasetCalled = datasets[0];
+        } else {return isValid; }
         return isValid;
     }
 
