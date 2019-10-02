@@ -82,6 +82,36 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect(err).to.be.instanceOf(expected);
         });
     });
+    it("Should reject when id is null", function () {
+        const id: string = "courses";
+        const content = datasets["courses"];
+        const expected = InsightError;
+        return insightFacade.addDataset(null, content, InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, new InsightError(), "Should not have accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(expected);
+        });
+    });
+    it("Should reject when content is null", function () {
+        const id: string = "courses";
+        const content = datasets["courses"];
+        const expected = InsightError;
+        return insightFacade.addDataset(id, null, InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, new InsightError(), "Should not have accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(expected);
+        });
+    });
+    it("Should reject when kind is null", function () {
+        const id: string = "courses";
+        const content = datasets["courses"];
+        const expected = InsightError;
+        return insightFacade.addDataset(id, content, null).then((result: string[]) => {
+            expect.fail(result, new InsightError(), "Should not have accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(expected);
+        });
+    });
 
     it("Should reject when adding a dataset with an id that contains an underscore", function () {
         const id: string = "courses_";
