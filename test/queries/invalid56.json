@@ -1,8 +1,0 @@
-{
-    "title": "SELECT dept, avg WHERE avg > 97",
-    "query":{
-        "WHERE": {}
-    },
-    "isQueryValid": false,
-    "result": "InsightError"
-}
