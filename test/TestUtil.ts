@@ -12,7 +12,7 @@ export default class TestUtil {
         try {
             if (test.isQueryValid) {
                 expect(response).to.deep.equal(test.result);
-                done();
+                // done();
             } else {
                 if (test.result === "ResultTooLargeError") {
                     expect(response).to.be.instanceOf(ResultTooLargeError);
