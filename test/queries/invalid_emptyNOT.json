@@ -1,0 +1,18 @@
+{
+    "title": "Invalid query: Missing fields in NOT.",
+    "query": {
+        "WHERE": {
+            "NOT": {}
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER": "courses_id"
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

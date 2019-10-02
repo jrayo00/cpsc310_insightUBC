@@ -1,8 +1,10 @@
 import Log from "../Util";
-import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
+import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
+import {NotFoundError, ResultTooLargeError} from "./IInsightFacade";
 import * as JSZip from "jszip";
 import {Dataset} from "./Dataset";
 import * as fs from "fs";
+import InsightQuery from "./InsightQuery";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -114,10 +116,6 @@ export default class InsightFacade implements IInsightFacade {
         }
     }
 
-    public performQuery(query: any): Promise <any[]> {
-        return Promise.reject("Not implemented.");
-    }
-
     public listDatasets(): Promise<InsightDataset[]> {
         return Promise.resolve(this.datasets);
     }
@@ -130,4 +128,29 @@ export default class InsightFacade implements IInsightFacade {
         return true;
     }
 
+    public performQuery(query: any): Promise <any[]> {
+        // Construct helper class
+        let insightQuery: InsightQuery;
+        insightQuery = new InsightQuery();
+        // Validate the input query
+        return insightQuery.validQuery(query, this.datasetsString).then((result: boolean) => {
+            Log.info(`In performQuery ${result}`);
+            if (result) {
+                // Return fetched query result if the input query is valid
+                return insightQuery.fetchQuery(query);
+            } else {
+                return Promise.reject(new InsightError("Invalid query"));
+            }
+        }).then((result: any[]) => {
+            // Check if the result is too large
+            if (result.length > 5000) {
+                return Promise.reject(new ResultTooLargeError());
+            } else {
+                return Promise.resolve(result);
+            }
+        }).catch((err: any) => {
+            Log.info(`In performQuery ${err}`);
+            return Promise.reject(err);
+        });
+    }
 }

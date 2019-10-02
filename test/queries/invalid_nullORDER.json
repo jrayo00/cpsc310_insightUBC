@@ -1,0 +1,15 @@
+{
+    "title": "Invalid query: Null in ORDER.",
+    "query": {
+        "WHERE": {},
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": null
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

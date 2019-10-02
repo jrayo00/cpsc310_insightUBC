@@ -1,0 +1,19 @@
+{
+    "title": "Invalid query: SField for MField in EQ.",
+    "query": {
+        "WHERE": {
+            "EQ": {
+                "courses_dept": 0
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

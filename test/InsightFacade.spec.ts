@@ -1,10 +1,12 @@
 import { expect } from "chai";
 import * as fs from "fs-extra";
-import {InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "../src/controller/IInsightFacade";
+import {InsightDatasetKind} from "../src/controller/IInsightFacade";
+import {InsightError} from "../src/controller/IInsightFacade";
+import {NotFoundError} from "../src/controller/IInsightFacade";
+import {InsightDataset} from "../src/controller/IInsightFacade";
 import InsightFacade from "../src/controller/InsightFacade";
 import Log from "../src/Util";
 import TestUtil from "./TestUtil";
-import * as assert from "assert";
 
 // This should match the schema given to TestUtil.validate(..) in TestUtil.readTestQueries(..)
 // except 'filename' which is injected when the file is read.
@@ -192,6 +194,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect.fail(result, expected, "Should not have removed dataset whose id undefined");
         }).catch((err: any) => {
             expect(err).to.be.instanceOf(InsightError);
+
         });
     });
 });

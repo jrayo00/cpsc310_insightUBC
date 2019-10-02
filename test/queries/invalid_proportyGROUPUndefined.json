@@ -1,0 +1,13 @@
+{
+    "title": "Invalid query: Cannot read property GROUP of undefined.",
+    "query": {
+        "WHERE": {},
+        "OPTIONS": {
+            "COLUMNS":[
+                "null"
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}
