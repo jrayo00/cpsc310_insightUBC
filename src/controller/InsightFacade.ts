@@ -144,7 +144,7 @@ export default class InsightFacade implements IInsightFacade {
             Log.info(`In performQuery ${result}`);
             if (result) {
                 // Return fetched query result if the input query is valid
-                return insightQuery.fetchQuery(query);
+                return insightQuery.fetchQuery(query, this.datasets, this.datasetsString);
             } else {
                 return Promise.reject(new InsightError("Invalid query"));
             }
