@@ -94,7 +94,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public removeDataset(id: string): Promise<string> {
-        return Promise.reject("Not implemented");
+        // return Promise.reject("Not implemented");
         if (id == null || id === undefined) {
             return Promise.reject(new InsightError("id cannot be null or undefined"));
         }
@@ -119,7 +119,12 @@ export default class InsightFacade implements IInsightFacade {
 
     public listDatasets(): Promise<InsightDataset[]> {
         // return Promise.reject("Not implemented");
-        return Promise.resolve(this.datasets);
+        let insightDatasets: InsightDataset[] = new Array();
+        for (let dset of this.datasets) {
+            let tmp = {id : dset.id, kind: dset.kind, numRows: dset.numRows};
+            insightDatasets.push(tmp);
+        }
+        return Promise.resolve(insightDatasets);
     }
     private allWhitespaces(id: string): boolean {
         for (let i: number = 0; i < id.length; i++) {

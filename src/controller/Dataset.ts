@@ -3,7 +3,7 @@ import {Section} from "./Section";
 import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
 import * as fs from "fs";
 
-export class Dataset implements InsightDataset {
+export class Dataset {
     public allSections: Section[] = [];
     public id: string;
     public numRows: number = 0;
