@@ -87,7 +87,7 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
     }
 
     public getRegex(value: string): string {
-        const a = ".";
+        const a = ".+";
         return value.replace("*", a);
     }
 
