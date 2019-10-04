@@ -151,9 +151,7 @@ export default class InsightFacade implements IInsightFacade {
             if (result.length > 5000) {
                 return Promise.reject(new ResultTooLargeError());
             } else {
-                if (result === undefined || result === null) {
-                    return Promise.reject(new InsightError("Result is null or undefined"));
-                } else {return Promise.resolve(result); }
+                return Promise.resolve(result);
             }
         }).catch((err: any) => {
             Log.info(`In performQuery ${err}`);
