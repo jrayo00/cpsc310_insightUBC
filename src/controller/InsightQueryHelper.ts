@@ -81,9 +81,11 @@ export default class InsightQueryHelper implements IInsightQueryHelper {
     public validInputstring(inputstring: any): boolean {
         let isValid = true;
         if (typeof inputstring === "string") {
-            inputstring = inputstring.substring(1, inputstring.length - 1);
-            if (inputstring.includes("*")) {
-                isValid = false;
+            if (inputstring.length > 1) {
+                inputstring = inputstring.substring(1, inputstring.length - 1);
+                if (inputstring.includes("*")) {
+                    isValid = false;
+                }
             }
         } else {
             isValid = false;
