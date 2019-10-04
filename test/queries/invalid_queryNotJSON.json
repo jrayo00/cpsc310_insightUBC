@@ -1,6 +1,6 @@
 {
     "title": "Invalid query: Empty idstring of Mkey in LT.",
-    "query": [],
+    "query": 2,
     "isQueryValid": false,
     "result": "InsightError"
 }
