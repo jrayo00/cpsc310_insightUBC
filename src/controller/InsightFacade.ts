@@ -35,7 +35,7 @@ export default class InsightFacade implements IInsightFacade {
             return Promise.reject(new InsightError("id cannot be all whitespaces"));
         }
         if (kind === InsightDatasetKind.Rooms) {
-            return Promise.reject("Not implemented");
+            return Promise.reject(new InsightError("Not implemented"));
         }
         // Reference variables used b/c Promise.all can't find the member variables.
         let datasetsReference: Dataset[] = this.datasets;
@@ -64,8 +64,6 @@ export default class InsightFacade implements IInsightFacade {
                 // Write to file only after all promises have been resolved
                 if (newDataset.writeToFile()) {
                      return Promise.resolve(datasetsStringReference);
-                 } else {
-                     return Promise.reject(new InsightError("Could not write dataset to file"));
                  }
             }).catch((err: any) => {
                 return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));

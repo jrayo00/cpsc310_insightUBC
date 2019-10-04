@@ -46,13 +46,8 @@ export class Dataset {
     }
 
     public writeToFile(): boolean {
-            try {
-                    fs.writeFileSync(__dirname + "/../../data/" + this.id + ".txt", JSON.stringify(this));
-                    Log.test("The file has been saved!");
-                    return true;
-                } catch (err) {
-                Log.error("Error in creating file");
-                return false;
-            }
+        fs.writeFileSync(__dirname + "/../../data/" + this.id + ".txt", JSON.stringify(this));
+        Log.test("The file has been saved!");
+        return true;
     }
 }

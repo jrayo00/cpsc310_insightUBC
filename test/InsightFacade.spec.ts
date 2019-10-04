@@ -23,7 +23,9 @@ describe("InsightFacade Add/Remove Dataset", function () {
     // automatically be loaded in the 'before' hook.
     const datasetsToLoad: { [id: string]: string } = {
         courses: "./test/data/courses.zip",
-        invalid: "./test/data/invalid.zip"
+        invalid: "./test/data/invalid.zip",
+        missingkeys: "./test/data/missingkeys.zip",
+        novalidsections: "./test/data/novalidsections.zip",
     };
     let datasets: { [id: string]: string } = {};
     let insightFacade: InsightFacade;
@@ -68,9 +70,35 @@ describe("InsightFacade Add/Remove Dataset", function () {
         }).catch((err: any) => {
             expect.fail(err, expected, "Should not have rejected");
         });
-
+    });
+    it("Should add a valid dataset - some sections missing keys", function () {
+        const id: string = "missingkeys";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            expect(result).to.deep.equal(expected);
+        }).catch((err: any) => {
+            expect.fail(err, expected, "Should not have rejected");
+        });
     });
 
+    it("Should not add dataset with kind rooms - not implemented", function () {
+        const id: string = "courses";
+        const expected = InsightError;
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms).then((result: string[]) => {
+            expect.fail(result, new InsightError(), "Should not have accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(expected);
+        });
+    });
+    it("Should not add dataset - no valid sections", function () {
+        const id: string = "novalidsections";
+        const expected = InsightError;
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Courses).then((result: string[]) => {
+            expect.fail(result, new InsightError(), "Should not have accepted");
+        }).catch((err: any) => {
+            expect(err).to.be.instanceOf(expected);
+        });
+    });
     // TODO: Add more unit tests
     it("Should reject when adding a dataset with a whitespace id", function () {
         const id: string = " ";
