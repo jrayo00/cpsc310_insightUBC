@@ -89,7 +89,7 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
     public getRegex(value: string): string {
         // $& means the whole matched string, remove the * after .
         value = value.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
-        return value.replace(/[*]/g, ".+");
+        return value.replace(/[*]/g, ".*");
     }
 
     public isAdded(datasetId: string, datasetIds: string[]): boolean {
@@ -153,7 +153,7 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
     public getIndexesIS(dataset: any[], item: any): number[] {
         let field = Object.keys(item)[0];
         let value = item[field];
-        let reg = new RegExp(this.getRegex(value));
+        let reg = new RegExp("^" + this.getRegex(value) + "$");
         let indexes: number[] = [];
         for (let section in dataset) {
             let info = dataset[section].info;
