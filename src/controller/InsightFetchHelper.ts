@@ -49,6 +49,7 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
         }
         let newDataset: Dataset = new Dataset(datasetId, obj.kind);
         newDataset.numRows = obj.numRows;
+        newDataset.allSections = sections;
         return newDataset;
     }
 

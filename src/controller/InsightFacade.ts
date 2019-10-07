@@ -114,29 +114,6 @@ export default class InsightFacade implements IInsightFacade {
             return Promise.resolve(id);
         }
     }
-    public removeDatasetFromMemory(id: string): Promise<string> {
-        // return Promise.reject("Not implemented");
-        if (id == null || id === undefined) {
-            return Promise.reject(new InsightError("id cannot be null or undefined"));
-        }
-        if (this.idContainsUnderscore(id)) {
-            return Promise.reject(new InsightError("id cannot contain underscore(s)"));
-        }
-        // Test if given id is all whitespaces
-        if (this.allWhitespaces(id)) {
-            return Promise.reject(new InsightError("id cannot be all whitespaces"));
-        }
-        if (!this.datasetsString.includes(id)) {
-            return Promise.reject(new NotFoundError("dataset with id: " + id + "has not yet been added"));
-        } else {
-            let index: number = this.datasetsString.indexOf(id);
-            this.datasetsString.splice(index, 1);
-            this.datasets.splice(index, 1);
-            // fs.unlinkSync(__dirname + "/../../data/" + id + ".txt");
-            // Log.test("Dataset removed from disk");
-            return Promise.resolve(id);
-        }
-    }
 
     public listDatasets(): Promise<InsightDataset[]> {
         // return Promise.reject("Not implemented");
