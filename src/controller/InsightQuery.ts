@@ -30,7 +30,7 @@ export default class InsightQuery implements IInsightQuery {
         return new Promise((resolve, reject) => {
             let isValid = true;
             // Check if the input is a JSON object
-            if (typeof query === "object") {
+            if (typeof query === "object" && query !== null) {
                 const allTheKeys = Object.keys(query);
                 // Check if query is empty
                 if (allTheKeys.length !== 2) {
