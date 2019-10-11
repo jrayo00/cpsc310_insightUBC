@@ -71,6 +71,15 @@ describe("InsightFacade Add/Remove Dataset", function () {
             expect.fail(err, expected, "Should not have rejected");
         });
     });
+    it("Should add a valid dataset with kind rooms", function () {
+        const id: string = "rooms";
+        const expected: string[] = [id];
+        return insightFacade.addDataset(id, datasets[id], InsightDatasetKind.Rooms).then((result: string[]) => {
+            expect(result).to.deep.equal(expected);
+        }).catch((err: any) => {
+            expect.fail(err, expected, "Should not have rejected");
+        });
+    });
     it("Should add a valid dataset - some sections missing keys", function () {
         const id: string = "missingkeys";
         const expected: string[] = [id];

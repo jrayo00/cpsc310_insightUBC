@@ -1,6 +1,12 @@
 import Log from "../Util";
-import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
-import {NotFoundError, ResultTooLargeError} from "./IInsightFacade";
+import {
+    IInsightFacade,
+    InsightDataset,
+    InsightDatasetKind,
+    InsightError,
+    NotFoundError,
+    ResultTooLargeError
+} from "./IInsightFacade";
 import * as JSZip from "jszip";
 import {Dataset} from "./Dataset";
 import * as fs from "fs";
@@ -35,7 +41,7 @@ export default class InsightFacade implements IInsightFacade {
             return Promise.reject(new InsightError("id cannot be all whitespaces"));
         }
         if (kind === InsightDatasetKind.Rooms) {
-            return Promise.reject(new InsightError("Not implemented"));
+            return this.addRoomsDataset(id, content);
         }
         // Reference variables used b/c Promise.all can't find the member variables.
         let datasetsReference: Dataset[] = this.datasets;
@@ -70,6 +76,18 @@ export default class InsightFacade implements IInsightFacade {
             });
         }).catch((err: any) => {
                 return Promise.reject(new InsightError("invalid zip file"));
+        });
+    }
+
+    private addRoomsDataset(id: string, content: string): Promise<any> {
+        return JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
+            let newDataset: Dataset = new Dataset(id, InsightDatasetKind.Rooms);
+            const promises: Array<Promise<any>> = [];
+            return zip.folder("rooms").file("index.htm").async("text").then(function (data: string) {
+                Log.test("Retrieved file contents, now parse !");
+            });
+        }).catch((err: any) => {
+            return Promise.reject(new InsightError("invalid zip file"));
         });
     }
 
@@ -124,6 +142,7 @@ export default class InsightFacade implements IInsightFacade {
         }
         return Promise.resolve(insightDatasets);
     }
+
     private allWhitespaces(id: string): boolean {
         for (let i: number = 0; i < id.length; i++) {
             if (id.charAt(i) !== " ") {
@@ -132,6 +151,7 @@ export default class InsightFacade implements IInsightFacade {
         }
         return true;
     }
+
 
     public performQuery(query: any): Promise <any[]> {
         // Construct helper class
