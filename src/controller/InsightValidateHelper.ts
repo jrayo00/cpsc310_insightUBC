@@ -187,7 +187,9 @@ export default class InsightValidateHelper implements IInsightValidateHelper {
             });
             return sorted;
         } else {
-            sorted = result.sort((a, b) => (a[property] > b[property]) ? 1 : ((b[property] > a[property]) ? -1 : 0));
+            sorted = result.sort((a, b) => {
+                return (a[property] > b[property]) ? 1 : ((b[property] > a[property]) ? -1 : 0);
+            });
             return sorted;
         }
     }

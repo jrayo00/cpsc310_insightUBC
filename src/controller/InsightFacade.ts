@@ -124,6 +124,7 @@ export default class InsightFacade implements IInsightFacade {
         }
         return Promise.resolve(insightDatasets);
     }
+
     private allWhitespaces(id: string): boolean {
         for (let i: number = 0; i < id.length; i++) {
             if (id.charAt(i) !== " ") {

@@ -52,8 +52,12 @@ export default class InsightQuery implements IInsightQuery {
                     isValid = this.semanticCheck(query, datasetIds);
                     if (isValid) {
                         isValid = this.insightFetchHelper.isAdded(this.datasetCalled, datasetIds);
-                        if (!isValid) {return reject(new InsightError("Query calls dataset not added.")); }
-                    } else {return reject(new InsightError("Query calls multiple datasets.")); }
+                        if (!isValid) {
+                            return reject(new InsightError("Query calls dataset not added."));
+                        }
+                    } else {
+                        return reject(new InsightError("Query calls multiple datasets."));
+                    }
                 } else {
                     return reject(new InsightError("Query doesn't pass syntactic checking."));
                 }
