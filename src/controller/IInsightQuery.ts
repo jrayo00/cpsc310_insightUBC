@@ -21,21 +21,6 @@ export interface IInsightQuery {
     validQuery(query: any, datasetIds: string[]): Promise<boolean>;
 
     /**
-     * Validate the body of a query on UBCInsight.
-     *
-     * @param query  The body of the query to be validated.
-     *
-     * If a query is incorrectly formatted, references a dataset not added (in memory or on disk),
-     * or references multiple datasets, it should be rejected.
-     *
-     * @return Promise <boolean>
-     *
-     * The promise should fulfill with a boolean value.
-     * The promise should reject with an InsightError describing the error.
-     */
-    validFilter(query: any): boolean;
-
-    /**
      * Validate the options of a query on UBCInsight.
      *
      * @param query  The options of the query to be validated.

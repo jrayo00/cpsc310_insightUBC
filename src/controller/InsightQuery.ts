@@ -41,7 +41,7 @@ export default class InsightQuery implements IInsightQuery {
         const allTheKeys = Object.keys(query);
         if (allTheKeys.length > 1 && allTheKeys.length < 4 && "WHERE" in query && "OPTIONS" in query) {
             if (!this.insightValidateHelper.isObjectEmpty(query["WHERE"])) {
-                isValid = this.validFilter(query["WHERE"]) && this.validOptions(query["OPTIONS"]);
+                isValid = this.insightValidateHelper.validFilter(query["WHERE"]) && this.validOptions(query["OPTIONS"]);
             } else {
                 isValid = this.validOptions(query["OPTIONS"]);
             }
@@ -56,35 +56,6 @@ export default class InsightQuery implements IInsightQuery {
         if (typeof trans === "object" && trans !== null) {
             // Todo: Validate TRANSFORMATION
             return true;
-        }
-        return false;
-    }
-
-    public validFilter(filter: any): boolean {
-        // Check if the input is a JSON object
-        if (typeof filter === "object") {
-            const allTheKeys = Object.keys(filter);
-            // Check if query is empty
-            if (allTheKeys.length === 1) {
-                switch (allTheKeys[0]) {
-                    case "AND":
-                        return this.insightValidateHelper.validLogicComparison(filter["AND"]);
-                    case "OR":
-                        return this.insightValidateHelper.validLogicComparison(filter["OR"]);
-                    case "NOT":
-                        return this.validFilter(filter["NOT"]);
-                    case "LT":
-                        return this.insightValidateHelper.validMComparison(filter["LT"]);
-                    case "GT":
-                        return this.insightValidateHelper.validMComparison(filter["GT"]);
-                    case "EQ":
-                        return this.insightValidateHelper.validMComparison(filter["EQ"]);
-                    case "IS":
-                        return this.insightValidateHelper.validSComparison(filter["IS"]);
-                    default:
-                        return false;
-                }
-            }
         }
         return false;
     }
@@ -106,7 +77,7 @@ export default class InsightQuery implements IInsightQuery {
                         }
                     } else {
                         if (this.insightValidateHelper.validColumns(options["COLUMNS"]) &&
-                            this.insightValidateHelper.validOrderString(options["ORDER"])) {
+                            this.insightValidateHelper.validOrderKeys(options["ORDER"])) {
                             return options["COLUMNS"].includes(options["ORDER"]);
                         }
                     }
