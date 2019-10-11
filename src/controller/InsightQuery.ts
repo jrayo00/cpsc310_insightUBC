@@ -45,14 +45,8 @@ export default class InsightQuery implements IInsightQuery {
                 }
                 // Semantic checking only if the query is syntactically valid
                 if (isValid) {
-                    isValid = this.semanticCheck(query, datasetIds);
-                    if (isValid) {
-                        isValid = this.insightFetchHelper.isAdded(this.datasetCalled, datasetIds);
-                        if (!isValid) {
-                            return reject(new InsightError("Query calls dataset not added."));
-                        }
-                    } else {
-                        return reject(new InsightError("Query calls multiple datasets."));
+                    if (!this.semanticCheck(query, datasetIds)) {
+                        return reject(new InsightError("Query doesn't pass semantic checking."));
                     }
                 } else {
                     return reject(new InsightError("Query doesn't pass syntactic checking."));
@@ -65,7 +59,6 @@ export default class InsightQuery implements IInsightQuery {
     }
 
     public validFilter(filter: any): boolean {
-        let isValid = true;
         // Check if the input is a JSON object
         if (typeof filter === "object") {
             const allTheKeys = Object.keys(filter);
@@ -73,97 +66,72 @@ export default class InsightQuery implements IInsightQuery {
             if (allTheKeys.length === 1) {
                 switch (allTheKeys[0]) {
                     case "AND":
-                        isValid = this.insightValidateHelper.validLogicComparison(filter["AND"]);
-                        break;
+                        return this.insightValidateHelper.validLogicComparison(filter["AND"]);
                     case "OR":
-                        isValid = this.insightValidateHelper.validLogicComparison(filter["OR"]);
-                        break;
+                        return this.insightValidateHelper.validLogicComparison(filter["OR"]);
                     case "NOT":
-                        isValid = this.validFilter(filter["NOT"]);
-                        break;
+                        return this.validFilter(filter["NOT"]);
                     case "LT":
-                        isValid = this.insightValidateHelper.validMComparison(filter["LT"]);
-                        break;
+                        return this.insightValidateHelper.validMComparison(filter["LT"]);
                     case "GT":
-                        isValid = this.insightValidateHelper.validMComparison(filter["GT"]);
-                        break;
+                        return this.insightValidateHelper.validMComparison(filter["GT"]);
                     case "EQ":
-                        isValid = this.insightValidateHelper.validMComparison(filter["EQ"]);
-                        break;
+                        return this.insightValidateHelper.validMComparison(filter["EQ"]);
                     case "IS":
-                        isValid = this.insightValidateHelper.validSComparison(filter["IS"]);
-                        break;
+                        return this.insightValidateHelper.validSComparison(filter["IS"]);
                     default:
-                        isValid = false;
+                        return false;
                 }
-            } else {
-                isValid = false;
             }
-        } else {
-            isValid = false;
         }
-        return isValid;
+        return false;
     }
 
     public validOptions(options: any): boolean {
-        let isValid = true;
         // Check if the input is a JSON object
         if (typeof options === "object") {
             const allTheKeys = Object.keys(options);
             switch (allTheKeys.length) {
                 case 0:
-                    isValid = false;
-                    break;
+                    return false;
                 case 1:
                     if (!("COLUMNS" in options)) {
-                        isValid = false;
+                        return false;
                     } else {
-                        isValid = this.validColumns(options["COLUMNS"]);
+                        return this.validColumns(options["COLUMNS"]);
                     }
-                    break;
                 case 2:
                     if (!("COLUMNS" in options) || !("ORDER" in options)) {
-                        isValid = false;
+                        return false;
                     } else {
-                        isValid = this.validColumns(options["COLUMNS"]) && this.validOrder(options["ORDER"]);
                         // If both COLUMNS and OPTIONS are valid, check if COLUMNS contains ORDER
-                        if (isValid) {
-                            isValid = options["COLUMNS"].includes(options["ORDER"]);
+                        if (this.validColumns(options["COLUMNS"]) && this.validOrder(options["ORDER"])) {
+                            return options["COLUMNS"].includes(options["ORDER"]);
                         }
+                        return false;
                     }
-                    break;
                 default:
-                    isValid = false;
+                    return false;
             }
-        } else {
-            isValid = false;
         }
-        return isValid;
+        return false;
     }
 
     public validColumns(cols: any): boolean {
-        let isValid = true;
         if (Array.isArray(cols)) {
             // COLUMNS array cannot be empty
             if (cols.length > 0) {
-                isValid = this.insightValidateHelper.validKeys(cols);
-            } else {
-                isValid = false;
+                return this.insightValidateHelper.validKeys(cols);
             }
-        } else {
-            isValid = false;
         }
-        return isValid;
+        return false;
     }
 
     public validOrder(order: any): boolean {
-        let isValid = true;
         if (typeof order === "string") {
-            isValid = this.insightValidateHelper.validKeys(order);
-        } else {
-            isValid = false;
+            return this.insightValidateHelper.validKeys(order);
         }
-        return isValid;
+        return false;
     }
 
     public semanticCheck(query: any, datasetIds: string[]): boolean {
@@ -173,6 +141,10 @@ export default class InsightQuery implements IInsightQuery {
         datasets = this.insightValidateHelper.getDatasetIDInOPTIONS(query["OPTIONS"], datasets);
         let isValid = !this.insightValidateHelper.areMultipleDatasets(datasets);
         this.datasetCalled = datasets[0];
+        // Only check if the dataset is added when the query is valid at this point
+        if (isValid) {
+            isValid = this.insightFetchHelper.isAdded(this.datasetCalled, datasetIds);
+        }
         return isValid;
     }
 

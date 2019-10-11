@@ -118,37 +118,31 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
                 for (let filter in item) {
                     indexes = this.intersectIndexes(indexes, this.getIndexes(dataset, item[filter]));
                 }
-                break;
+                return indexes;
             case "OR":
                 item = query["OR"];
                 for (let filter in item) {
                     indexes = this.unionIndexes(indexes, this.getIndexes(dataset, item[filter]));
                 }
-                break;
+                return indexes;
             case "NOT":
                 indexes = this.getIndexes(dataset, query["NOT"]);
-                indexes = this.filterWithNumber(Array.from(dataset.keys()), indexes);
-                break;
+                return this.filterWithNumber(Array.from(dataset.keys()), indexes);
             case "LT":
                 item = query["LT"];
-                indexes = this.getIndexesLT(dataset, item);
-                break;
+                return this.getIndexesLT(dataset, item);
             case "GT":
                 item = query["GT"];
-                indexes = this.getIndexesGT(dataset, item);
-                break;
+                return this.getIndexesGT(dataset, item);
             case "EQ":
                 item = query["EQ"];
-                indexes = this.getIndexesEQ(dataset, item);
-                break;
+                return this.getIndexesEQ(dataset, item);
             case "IS":
                 item = query["IS"];
-                indexes = this.getIndexesIS(dataset, item);
-                break;
+                return this.getIndexesIS(dataset, item);
             default:
-                indexes = [];
+                return [];
         }
-        return indexes;
     }
 
     public getIndexesLT(dataset: any[], item: any): number[] {
