@@ -1,0 +1,33 @@
+{
+    "title": "Invalid query: Courses for rooms prefix",
+    "query": {
+        "WHERE": {
+            "AND": [
+                {
+                    "IS": {
+                        "courses_furniture": "*Tables*"
+                    }
+                },
+                {
+                    "GT": {
+                        "courses_seats": 300
+                    }
+                }
+            ]
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_shortname",
+                "courses_seats"
+            ],
+            "ORDER": {
+                "dir": "DOWN",
+                "keys": [
+                    "courses_seats"
+                ]
+            }
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}
