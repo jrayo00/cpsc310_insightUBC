@@ -1,15 +1,10 @@
-import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
-import {InsightError, NotFoundError, ResultTooLargeError} from "./IInsightFacade";
-import InsightFetchHelper from "./InsightFetchHelper";
-
 /*
  * This is the primary high-level API for the project.
  * On top of InsightFacade, in this folder we add:
- * A class called InsightQuery, this should be in a file called InsightQuery.ts.
+ * A class called InsightValidateHelper, this should be in a file called InsightValidateHelper.ts.
  */
 
 export interface IInsightValidateHelper {
-    insightFetchHelper: InsightFetchHelper;
     /**
      * Validate the options of a query on UBCInsight.
      *

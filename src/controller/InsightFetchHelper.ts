@@ -1,20 +1,12 @@
 import Log from "../Util";
-import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
-import {InsightError, NotFoundError} from "./IInsightFacade";
 import {IInsightFetchHelper} from "./IInsightFetchHelper";
-import {IInsightQuery} from "./IInsightQuery";
-import {type} from "os";
-import InsightQuery from "./InsightQuery";
-import InsightFacade from "./InsightFacade";
 import * as fs from "fs-extra";
 import {Section} from "./Section";
 import {Dataset} from "./Dataset";
-import InsightValidateHelper from "./InsightValidateHelper";
 
 /**
- * This is the main programmatic entry point for the project.
- * Method documentation is in IInsightFacade
- *
+ * This is the data fetching helper class for InsightQuery.
+ * Method documentation is in IInsightValidateHelper
  */
 export default class InsightFetchHelper implements IInsightFetchHelper {
 
@@ -27,7 +19,6 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
     // Helpers for fetching starts here
     public getDataset(datasetId: string): any {
         const cacheDir = __dirname + "/../../data/";
-        // Todo: Go to cache dir "/../data" and call JSON.parse(obj)
         const dataset = fs.readFileSync(cacheDir + datasetId + ".txt", "text");
         let obj = JSON.parse(dataset);
         let sections = [];
@@ -116,6 +107,50 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
             }
         }
         return isAdded;
+    }
+
+    public getIndexes(dataset: any[], query: any): number[] {
+        let indexes: number[] = [];
+        let item: any;
+        const allTheKeys = Object.keys(query);
+        switch (allTheKeys[0]) {
+            case "AND":
+                item = query["AND"];
+                indexes = Array.from(dataset.keys());
+                for (let filter in item) {
+                    indexes = this.intersectIndexes(indexes, this.getIndexes(dataset, item[filter]));
+                }
+                break;
+            case "OR":
+                item = query["OR"];
+                for (let filter in item) {
+                    indexes = this.unionIndexes(indexes, this.getIndexes(dataset, item[filter]));
+                }
+                break;
+            case "NOT":
+                indexes = this.getIndexes(dataset, query["NOT"]);
+                indexes = this.filterWithNumber(Array.from(dataset.keys()), indexes);
+                break;
+            case "LT":
+                item = query["LT"];
+                indexes = this.getIndexesLT(dataset, item);
+                break;
+            case "GT":
+                item = query["GT"];
+                indexes = this.getIndexesGT(dataset, item);
+                break;
+            case "EQ":
+                item = query["EQ"];
+                indexes = this.getIndexesEQ(dataset, item);
+                break;
+            case "IS":
+                item = query["IS"];
+                indexes = this.getIndexesIS(dataset, item);
+                break;
+            default:
+                indexes = [];
+        }
+        return indexes;
     }
 
     public getIndexesLT(dataset: any[], item: any): number[] {

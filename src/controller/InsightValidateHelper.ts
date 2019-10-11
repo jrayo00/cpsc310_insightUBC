@@ -1,28 +1,19 @@
 import Log from "../Util";
-import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
-import {InsightError, NotFoundError} from "./IInsightFacade";
 import {IInsightValidateHelper} from "./IInsightValidateHelper";
 import InsightFetchHelper from "./InsightFetchHelper";
-import {IInsightQuery} from "./IInsightQuery";
-import {type} from "os";
 import InsightQuery from "./InsightQuery";
-import InsightFacade from "./InsightFacade";
-import * as fs from "fs-extra";
-import {Section} from "./Section";
-import {Dataset} from "./Dataset";
 
 /**
- * This is the main programmatic entry point for the project.
- * Method documentation is in IInsightFacade
- *
+ * This is the validation helper class for InsightQuery.
+ * Method documentation is in IInsightValidateHelper
  */
 export default class InsightValidateHelper implements IInsightValidateHelper {
+    public insightFetchHelper: InsightFetchHelper;
 
     constructor() {
         Log.trace("InsightQueryHelperImpl::init()");
+        this.insightFetchHelper = new InsightFetchHelper();
     }
-
-    public insightFetchHelper: InsightFetchHelper = new InsightFetchHelper();
 
     public validLogicComparison(filters: any): boolean {
         // Should have a for loop, loop over the array of filters

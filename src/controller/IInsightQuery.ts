@@ -10,10 +10,6 @@ import InsightFetchHelper from "./InsightFetchHelper";
  */
 
 export interface IInsightQuery {
-    // datasets: { [id: string]: any[] };
-    // datasetCalled: string;
-    insightQueryHelper: InsightValidateHelper;
-    insightFetchHelper: InsightFetchHelper;
     /**
      * Validate a query on UBCInsight.
      *
