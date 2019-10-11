@@ -1,6 +1,6 @@
 import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
 import {InsightError, NotFoundError, ResultTooLargeError} from "./IInsightFacade";
-import InsightQueryHelper from "./InsightQueryHelper";
+import InsightValidateHelper from "./InsightValidateHelper";
 
 /*
  * This is the primary high-level API for the project.
@@ -9,7 +9,7 @@ import InsightQueryHelper from "./InsightQueryHelper";
  */
 
 export interface IInsightFetchHelper {
-    // insightQueryHelper: InsightQueryHelper;
+    // insightQueryHelper: InsightValidateHelper;
     // Helpers for fetching starts here
     getDataset(datasetName: string): any;
 

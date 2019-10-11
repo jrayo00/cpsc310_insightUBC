@@ -8,7 +8,7 @@ import InsightFetchHelper from "./InsightFetchHelper";
  * A class called InsightQuery, this should be in a file called InsightQuery.ts.
  */
 
-export interface IInsightQueryHelper {
+export interface IInsightValidateHelper {
     insightFetchHelper: InsightFetchHelper;
     /**
      * Validate the options of a query on UBCInsight.

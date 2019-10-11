@@ -9,7 +9,7 @@ import InsightFacade from "./InsightFacade";
 import * as fs from "fs-extra";
 import {Section} from "./Section";
 import {Dataset} from "./Dataset";
-import InsightQueryHelper from "./InsightQueryHelper";
+import InsightValidateHelper from "./InsightValidateHelper";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -22,7 +22,7 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
         Log.trace("InsightQueryHelperImpl::init()");
     }
 
-    // public insightQueryHelper: InsightQueryHelper = new InsightQueryHelper();
+    // public insightQueryHelper: InsightValidateHelper = new InsightValidateHelper();
 
     // Helpers for fetching starts here
     public getDataset(datasetId: string): any {
@@ -54,7 +54,9 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
     }
 
     public intersectIndexes(a: number[], b: number[]): number[] {
-        return a.filter((value) => b.includes(value));
+        return a.filter((value) => {
+            return b.includes(value);
+        });
     }
 
     public unionIndexes(a: number[], b: number[]): number[] {
@@ -62,11 +64,15 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
     }
 
     public indexWithNumber(result: any[], indexes: number[]): any[] {
-        return indexes.map((i) => result[i]);
+        return indexes.map((i) => {
+            return result[i];
+        });
     }
 
     public filterWithNumber(result: any[], indexes: number[]): any[] {
-        return result.filter((x) => !indexes.includes(x));
+        return result.filter((x) => {
+            return !indexes.includes(x);
+        });
     }
 
     public extractProperties(result: any[], properties: string[], datasetCalled: string): any[] {
@@ -94,12 +100,12 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
     }
 
     public isAdded(datasetId: string, datasetIds: string[]): boolean {
-        // Todo: Implement this and use it
         const cacheDir = __dirname + "/../../data/";
-        // Todo: Go to cache dir "/../data" and call JSON.parse(obj)
         let isAdded = false;
         for (let d in datasetIds) {
-            if (datasetIds[d] === datasetId) {isAdded = true; }
+            if (datasetIds[d] === datasetId) {
+                isAdded = true;
+            }
         }
         if (!isAdded) {
             try {
