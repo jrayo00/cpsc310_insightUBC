@@ -9,7 +9,7 @@ import InsightFacade from "./InsightFacade";
 import * as fs from "fs-extra";
 import {Section} from "./Section";
 import {Dataset} from "./Dataset";
-import InsightQueryHelper from "./InsightQueryHelper";
+import InsightValidateHelper from "./InsightValidateHelper";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -22,7 +22,7 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
         Log.trace("InsightQueryHelperImpl::init()");
     }
 
-    // public insightQueryHelper: InsightQueryHelper = new InsightQueryHelper();
+    // public insightQueryHelper: InsightValidateHelper = new InsightValidateHelper();
 
     // Helpers for fetching starts here
     public getDataset(datasetId: string): any {

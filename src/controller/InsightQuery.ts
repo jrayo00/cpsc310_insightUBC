@@ -2,9 +2,9 @@ import Log from "../Util";
 import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
 import {InsightError, NotFoundError} from "./IInsightFacade";
 import {IInsightQuery} from "./IInsightQuery";
-import {IInsightQueryHelper} from "./IInsightQueryHelper";
+import {IInsightValidateHelper} from "./IInsightValidateHelper";
 import {type} from "os";
-import InsightQueryHelper from "./InsightQueryHelper";
+import InsightValidateHelper from "./InsightValidateHelper";
 import InsightFetchHelper from "./InsightFetchHelper";
 import {Dataset} from "./Dataset";
 
@@ -23,7 +23,7 @@ export default class InsightQuery implements IInsightQuery {
         this.datasetCalled = "";
     }
 
-    public insightQueryHelper: InsightQueryHelper = new InsightQueryHelper();
+    public insightQueryHelper: InsightValidateHelper = new InsightValidateHelper();
     public insightFetchHelper: InsightFetchHelper = new InsightFetchHelper();
 
     public validQuery(query: any, datasetIds: string[]): Promise <boolean> {

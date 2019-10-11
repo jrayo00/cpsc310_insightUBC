@@ -1,6 +1,6 @@
 import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
 import {InsightError, NotFoundError, ResultTooLargeError} from "./IInsightFacade";
-import InsightQueryHelper from "./InsightQueryHelper";
+import InsightValidateHelper from "./InsightValidateHelper";
 import InsightFetchHelper from "./InsightFetchHelper";
 
 /*
@@ -12,7 +12,7 @@ import InsightFetchHelper from "./InsightFetchHelper";
 export interface IInsightQuery {
     // datasets: { [id: string]: any[] };
     // datasetCalled: string;
-    insightQueryHelper: InsightQueryHelper;
+    insightQueryHelper: InsightValidateHelper;
     insightFetchHelper: InsightFetchHelper;
     /**
      * Validate a query on UBCInsight.

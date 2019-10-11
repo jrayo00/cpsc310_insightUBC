@@ -1,7 +1,7 @@
 import Log from "../Util";
 import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
 import {InsightError, NotFoundError} from "./IInsightFacade";
-import {IInsightQueryHelper} from "./IInsightQueryHelper";
+import {IInsightValidateHelper} from "./IInsightValidateHelper";
 import InsightFetchHelper from "./InsightFetchHelper";
 import {IInsightQuery} from "./IInsightQuery";
 import {type} from "os";
@@ -16,7 +16,7 @@ import {Dataset} from "./Dataset";
  * Method documentation is in IInsightFacade
  *
  */
-export default class InsightQueryHelper implements IInsightQueryHelper {
+export default class InsightValidateHelper implements IInsightValidateHelper {
 
     constructor() {
         Log.trace("InsightQueryHelperImpl::init()");

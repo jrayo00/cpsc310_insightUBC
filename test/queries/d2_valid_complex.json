@@ -1,0 +1,93 @@
+{
+    "title": "Valid query: A very complex query",
+    "query": {
+        "WHERE": {
+            "GT": {
+                "rooms_seats": 100
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "rooms_type",
+                "rooms_address",
+                "overallAvg",
+                "overallSum",
+                "overallCount",
+                "overallMin",
+                "overallMax"
+            ],
+            "ORDER": {
+                "dir": "DOWN",
+                "keys": [
+                    "overallMax"
+                ]
+            }
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "rooms_type",
+                "rooms_address"
+            ],
+            "APPLY": [
+                {
+                    "overallAvg": {
+                        "AVG": "rooms_seats"
+                    }
+                },
+                {
+                    "overallCount": {
+                        "COUNT": "rooms_seats"
+                    }
+                },
+                {
+                    "overallSum": {
+                        "SUM": "rooms_seats"
+                    }
+                },
+                {
+                    "overallMin": {
+                        "MIN": "rooms_seats"
+                    }
+                },
+                {
+                    "overallMax": {
+                        "MAX": "rooms_seats"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"rooms_type":"Tiered Large Group","rooms_address":"2194 Health Sciences Mall","overallAvg":208.8,"overallSum":1044,"overallCount":3,"overallMin":120,"overallMax":503},
+        {"rooms_type":"Open Design General Purpose","rooms_address":"6108 Thunderbird Boulevard","overallAvg":442,"overallSum":442,"overallCount":1,"overallMin":442,"overallMax":442},
+        {"rooms_type":"Tiered Large Group","rooms_address":"2260 West Mall, V6T 1Z4","overallAvg":426,"overallSum":426,"overallCount":1,"overallMin":426,"overallMax":426},
+        {"rooms_type":"Tiered Large Group","rooms_address":"2045 East Mall","overallAvg":375,"overallSum":375,"overallCount":1,"overallMin":375,"overallMax":375},
+        {"rooms_type":"Tiered Large Group","rooms_address":"2207 Main Mall","overallAvg":250,"overallSum":500,"overallCount":2,"overallMin":150,"overallMax":350},
+        {"rooms_type":"Tiered Large Group","rooms_address":"2350 Health Sciences Mall","overallAvg":275,"overallSum":825,"overallCount":2,"overallMin":125,"overallMax":350},
+        {"rooms_type":"Tiered Large Group","rooms_address":"6174 University Boulevard","overallAvg":213.5,"overallSum":427,"overallCount":2,"overallMin":102,"overallMax":325},
+        {"rooms_type":"TBD","rooms_address":"6000 Student Union Blvd","overallAvg":299,"overallSum":897,"overallCount":1,"overallMin":299,"overallMax":299},
+        {"rooms_type":"Tiered Large Group","rooms_address":"2125 Main Mall","overallAvg":280,"overallSum":280,"overallCount":1,"overallMin":280,"overallMax":280},
+        {"rooms_type":"Tiered Large Group","rooms_address":"1866 Main Mall","overallAvg":177.4,"overallSum":887,"overallCount":4,"overallMin":131,"overallMax":275},
+        {"rooms_type":"Tiered Large Group","rooms_address":"2036 Main Mall","overallAvg":183.25,"overallSum":733,"overallCount":3,"overallMin":114,"overallMax":265},
+        {"rooms_type":"Tiered Large Group","rooms_address":"2053 Main Mall","overallAvg":260,"overallSum":260,"overallCount":1,"overallMin":260,"overallMax":260},
+        {"rooms_type":"Tiered Large Group","rooms_address":"6224 Agricultural Road","overallAvg":187.33,"overallSum":562,"overallCount":3,"overallMin":150,"overallMax":257},
+        {"rooms_type":"Tiered Large Group","rooms_address":"2424 Main Mall","overallAvg":250,"overallSum":250,"overallCount":1,"overallMin":250,"overallMax":250},
+        {"rooms_type":"Tiered Large Group","rooms_address":"2405 Wesbrook Mall","overallAvg":201.5,"overallSum":403,"overallCount":2,"overallMin":167,"overallMax":236},
+        {"rooms_type":"Tiered Large Group","rooms_address":"6270 University Boulevard","overallAvg":228,"overallSum":228,"overallCount":1,"overallMin":228,"overallMax":228},
+        {"rooms_type":"Tiered Large Group","rooms_address":"1984 West Mall","overallAvg":225,"overallSum":225,"overallCount":1,"overallMin":225,"overallMax":225},
+        {"rooms_type":"Tiered Large Group","rooms_address":"1984 Mathematics Road","overallAvg":224,"overallSum":224,"overallCount":1,"overallMin":224,"overallMax":224},
+        {"rooms_type":"Tiered Large Group","rooms_address":"6356 Agricultural Road","overallAvg":194,"overallSum":388,"overallCount":2,"overallMin":183,"overallMax":205},
+        {"rooms_type":"Tiered Large Group","rooms_address":"2357 Main Mall","overallAvg":200,"overallSum":200,"overallCount":1,"overallMin":200,"overallMax":200},
+        {"rooms_type":"Tiered Large Group","rooms_address":"2360 East Mall V6T 1Z3","overallAvg":200,"overallSum":200,"overallCount":1,"overallMin":200,"overallMax":200},
+        {"rooms_type":"Tiered Large Group","rooms_address":"2175 West Mall V6T 1Z4","overallAvg":188.75,"overallSum":755,"overallCount":3,"overallMin":187,"overallMax":190},
+        {"rooms_type":"Tiered Large Group","rooms_address":"2177 Wesbrook Mall V6T 1Z3","overallAvg":160,"overallSum":160,"overallCount":1,"overallMin":160,"overallMax":160},
+        {"rooms_type":"Tiered Large Group","rooms_address":"6245 Agronomy Road V6T 1Z4","overallAvg":140,"overallSum":280,"overallCount":2,"overallMin":120,"overallMax":160},
+        {"rooms_type":"Tiered Large Group","rooms_address":"1961 East Mall V6T 1Z1","overallAvg":154,"overallSum":154,"overallCount":1,"overallMin":154,"overallMax":154},
+        {"rooms_type":"Tiered Large Group","rooms_address":"2202 Main Mall","overallAvg":144,"overallSum":144,"overallCount":1,"overallMin":144,"overallMax":144},
+        {"rooms_type":"Tiered Large Group","rooms_address":"2356 Main Mall","overallAvg":129.5,"overallSum":259,"overallCount":2,"overallMin":123,"overallMax":136},
+        {"rooms_type":"Open Design General Purpose","rooms_address":"1961 East Mall V6T 1Z1","overallAvg":112,"overallSum":112,"overallCount":1,"overallMin":112,"overallMax":112},
+        {"rooms_type":"Case Style","rooms_address":"1866 Main Mall","overallAvg":108,"overallSum":216,"overallCount":1,"overallMin":108,"overallMax":108},
+        {"rooms_type":"Tiered Large Group","rooms_address":"1986 Mathematics Road","overallAvg":106,"overallSum":106,"overallCount":1,"overallMin":106,"overallMax":106}
+    ]
+}
