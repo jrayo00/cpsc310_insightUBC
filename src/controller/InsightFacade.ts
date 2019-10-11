@@ -85,6 +85,10 @@ export default class InsightFacade implements IInsightFacade {
             const promises: Array<Promise<any>> = [];
             return zip.folder("rooms").file("index.htm").async("text").then(function (data: string) {
                 Log.test("Retrieved file contents, now parse !");
+                const parse5 = require("parse5");
+                const document = parse5.parse(data);
+                const sarr: string[] = [id];
+                return Promise.resolve(sarr);
             });
         }).catch((err: any) => {
             return Promise.reject(new InsightError("invalid zip file"));

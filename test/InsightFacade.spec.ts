@@ -26,6 +26,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
         invalid: "./test/data/invalid.zip",
         missingkeys: "./test/data/missingkeys.zip",
         novalidsections: "./test/data/novalidsections.zip",
+        rooms: "./test/data/rooms.zip",
     };
     let datasets: { [id: string]: string } = {};
     let insightFacade: InsightFacade;
