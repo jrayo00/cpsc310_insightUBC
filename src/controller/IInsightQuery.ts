@@ -51,39 +51,9 @@ export interface IInsightQuery {
      */
     validOptions(query: any): boolean;
 
+    syntacticCheck(query: any): boolean;
+
     semanticCheck(query: any, datasetIds: string[]): boolean;
-
-    /**
-     * Validate the options of a query on UBCInsight.
-     *
-     * @param query  The options of the query to be validated.
-     *
-     * If a query is incorrectly formatted, references a dataset not added (in memory or on disk),
-     * or references multiple datasets, it should be rejected.
-     *
-     * @return Promise <boolean>
-     *
-     * The promise should fulfill with a boolean value.
-     * The promise should reject with a NotFoundError when the dataset is not found.
-     * The promise should reject with an InsightError describing other errors.
-     */
-    validColumns(query: any): boolean;
-
-    /**
-     * Validate the options of a query on UBCInsight.
-     *
-     * @param query  The options of the query to be validated.
-     *
-     * If a query is incorrectly formatted, references a dataset not added (in memory or on disk),
-     * or references multiple datasets, it should be rejected.
-     *
-     * @return Promise <boolean>
-     *
-     * The promise should fulfill with a boolean value.
-     * The promise should reject with a NotFoundError when the dataset is not found.
-     * The promise should reject with an InsightError describing other errors.
-     */
-    validOrder(query: any): boolean;
 
     /**
      * Fetch a valid query on UBCInsight.

@@ -24,38 +24,40 @@ export default class InsightQuery implements IInsightQuery {
 
     public validQuery(query: any, datasetIds: string[]): Promise <boolean> {
         return new Promise((resolve, reject) => {
-            let isValid = true;
-            // Check if the input is a JSON object
             if (typeof query === "object" && query !== null) {
-                const allTheKeys = Object.keys(query);
-                // Check if query is empty
-                if (allTheKeys.length !== 2) {
-                    return reject(new InsightError("Missing keys or excessive keys in query."));
-                } else {
-                    // Check if there is exactly one WHERE and one OPTIONS
-                    if (!("WHERE" in query) || !("OPTIONS" in query)) {
-                        return reject(new InsightError("Invalid key in query."));
-                    }
-                }
-                // Valid if the input is null, otherwise call helper
-                if (!this.insightValidateHelper.isObjectEmpty(query["WHERE"])) {
-                    isValid = this.validFilter(query["WHERE"]) && this.validOptions(query["OPTIONS"]);
-                } else {
-                    isValid = this.validOptions(query["OPTIONS"]);
-                }
                 // Semantic checking only if the query is syntactically valid
-                if (isValid) {
-                    if (!this.semanticCheck(query, datasetIds)) {
-                        return reject(new InsightError("Query doesn't pass semantic checking."));
+                if (this.syntacticCheck(query)) {
+                    if (this.semanticCheck(query, datasetIds)) {
+                        return resolve(true);
                     }
-                } else {
-                    return reject(new InsightError("Query doesn't pass syntactic checking."));
                 }
-            } else {
-                return reject(new InsightError("Query is not a JSON object."));
             }
-            return resolve(isValid);
+            return reject(new InsightError("Invalid query"));
         });
+    }
+
+    public syntacticCheck(query: any): boolean {
+        let isValid = false;
+        const allTheKeys = Object.keys(query);
+        if (allTheKeys.length > 1 && allTheKeys.length < 4 && "WHERE" in query && "OPTIONS" in query) {
+            if (!this.insightValidateHelper.isObjectEmpty(query["WHERE"])) {
+                isValid = this.validFilter(query["WHERE"]) && this.validOptions(query["OPTIONS"]);
+            } else {
+                isValid = this.validOptions(query["OPTIONS"]);
+            }
+            if (allTheKeys.length === 3 && isValid) {
+                return this.validTrans(query["TRANSFORMATION"]);
+            }
+        }
+        return isValid;
+    }
+
+    public validTrans(trans: any): boolean {
+        if (typeof trans === "object" && trans !== null) {
+            // Todo: Validate TRANSFORMATION
+            return true;
+        }
+        return false;
     }
 
     public validFilter(filter: any): boolean {
@@ -92,44 +94,23 @@ export default class InsightQuery implements IInsightQuery {
         if (typeof options === "object") {
             const allTheKeys = Object.keys(options);
             switch (allTheKeys.length) {
-                case 0:
-                    return false;
                 case 1:
-                    if (!("COLUMNS" in options)) {
-                        return false;
-                    } else {
-                        return this.validColumns(options["COLUMNS"]);
-                    }
+                    return this.insightValidateHelper.validColumns(options["COLUMNS"]);
                 case 2:
-                    if (!("COLUMNS" in options) || !("ORDER" in options)) {
-                        return false;
-                    } else {
+                    if (typeof options["ORDER"] === "object") {
                         // If both COLUMNS and OPTIONS are valid, check if COLUMNS contains ORDER
-                        if (this.validColumns(options["COLUMNS"]) && this.validOrder(options["ORDER"])) {
+                        if (this.insightValidateHelper.validColumns(options["COLUMNS"]) &&
+                            this.insightValidateHelper.validOrder(options["ORDER"])) {
+                            const order = options["ORDER"];
+                            return options["COLUMNS"].includes(order["keys"]);
+                        }
+                    } else {
+                        if (this.insightValidateHelper.validColumns(options["COLUMNS"]) &&
+                            this.insightValidateHelper.validOrderString(options["ORDER"])) {
                             return options["COLUMNS"].includes(options["ORDER"]);
                         }
-                        return false;
                     }
-                default:
-                    return false;
             }
-        }
-        return false;
-    }
-
-    public validColumns(cols: any): boolean {
-        if (Array.isArray(cols)) {
-            // COLUMNS array cannot be empty
-            if (cols.length > 0) {
-                return this.insightValidateHelper.validKeys(cols);
-            }
-        }
-        return false;
-    }
-
-    public validOrder(order: any): boolean {
-        if (typeof order === "string") {
-            return this.insightValidateHelper.validKeys(order);
         }
         return false;
     }
@@ -139,6 +120,8 @@ export default class InsightQuery implements IInsightQuery {
         let datasets: string[] = [];
         datasets = this.insightValidateHelper.getDatasetIDInWHERE(query["WHERE"], datasets);
         datasets = this.insightValidateHelper.getDatasetIDInOPTIONS(query["OPTIONS"], datasets);
+        // Todo: if (!this.insightValidateHelper.isObjectEmpty(query["TRANSFORMATION"]))
+        // Todo: datasets = this.insightValidateHelper.getDatasetIDInOPTIONS(query["TRANSFORMATION"], datasets);
         let isValid = !this.insightValidateHelper.areMultipleDatasets(datasets);
         this.datasetCalled = datasets[0];
         // Only check if the dataset is added when the query is valid at this point

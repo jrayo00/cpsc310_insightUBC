@@ -15,6 +15,41 @@ export default class InsightValidateHelper implements IInsightValidateHelper {
         this.insightFetchHelper = new InsightFetchHelper();
     }
 
+    public validColumns(cols: any): boolean {
+        if (Array.isArray(cols)) {
+            // COLUMNS array cannot be empty
+            if (cols.length > 0) {
+                return this.validKeys(cols);
+            }
+        }
+        return false;
+    }
+
+    public validOrderString(order: any): boolean {
+        if (typeof order === "string") {
+            return this.validKeys(order);
+        }
+        return false;
+    }
+
+    public validOrder(order: any): boolean {
+        const dir = ["UP", "DOWN"];
+        let isValid = true;
+        if (typeof order === "object" && order != null) {
+            // Todo: Check order["dir"] and order["keys"]
+            if (dir.includes(order["dir"])) {
+                if (Array.isArray(order["keys"])) {
+                    const keys = order["keys"];
+                    for (let k in keys) {
+                        isValid = isValid && this.validOrderString(keys[k]);
+                    }
+                    return isValid;
+                }
+            }
+        }
+        return false;
+    }
+
     public validLogicComparison(filters: any): boolean {
         // Should have a for loop, loop over the array of filters
         let insightQuery: InsightQuery;
@@ -87,40 +122,37 @@ export default class InsightValidateHelper implements IInsightValidateHelper {
     public validKeys(key: any): boolean {
         let isValid = true;
         if (typeof key === "string") {
-            isValid = this.validMKey(key) || this.validSKey(key);
+            return this.validMKey(key) || this.validSKey(key) || this.validApplyKey(key);
         } else if (Array.isArray(key)) {
             // Input could be an array of keys, or an array of strings
             for (let k in key) {
                 isValid = isValid && this.validKeys(key[k]);
             }
-        } else {
-            isValid = false;
+            return isValid;
         }
-        return isValid;
+        return false;
     }
 
     public validMKey(key: any): boolean {
-        let isValid = true;
         const mfields = ["avg", "pass", "fail", "audit", "year"];
         const parts = key.split("_");
         if (parts.length === 2) {
-            isValid = mfields.includes(parts[1]) && parts[0].length !== 0;
-        } else {
-            isValid = false;
+            return mfields.includes(parts[1]) && parts[0].length !== 0;
         }
-        return isValid;
+        return false;
     }
 
     public validSKey(key: any): boolean {
-        let isValid = true;
         const sfields = ["dept", "id", "instructor", "title", "uuid"];
         const parts = key.split("_");
         if (parts.length === 2) {
-            isValid = sfields.includes(parts[1]) && parts[0].length !== 0;
-        } else {
-            isValid = false;
+            return sfields.includes(parts[1]) && parts[0].length !== 0;
         }
-        return isValid;
+        return false;
+    }
+
+    public validApplyKey(key: any): boolean {
+        return key.split("_") < 2 && key.length > 0;
     }
 
     public getDatasetIDInWHERE(query: any, datasets: string[]): string[] {
