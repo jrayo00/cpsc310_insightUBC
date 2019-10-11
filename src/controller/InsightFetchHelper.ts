@@ -14,8 +14,6 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
         Log.trace("InsightQueryHelperImpl::init()");
     }
 
-    // public insightQueryHelper: InsightValidateHelper = new InsightValidateHelper();
-
     // Helpers for fetching starts here
     public getDataset(datasetId: string): any {
         const cacheDir = __dirname + "/../../data/";

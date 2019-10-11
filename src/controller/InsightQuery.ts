@@ -5,9 +5,8 @@ import InsightValidateHelper from "./InsightValidateHelper";
 import InsightFetchHelper from "./InsightFetchHelper";
 
 /**
- * This is the main programmatic entry point for the project.
- * Method documentation is in IInsightFacade
- *
+ * This is the query handling class for the insightFacade class.
+ * Method documentation is in IInsightQuery
  */
 export default class InsightQuery implements IInsightQuery {
     public datasets: { [id: string]: any[] } ;
@@ -172,7 +171,6 @@ export default class InsightQuery implements IInsightQuery {
         let datasets: string[] = [];
         datasets = this.insightValidateHelper.getDatasetIDInWHERE(query["WHERE"], datasets);
         datasets = this.insightValidateHelper.getDatasetIDInOPTIONS(query["OPTIONS"], datasets);
-        // Todo: Need to check if the dataset has been added, call listDatasets()
         let isValid = !this.insightValidateHelper.areMultipleDatasets(datasets);
         this.datasetCalled = datasets[0];
         return isValid;
@@ -185,11 +183,9 @@ export default class InsightQuery implements IInsightQuery {
             let result: any[] = [];
             let dataset: any[];
             if (!datasetsString.includes(this.datasetCalled)) {
-                // Todo
                 datasets.push(this.insightFetchHelper.getDataset(this.datasetCalled));
                 datasetsString.push(this.datasetCalled);
             }
-            // let dataset: any = datasets[this.datasetCalled];
             let index: number = datasetsString.indexOf(this.datasetCalled);
             dataset = datasets[index].allSections;
             if (this.insightValidateHelper.isObjectEmpty(body)) {

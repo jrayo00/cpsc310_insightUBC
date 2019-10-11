@@ -1,8 +1,3 @@
-import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
-import {InsightError, NotFoundError, ResultTooLargeError} from "./IInsightFacade";
-import InsightValidateHelper from "./InsightValidateHelper";
-import InsightFetchHelper from "./InsightFetchHelper";
-
 /*
  * This is the primary high-level API for the project.
  * On top of InsightFacade, in this folder we add:

@@ -5,8 +5,6 @@
  */
 
 export interface IInsightFetchHelper {
-    // insightQueryHelper: InsightValidateHelper;
-    // Helpers for fetching starts here
     getDataset(datasetName: string): any;
 
     intersectIndexes(a: number[], b: number[]): number[];
