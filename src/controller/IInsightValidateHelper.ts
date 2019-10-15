@@ -28,6 +28,4 @@ export interface IInsightValidateHelper {
     areMultipleDatasets(obj: string[]): boolean;
 
     onlyUnique(value: any, index: any, self: any): boolean;
-
-    orderByProperty(result: any[], property: string): any[];
 }

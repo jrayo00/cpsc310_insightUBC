@@ -110,6 +110,21 @@ export default class InsightQuery implements IInsightQuery {
         return isValid;
     }
 
+    public orderByProperty(result: any[], property: string): any[] {
+        let sorted: any[] = [];
+        if (this.insightValidateHelper.validMKey(property)) {
+            sorted = result.sort((a, b) => {
+                return Number(a[property]) - Number(b[property]);
+            });
+            return sorted;
+        } else {
+            sorted = result.sort((a, b) => {
+                return (a[property] > b[property]) ? 1 : ((b[property] > a[property]) ? -1 : 0);
+            });
+            return sorted;
+        }
+    }
+
     public fetchQuery(query: any, datasets: any[], datasetsString: any[]): Promise<any[]> {
         return new Promise<any[]>((resolve, reject) => {
             const body = query["WHERE"];
@@ -130,7 +145,7 @@ export default class InsightQuery implements IInsightQuery {
             result = this.insightFetchHelper.indexWithNumber(dataset, result);
             result = this.insightFetchHelper.extractProperties(result, options["COLUMNS"], this.datasetCalled);
             if (("ORDER" in options)) {
-                result = this.insightValidateHelper.orderByProperty(result, options["ORDER"]);
+                result = this.orderByProperty(result, options["ORDER"]);
             }
             return resolve(result);
         });

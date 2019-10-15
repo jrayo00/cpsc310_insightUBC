@@ -40,6 +40,8 @@ export interface IInsightQuery {
 
     semanticCheck(query: any, datasetIds: string[]): boolean;
 
+    orderByProperty(result: any[], property: string): any[];
+
     /**
      * Fetch a valid query on UBCInsight.
      *

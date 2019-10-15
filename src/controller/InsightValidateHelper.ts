@@ -40,11 +40,13 @@ export default class InsightValidateHelper implements IInsightValidateHelper {
     }
 
     public validApplyToken(token: any): boolean {
-        const tokens = ["COUNT", "SUM", "AVG", "MAX", "MIN"];
+        const mtokens = ["SUM", "AVG", "MAX", "MIN"];
         if (typeof token === "object" && token != null) {
             const allTheKeys = Object.keys(token);
             if (allTheKeys.length === 1) {
-                if (tokens.includes(allTheKeys[0]) && typeof Object.values(token)[0] === "string") {
+                if (mtokens.includes(allTheKeys[0]) && typeof Object.values(token)[0] === "string") {
+                    return this.validMKey(Object.values(token)[0]);
+                } else if (allTheKeys[0] === "COUNT" && typeof Object.values(token)[0] === "string") {
                     return this.validKeys(Object.values(token)[0], false);
                 }
             }
@@ -215,10 +217,14 @@ export default class InsightValidateHelper implements IInsightValidateHelper {
         const order = query["ORDER"];
         for (let item in cols) {
             let keyString = cols[item];
-            datasets = datasets.concat(keyString.split("_")[0]);
+            if (!this.validApplyKey(keyString)) {
+                datasets = datasets.concat(keyString.split("_")[0]);
+            }
         }
         if (typeof order === "string") {
-            datasets = datasets.concat(order.split("_")[0]);
+            if (!this.validApplyKey(order)) {
+                datasets = datasets.concat(order.split("_")[0]);
+            }
         }
         return datasets;
     }
@@ -234,20 +240,5 @@ export default class InsightValidateHelper implements IInsightValidateHelper {
 
     public onlyUnique(value: any, index: any, self: any): boolean {
         return self.indexOf(value) === index;
-    }
-
-    public orderByProperty(result: any[], property: string): any[] {
-        let sorted: any[] = [];
-        if (this.validMKey(property)) {
-            sorted = result.sort((a, b) => {
-                return Number(a[property]) - Number(b[property]);
-            });
-            return sorted;
-        } else {
-            sorted = result.sort((a, b) => {
-                return (a[property] > b[property]) ? 1 : ((b[property] > a[property]) ? -1 : 0);
-            });
-            return sorted;
-        }
     }
 }
