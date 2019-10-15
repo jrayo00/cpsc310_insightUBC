@@ -39,6 +39,7 @@ export default class InsightQuery implements IInsightQuery {
     public syntacticCheck(query: any): boolean {
         let isValid = false;
         const allTheKeys = Object.keys(query);
+        // If there're 2 or 3 keys
         if (allTheKeys.length > 1 && allTheKeys.length < 4 && "WHERE" in query && "OPTIONS" in query) {
             if (!this.insightValidateHelper.isObjectEmpty(query["WHERE"])) {
                 isValid = this.insightValidateHelper.validFilter(query["WHERE"]) && this.validOptions(query["OPTIONS"]);
@@ -46,7 +47,7 @@ export default class InsightQuery implements IInsightQuery {
                 isValid = this.validOptions(query["OPTIONS"]);
             }
             if (allTheKeys.length === 3 && isValid) {
-                return this.validTrans(query["TRANSFORMATION"]);
+                return this.validTrans(query["TRANSFORMATIONS"]);
             }
         }
         return isValid;
@@ -54,8 +55,12 @@ export default class InsightQuery implements IInsightQuery {
 
     public validTrans(trans: any): boolean {
         if (typeof trans === "object" && trans !== null) {
-            // Todo: Validate TRANSFORMATION
-            return true;
+            // Todo: Validate TRANSFORMATIONS
+            const allTheKeys = Object.keys(trans);
+            if (allTheKeys.length === 2 && "GROUP" in trans && "APPLY" in trans) {
+                return this.insightValidateHelper.validKeys(trans["GROUP"], false) &&
+                    this.insightValidateHelper.validApply(trans["APPLY"]);
+            }
         }
         return false;
     }
@@ -66,21 +71,24 @@ export default class InsightQuery implements IInsightQuery {
             const allTheKeys = Object.keys(options);
             switch (allTheKeys.length) {
                 case 1:
-                    return this.insightValidateHelper.validColumns(options["COLUMNS"]);
+                    return this.insightValidateHelper.validKeys(options["COLUMNS"], true);
                 case 2:
+                    // If ORDER clause is an object
                     if (typeof options["ORDER"] === "object") {
                         // If both COLUMNS and OPTIONS are valid, check if COLUMNS contains ORDER
-                        if (this.insightValidateHelper.validColumns(options["COLUMNS"]) &&
+                        if (this.insightValidateHelper.validKeys(options["COLUMNS"], true) &&
                             this.insightValidateHelper.validOrder(options["ORDER"])) {
                             const order = options["ORDER"];
                             return options["COLUMNS"].includes(order["keys"]);
                         }
-                    } else {
-                        if (this.insightValidateHelper.validColumns(options["COLUMNS"]) &&
-                            this.insightValidateHelper.validOrderKeys(options["ORDER"])) {
+                    } else if (typeof options["ORDER"] === "string") {
+                        // If ORDER clause is a string (key)
+                        if (this.insightValidateHelper.validKeys(options["COLUMNS"], true) &&
+                            this.insightValidateHelper.validKeys(options["ORDER"], true)) {
                             return options["COLUMNS"].includes(options["ORDER"]);
                         }
                     }
+                    return false;
             }
         }
         return false;

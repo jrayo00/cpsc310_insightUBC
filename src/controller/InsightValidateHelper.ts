@@ -14,36 +14,50 @@ export default class InsightValidateHelper implements IInsightValidateHelper {
         this.insightFetchHelper = new InsightFetchHelper();
     }
 
-    public validColumns(cols: any): boolean {
-        if (Array.isArray(cols)) {
-            // COLUMNS array cannot be empty
-            if (cols.length > 0) {
-                return this.validKeys(cols);
+    public validApply(apply: any): boolean {
+        let isValid = true;
+        if (Array.isArray(apply)) {
+            if (apply.length > 0) {
+                for (let rule in apply) {
+                    isValid = isValid && this.validApplyRule(apply[rule]);
+                }
+            }
+            return isValid;
+        }
+        return false;
+    }
+
+    public validApplyRule(rule: any): boolean {
+        if (typeof rule === "object" && rule != null) {
+            const allTheKeys = Object.keys(rule);
+            if (allTheKeys.length === 1) {
+                if (this.validApplyKey(allTheKeys[0])) {
+                    return this.validApplyToken(Object.values(rule)[0]);
+                }
             }
         }
         return false;
     }
 
-    public validOrderKeys(order: any): boolean {
-        if (typeof order === "string") {
-            return this.validKeys(order);
+    public validApplyToken(token: any): boolean {
+        const tokens = ["COUNT", "SUM", "AVG", "MAX", "MIN"];
+        if (typeof token === "object" && token != null) {
+            const allTheKeys = Object.keys(token);
+            if (allTheKeys.length === 1) {
+                if (tokens.includes(allTheKeys[0]) && typeof Object.values(token)[0] === "string") {
+                    return this.validKeys(Object.values(token)[0], false);
+                }
+            }
         }
         return false;
     }
 
     public validOrder(order: any): boolean {
         const dir = ["UP", "DOWN"];
-        let isValid = true;
         if (typeof order === "object" && order != null) {
-            // Todo: Check order["dir"] and order["keys"]
+            // Check order["dir"] and order["keys"]
             if (dir.includes(order["dir"])) {
-                if (Array.isArray(order["keys"])) {
-                    const keys = order["keys"];
-                    for (let k in keys) {
-                        isValid = isValid && this.validOrderKeys(keys[k]);
-                    }
-                    return isValid;
-                }
+                return this.validKeys(order["keys"], true);
             }
         }
         return false;
@@ -132,16 +146,22 @@ export default class InsightValidateHelper implements IInsightValidateHelper {
         return isValid;
     }
 
-    public validKeys(key: any): boolean {
+    public validKeys(key: any, applyKey: boolean): boolean {
         let isValid = true;
         if (typeof key === "string") {
-            return this.validMKey(key) || this.validSKey(key) || this.validApplyKey(key);
-        } else if (Array.isArray(key)) {
-            // Input could be an array of keys, or an array of strings
-            for (let k in key) {
-                isValid = isValid && this.validKeys(key[k]);
+            isValid = this.validMKey(key) || this.validSKey(key);
+            if (applyKey) {
+                return isValid || this.validApplyKey(key);
             }
             return isValid;
+        } else if (Array.isArray(key)) {
+            // Input could be an array of keys, or an array of strings
+            if (key.length > 0) {
+                for (let k in key) {
+                    isValid = isValid && this.validKeys(key[k], applyKey);
+                }
+                return isValid;
+            }
         }
         return false;
     }

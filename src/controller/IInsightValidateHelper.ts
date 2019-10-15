@@ -5,7 +5,7 @@
  */
 
 export interface IInsightValidateHelper {
-    validKeys(query: any): boolean;
+    validKeys(query: any, applyKey: boolean): boolean;
 
     validMKey(query: any): boolean;
 
