@@ -25,7 +25,7 @@ export interface IInsightValidateHelper {
 
     isObjectEmpty(obj: any): boolean;
 
-    areMultipleDatasets(obj: string[]): boolean;
+    areMultipleItems(obj: string[]): boolean;
 
     onlyUnique(value: any, index: any, self: any): boolean;
 }

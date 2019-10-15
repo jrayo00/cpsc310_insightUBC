@@ -169,20 +169,23 @@ export default class InsightValidateHelper implements IInsightValidateHelper {
     }
 
     public validMKey(key: any): boolean {
-        const mfields = ["avg", "pass", "fail", "audit", "year", "lat", "lon", "seats"];
+        const coursesMfields = ["avg", "pass", "fail", "audit", "year"];
+        const roomsMfields = ["lat", "lon", "seats"];
         const parts = key.split("_");
         if (parts.length === 2) {
-            return mfields.includes(parts[1]) && parts[0].length !== 0;
+            return (coursesMfields.includes(parts[1]) && parts[0] === "courses") ||
+                (roomsMfields.includes(parts[1]) && parts[0] === "rooms");
         }
         return false;
     }
 
     public validSKey(key: any): boolean {
-        const sfields = ["dept", "id", "instructor", "title", "uuid",
-            "fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
+        const coursesSfields = ["dept", "id", "instructor", "title", "uuid"];
+        const roomsSfields = ["fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
         const parts = key.split("_");
         if (parts.length === 2) {
-            return sfields.includes(parts[1]) && parts[0].length !== 0;
+            return (coursesSfields.includes(parts[1]) && parts[0] === "courses") ||
+                (roomsSfields.includes(parts[1]) && parts[0] === "rooms");
         }
         return false;
     }
@@ -229,16 +232,35 @@ export default class InsightValidateHelper implements IInsightValidateHelper {
         return datasets;
     }
 
+    public getDatasetIDInTRANSFORMATIONS(query: any, datasets: string[]): string[] {
+        const cols = query["GROUP"];
+        for (let item in cols) {
+            let keyString = cols[item];
+            datasets = datasets.concat(keyString.split("_")[0]);
+        }
+        return datasets;
+    }
+
     public isObjectEmpty(obj: any): boolean {
         return Object.keys(obj).length === 0;
     }
 
-    public areMultipleDatasets(obj: string[]): boolean {
+    public areMultipleItems(obj: string[]): boolean {
         let unique = obj.filter(this.onlyUnique);
         return unique.length > 1;
     }
 
     public onlyUnique(value: any, index: any, self: any): boolean {
         return self.indexOf(value) === index;
+    }
+
+    public hasDuplicates(array: any[]): boolean {
+        return (new Set(array)).size !== array.length;
+    }
+
+    public isSubarray(array: any[], subarray: any[]): boolean {
+        return subarray.every((item) => {
+            return array.indexOf(item) !== -1;
+        });
     }
 }

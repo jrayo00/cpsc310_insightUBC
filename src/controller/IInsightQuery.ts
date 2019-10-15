@@ -38,7 +38,7 @@ export interface IInsightQuery {
 
     syntacticCheck(query: any): boolean;
 
-    semanticCheck(query: any, datasetIds: string[]): boolean;
+    checkCalledDataset(query: any): boolean;
 
     orderByProperty(result: any[], property: string): any[];
 

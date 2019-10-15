@@ -27,10 +27,16 @@ export default class InsightQuery implements IInsightQuery {
             if (typeof query === "object" && query !== null) {
                 // Semantic checking only if the query is syntactically valid
                 if (this.syntacticCheck(query)) {
-                    if (this.semanticCheck(query, datasetIds)) {
-                        return resolve(true);
+                    if (this.checkCalledDataset(query) && this.checkSelectedColumns(query)) {
+                        // Only check if the dataset is added when the query is valid at this point
+                        if (this.insightFetchHelper.isAdded(this.datasetCalled, datasetIds)) {
+                            return resolve(true);
+                        }
+                        return reject (new InsightError("Dataset not added"));
                     }
+                    return reject (new InsightError("Failed semantic checking"));
                 }
+                return reject (new InsightError("Failed syntactic checking"));
             }
             return reject(new InsightError("Invalid query"));
         });
@@ -55,7 +61,6 @@ export default class InsightQuery implements IInsightQuery {
 
     public validTrans(trans: any): boolean {
         if (typeof trans === "object" && trans !== null) {
-            // Todo: Validate TRANSFORMATIONS
             const allTheKeys = Object.keys(trans);
             if (allTheKeys.length === 2 && "GROUP" in trans && "APPLY" in trans) {
                 return this.insightValidateHelper.validKeys(trans["GROUP"], false) &&
@@ -79,7 +84,7 @@ export default class InsightQuery implements IInsightQuery {
                         if (this.insightValidateHelper.validKeys(options["COLUMNS"], true) &&
                             this.insightValidateHelper.validOrder(options["ORDER"])) {
                             const order = options["ORDER"];
-                            return options["COLUMNS"].includes(order["keys"]);
+                            return this.insightValidateHelper.isSubarray(options["COLUMNS"], order["keys"]);
                         }
                     } else if (typeof options["ORDER"] === "string") {
                         // If ORDER clause is a string (key)
@@ -94,35 +99,37 @@ export default class InsightQuery implements IInsightQuery {
         return false;
     }
 
-    public semanticCheck(query: any, datasetIds: string[]): boolean {
+    public checkCalledDataset(query: any): boolean {
         // Know the query is valid syntactically, return false if multiple datasets selected
         let datasets: string[] = [];
         datasets = this.insightValidateHelper.getDatasetIDInWHERE(query["WHERE"], datasets);
         datasets = this.insightValidateHelper.getDatasetIDInOPTIONS(query["OPTIONS"], datasets);
-        // Todo: if (!this.insightValidateHelper.isObjectEmpty(query["TRANSFORMATION"]))
-        // Todo: datasets = this.insightValidateHelper.getDatasetIDInOPTIONS(query["TRANSFORMATION"], datasets);
-        let isValid = !this.insightValidateHelper.areMultipleDatasets(datasets);
-        this.datasetCalled = datasets[0];
-        // Only check if the dataset is added when the query is valid at this point
-        if (isValid) {
-            isValid = this.insightFetchHelper.isAdded(this.datasetCalled, datasetIds);
+        if ("TRANSFORMATIONS" in query) {
+            datasets = this.insightValidateHelper.getDatasetIDInTRANSFORMATIONS(query["TRANSFORMATIONS"], datasets);
         }
+        let isValid = !this.insightValidateHelper.areMultipleItems(datasets);
+        this.datasetCalled = datasets[0];
         return isValid;
     }
 
-    public orderByProperty(result: any[], property: string): any[] {
-        let sorted: any[] = [];
-        if (this.insightValidateHelper.validMKey(property)) {
-            sorted = result.sort((a, b) => {
-                return Number(a[property]) - Number(b[property]);
-            });
-            return sorted;
-        } else {
-            sorted = result.sort((a, b) => {
-                return (a[property] > b[property]) ? 1 : ((b[property] > a[property]) ? -1 : 0);
-            });
-            return sorted;
+    public checkSelectedColumns(query: any): boolean {
+        // Return true if TRANSFORMATIONS clause is empty
+        if ("TRANSFORMATIONS" in query) {
+            const options = query["OPTIONS"];
+            const cols = options["COLUMNS"];
+            const trans = query["TRANSFORMATIONS"];
+            const group = trans["GROUP"];
+            const apply = trans["APPLY"];
+            let applyKeys: string[] = [];
+            for (let item in apply) {
+                applyKeys = applyKeys.concat(Object.keys(apply[item])[0]);
+            }
+            const transKeys = group.concat(applyKeys);
+            return this.insightValidateHelper.isSubarray(cols, group) &&
+                this.insightValidateHelper.isSubarray(transKeys, cols) &&
+                !this.insightValidateHelper.hasDuplicates(applyKeys);
         }
+        return true;
     }
 
     public fetchQuery(query: any, datasets: any[], datasetsString: any[]): Promise<any[]> {
@@ -143,11 +150,29 @@ export default class InsightQuery implements IInsightQuery {
                 result = this.insightFetchHelper.getIndexes(dataset, body);
             }
             result = this.insightFetchHelper.indexWithNumber(dataset, result);
+            // Todo: if "TRANSFORMATIONS" in query
+            // Group with an intermediate data structure, calculate, and store applyKeys in properties
             result = this.insightFetchHelper.extractProperties(result, options["COLUMNS"], this.datasetCalled);
             if (("ORDER" in options)) {
                 result = this.orderByProperty(result, options["ORDER"]);
             }
             return resolve(result);
         });
+    }
+
+    public orderByProperty(result: any[], property: string): any[] {
+        // Todo: adapt multi-column ordering
+        let sorted: any[] = [];
+        if (this.insightValidateHelper.validMKey(property)) {
+            sorted = result.sort((a, b) => {
+                return Number(a[property]) - Number(b[property]);
+            });
+            return sorted;
+        } else {
+            sorted = result.sort((a, b) => {
+                return (a[property] > b[property]) ? 1 : ((b[property] > a[property]) ? -1 : 0);
+            });
+            return sorted;
+        }
     }
 }
