@@ -160,19 +160,27 @@ export default class InsightQuery implements IInsightQuery {
         });
     }
 
-    public orderByProperty(result: any[], property: string): any[] {
-        // Todo: adapt multi-column ordering
-        let sorted: any[] = [];
-        if (this.insightValidateHelper.validMKey(property)) {
-            sorted = result.sort((a, b) => {
-                return Number(a[property]) - Number(b[property]);
+    public orderByProperty(result: any[], order: any): any[] {
+        if (typeof order === "string") {
+            result.sort((a, b) => {
+                return this.insightValidateHelper.compareTo(a, b, order);
             });
-            return sorted;
         } else {
-            sorted = result.sort((a, b) => {
-                return (a[property] > b[property]) ? 1 : ((b[property] > a[property]) ? -1 : 0);
+            // Sort by a list of properties
+            const dir = order["dir"];
+            const properties = order["keys"];
+            result.sort((a, b) => {
+                let flag = 0;
+                for (let p in properties) {
+                    flag = flag || this.insightValidateHelper.compareTo(a, b, properties[p]);
+                }
+                return flag;
             });
-            return sorted;
+            // Reverse the order
+            if (dir === "DOWN") {
+                result.reverse();
+            }
         }
+        return result;
     }
 }

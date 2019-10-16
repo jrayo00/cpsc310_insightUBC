@@ -10,7 +10,7 @@ export default class InsightValidateHelper implements IInsightValidateHelper {
     public insightFetchHelper: InsightFetchHelper;
 
     constructor() {
-        Log.trace("InsightQueryHelperImpl::init()");
+        Log.trace("InsightQueryValidateHelperImpl::init()");
         this.insightFetchHelper = new InsightFetchHelper();
     }
 
@@ -267,5 +267,14 @@ export default class InsightValidateHelper implements IInsightValidateHelper {
         return subarray.every((item) => {
             return array.indexOf(item) !== -1;
         });
+    }
+
+    public compareTo(a: {[key: string]: number | string, },
+                     b: {[key: string]: number | string, }, property: string): number {
+        if (this.validMKey(property) || this.validApplyKey(property)) {
+            return Number(a[property]) - Number(b[property]);
+        } else {
+            return (a[property] > b[property]) ? 1 : ((b[property] > a[property]) ? -1 : 0);
+        }
     }
 }

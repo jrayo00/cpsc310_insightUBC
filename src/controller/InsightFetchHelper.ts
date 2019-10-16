@@ -11,7 +11,7 @@ import {Dataset} from "./Dataset";
 export default class InsightFetchHelper implements IInsightFetchHelper {
 
     constructor() {
-        Log.trace("InsightQueryHelperImpl::init()");
+        Log.trace("InsightQueryFetchHelperImpl::init()");
     }
 
     // Helpers for fetching starts here
