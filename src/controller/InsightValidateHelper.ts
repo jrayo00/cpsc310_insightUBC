@@ -169,23 +169,28 @@ export default class InsightValidateHelper implements IInsightValidateHelper {
     }
 
     public validMKey(key: any): boolean {
-        const coursesMfields = ["avg", "pass", "fail", "audit", "year"];
-        const roomsMfields = ["lat", "lon", "seats"];
+        const mfields = ["avg", "pass", "fail", "audit", "year", "lat", "lon", "seats"];
+        // const coursesMfields = ["avg", "pass", "fail", "audit", "year"];
+        // const roomsMfields = ["lat", "lon", "seats"];
         const parts = key.split("_");
         if (parts.length === 2) {
-            return (coursesMfields.includes(parts[1]) && parts[0] === "courses") ||
-                (roomsMfields.includes(parts[1]) && parts[0] === "rooms");
+            return mfields.includes(parts[1]) && parts[0].length !== 0;
+            // return (coursesMfields.includes(parts[1]) && parts[0] === "courses") ||
+            //     (roomsMfields.includes(parts[1]) && parts[0] === "rooms");
         }
         return false;
     }
 
     public validSKey(key: any): boolean {
-        const coursesSfields = ["dept", "id", "instructor", "title", "uuid"];
-        const roomsSfields = ["fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
+        const sfields = ["dept", "id", "instructor", "title", "uuid",
+            "fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
+        // const coursesSfields = ["dept", "id", "instructor", "title", "uuid"];
+        // const roomsSfields = ["fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
         const parts = key.split("_");
         if (parts.length === 2) {
-            return (coursesSfields.includes(parts[1]) && parts[0] === "courses") ||
-                (roomsSfields.includes(parts[1]) && parts[0] === "rooms");
+            return sfields.includes(parts[1]) && parts[0].length !== 0;
+            // return (coursesSfields.includes(parts[1]) && parts[0] === "courses") ||
+            //     (roomsSfields.includes(parts[1]) && parts[0] === "rooms");
         }
         return false;
     }
