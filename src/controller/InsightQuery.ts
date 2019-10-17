@@ -3,6 +3,7 @@ import {InsightError} from "./IInsightFacade";
 import {IInsightQuery} from "./IInsightQuery";
 import InsightValidateHelper from "./InsightValidateHelper";
 import InsightFetchHelper from "./InsightFetchHelper";
+import InsightTransformHelper from "./InsightTransformHelper";
 
 /**
  * This is the query handling class for the insightFacade class.
@@ -13,6 +14,7 @@ export default class InsightQuery implements IInsightQuery {
     public datasetCalled: string;
     public insightValidateHelper: InsightValidateHelper;
     public insightFetchHelper: InsightFetchHelper;
+    public insightTransformHelper: InsightTransformHelper;
 
     constructor() {
         Log.trace("InsightQueryImpl::init()");
@@ -20,6 +22,7 @@ export default class InsightQuery implements IInsightQuery {
         this.datasetCalled = "";
         this.insightFetchHelper = new InsightFetchHelper();
         this.insightValidateHelper = new InsightValidateHelper();
+        this.insightTransformHelper = new InsightTransformHelper();
     }
 
     public validQuery(query: any, datasetIds: string[]): Promise <boolean> {
@@ -150,8 +153,11 @@ export default class InsightQuery implements IInsightQuery {
                 result = this.insightFetchHelper.getIndexes(dataset, body);
             }
             result = this.insightFetchHelper.indexWithNumber(dataset, result);
-            // Todo: if "TRANSFORMATIONS" in query
+            // TODO: If "TRANSFORMATIONS" in query
             // Group with an intermediate data structure, calculate, and store applyKeys in properties
+            if ("TRANSFORMATIONS" in query) {
+                result = this.insightTransformHelper.transformQuery(result, query["TRANSFORMATIONS"]);
+            }
             result = this.insightFetchHelper.extractProperties(result, options["COLUMNS"], this.datasetCalled);
             if (("ORDER" in options)) {
                 result = this.orderByProperty(result, options["ORDER"]);

@@ -69,12 +69,25 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
         let copy;
         let newKey: string;
         for (let section in result) {
+            // Get the object with info key
             let temp: any = Object.values(result[section])[0];
+            let idKeys = Object.keys(temp).map((v: any) => {
+                // Append the dataset id as prefix
+                return datasetCalled.concat("_", v);
+            });
             copy = temp.constructor();
+            // First, handle existing columns
             for (let key in temp) {
                 if (properties.includes(datasetCalled.concat("_", key))) {
                     newKey = datasetCalled.concat("_", key);
                     copy[newKey] = temp[key];
+                }
+            }
+            // Then, handle the applyKey case
+            for (let p in properties) {
+                let applyKey = properties[p];
+                if (!idKeys.includes(applyKey)) {
+                    copy[applyKey] = temp[applyKey];
                 }
             }
             results.push(copy);
