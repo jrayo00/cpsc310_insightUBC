@@ -86,11 +86,11 @@ export default class InsightTransformHelper implements IInsightTransformHelper {
         // For each group in groupedResult
         for (let i in result) {
             let group = result[i];
-            let groupMAX = Math.max.apply(Math, group.map((o) => {
-                return Number(o[col]);
+            let max = Math.max.apply(Math, group.map((o) => {
+                return Number(o.info[col]);
             }));
             // Add the local max as a new property
-            result[i] = this.addProperty(result[i], applyKey, groupMAX);
+            result[i] = this.addProperty(result[i], applyKey, max);
         }
         return result;
     }
@@ -99,11 +99,11 @@ export default class InsightTransformHelper implements IInsightTransformHelper {
         // For each group in groupedResult
         for (let i in result) {
             let group = result[i];
-            let groupMIN = Math.min.apply(Math, group.map((o) => {
-                return Number(o[col]);
+            let min = Math.min.apply(Math, group.map((o) => {
+                return Number(o.info[col]);
             }));
             // Add the local min as a new property
-            result[i] = this.addProperty(result[i], applyKey, groupMIN);
+            result[i] = this.addProperty(result[i], applyKey, min);
         }
         return result;
     }
@@ -114,7 +114,7 @@ export default class InsightTransformHelper implements IInsightTransformHelper {
             let group = result[i];
             // Get an array of the property values
             let colValues = group.map((a) => {
-                return a[col];
+                return a.info[col];
             });
             // Add the group count as a new property
             result[i] = this.addProperty(result[i], applyKey, this.countUnique(colValues));
@@ -130,11 +130,11 @@ export default class InsightTransformHelper implements IInsightTransformHelper {
         // For each group in groupedResult
         for (let i in result) {
             let group = result[i];
-            let groupSUM = group.reduce((a, b) => {
-                return a + b[col];
+            let total = group.reduce((a, b) => {
+                return a + b.info[col];
                 }, 0);
             // Add the group sum as a new property
-            result[i] = this.addProperty(result[i], applyKey, groupSUM);
+            result[i] = this.addProperty(result[i], applyKey, Number(total.toFixed(2)));
         }
         return result;
     }
@@ -143,12 +143,13 @@ export default class InsightTransformHelper implements IInsightTransformHelper {
         // For each group in groupedResult
         for (let i in result) {
             let group = result[i];
-            let groupSUM = group.reduce((a, b) => {
-                return a + b[col];
+            let total = group.reduce((a, b) => {
+                let decimalA = new Decimal(a);
+                let decimalB = new Decimal(b.info[col]);
+                return decimalA.add(decimalB);
                 }, 0);
             // Add the local max as a new property
-            const sum: Decimal = new Decimal(groupSUM);
-            const avg = sum.toNumber() / group.length;
+            const avg = total.toNumber() / group.length;
             result[i] = this.addProperty(result[i], applyKey, Number(avg.toFixed(2)));
         }
         return result;

@@ -153,8 +153,6 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
             case "IS":
                 item = query["IS"];
                 return this.getIndexesIS(dataset, item);
-            default:
-                return [];
         }
     }
 
