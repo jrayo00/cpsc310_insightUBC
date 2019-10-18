@@ -83,10 +83,10 @@ export default class InsightFacade implements IInsightFacade {
         return JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
             let newDataset: Dataset = new Dataset(id, InsightDatasetKind.Rooms);
             const promises: Array<Promise<any>> = [];
-            return zip.folder("rooms").file("index.htm").async("text").then(function (data: string) {
+            // TEMP FIX: SWITCH FILE PATH BACK TO INDEX.HTM BEFORE SUBMISSION
+            return zip.folder("rooms").file("shortTree.htm").async("text").then(function (data: string) {
                 Log.test("Retrieved file contents, now parse !");
-                const parse5 = require("parse5");
-                const document = parse5.parse(data);
+                newDataset.parseRoomsDataset(data);
                 const sarr: string[] = [id];
                 return Promise.resolve(sarr);
             });
