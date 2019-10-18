@@ -158,7 +158,7 @@ export default class InsightFacade implements IInsightFacade {
         let insightQuery: InsightQuery;
         insightQuery = new InsightQuery();
         // Validate the input query
-        return insightQuery.validQuery(query, this.datasetsString).then((result: boolean) => {
+        return insightQuery.validQuery(query, this.datasets, this.datasetsString).then((result: boolean) => {
             Log.info(`In performQuery ${result}`);
             if (result) {
                 // Return fetched query result if the input query is valid

@@ -7,11 +7,13 @@ import InsightFetchHelper from "./InsightFetchHelper";
  * Method documentation is in IInsightValidateHelper
  */
 export default class InsightValidateHelper implements IInsightValidateHelper {
-    public insightFetchHelper: InsightFetchHelper;
+    public mfields: string[];
+    public sfields: string[];
 
     constructor() {
         Log.trace("InsightQueryValidateHelperImpl::init()");
-        this.insightFetchHelper = new InsightFetchHelper();
+        this.mfields = [];
+        this.sfields = [];
     }
 
     public validApply(apply: any): boolean {
@@ -66,10 +68,8 @@ export default class InsightValidateHelper implements IInsightValidateHelper {
     }
 
     public validFilter(filter: any): boolean {
-        // Check if the input is a JSON object
         if (typeof filter === "object") {
             const allTheKeys = Object.keys(filter);
-            // Check if query is empty
             if (allTheKeys.length === 1) {
                 switch (allTheKeys[0]) {
                     case "AND":
@@ -169,28 +169,43 @@ export default class InsightValidateHelper implements IInsightValidateHelper {
     }
 
     public validMKey(key: any): boolean {
-        const mfields = ["avg", "pass", "fail", "audit", "year", "lat", "lon", "seats"];
-        // const coursesMfields = ["avg", "pass", "fail", "audit", "year"];
-        // const roomsMfields = ["lat", "lon", "seats"];
+        const coursesMfields = ["avg", "pass", "fail", "audit", "year"];
+        const roomsMfields = ["lat", "lon", "seats"];
         const parts = key.split("_");
         if (parts.length === 2) {
-            return mfields.includes(parts[1]) && parts[0].length !== 0;
-            // return (coursesMfields.includes(parts[1]) && parts[0] === "courses") ||
-            //     (roomsMfields.includes(parts[1]) && parts[0] === "rooms");
+            // First time set the valid mfields according to the dataset called
+            if (parts[0].length !== 0 && this.mfields.length === 0) {
+                if (coursesMfields.includes(parts[1])) {
+                    this.mfields = coursesMfields;
+                    return true;
+                } else if (roomsMfields.includes(parts[1])) {
+                    this.mfields = roomsMfields;
+                    return true;
+                }
+                return false;
+            }
+            return this.mfields.includes(parts[1]) && parts[0].length !== 0;
         }
         return false;
     }
 
     public validSKey(key: any): boolean {
-        const sfields = ["dept", "id", "instructor", "title", "uuid",
-            "fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
-        // const coursesSfields = ["dept", "id", "instructor", "title", "uuid"];
-        // const roomsSfields = ["fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
+        const coursesSfields = ["dept", "id", "instructor", "title", "uuid"];
+        const roomsSfields = ["fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
         const parts = key.split("_");
         if (parts.length === 2) {
-            return sfields.includes(parts[1]) && parts[0].length !== 0;
-            // return (coursesSfields.includes(parts[1]) && parts[0] === "courses") ||
-            //     (roomsSfields.includes(parts[1]) && parts[0] === "rooms");
+            // First time set the valid mfields according to the dataset called
+            if (parts[0].length !== 0 && this.sfields.length === 0) {
+                if (coursesSfields.includes(parts[1])) {
+                    this.sfields = coursesSfields;
+                    return true;
+                } else if (roomsSfields.includes(parts[1])) {
+                    this.sfields = roomsSfields;
+                    return true;
+                }
+                return false;
+            }
+            return this.sfields.includes(parts[1]) && parts[0].length !== 0;
         }
         return false;
     }

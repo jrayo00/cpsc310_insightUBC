@@ -101,25 +101,6 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
         return value.replace(/[*]/g, ".*");
     }
 
-    public isAdded(datasetId: string, datasetIds: string[]): boolean {
-        const cacheDir = __dirname + "/../../data/";
-        let isAdded = false;
-        for (let d in datasetIds) {
-            if (datasetIds[d] === datasetId) {
-                isAdded = true;
-            }
-        }
-        if (!isAdded) {
-            try {
-                const dataset = fs.readFileSync(cacheDir + datasetId + ".txt", "text");
-                isAdded = true;
-            } catch (e) {
-                isAdded = false;
-            }
-        }
-        return isAdded;
-    }
-
     public getIndexes(dataset: any[], query: any): number[] {
         let indexes: number[] = [];
         let item: any;

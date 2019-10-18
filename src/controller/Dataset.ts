@@ -29,8 +29,8 @@ export class Dataset {
                 newSection.info.pass = item.Pass;
                 newSection.info.fail = item.Fail;
                 newSection.info.audit = item.Audit;
-                newSection.info.uuid = item.id;
-                newSection.info.year = item.Year;
+                newSection.info.uuid = item.id.toString();
+                newSection.info.year = Number(item.Year);
                 if (item.Section === "overall") {
                     newSection.info.year = 1900;
                 }

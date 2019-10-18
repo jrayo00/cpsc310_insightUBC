@@ -4,6 +4,7 @@ import {IInsightQuery} from "./IInsightQuery";
 import InsightValidateHelper from "./InsightValidateHelper";
 import InsightFetchHelper from "./InsightFetchHelper";
 import InsightTransformHelper from "./InsightTransformHelper";
+import * as fs from "fs-extra";
 
 /**
  * This is the query handling class for the insightFacade class.
@@ -25,14 +26,15 @@ export default class InsightQuery implements IInsightQuery {
         this.insightTransformHelper = new InsightTransformHelper();
     }
 
-    public validQuery(query: any, datasetIds: string[]): Promise <boolean> {
+    public validQuery(query: any, datasets: any[], datasetIds: string[]): Promise <boolean> {
         return new Promise((resolve, reject) => {
             if (typeof query === "object" && query !== null) {
                 // Semantic checking only if the query is syntactically valid
                 if (this.syntacticCheck(query)) {
                     if (this.checkCalledDataset(query) && this.checkSelectedColumns(query)) {
                         // Only check if the dataset is added when the query is valid at this point
-                        if (this.insightFetchHelper.isAdded(this.datasetCalled, datasetIds)) {
+                        if (this.isAdded(this.datasetCalled, datasetIds) &&
+                            this.checkKeyConsistency(datasets, datasetIds, this.datasetCalled)) {
                             return resolve(true);
                         }
                         return reject (new InsightError("Dataset not added"));
@@ -135,6 +137,25 @@ export default class InsightQuery implements IInsightQuery {
         return true;
     }
 
+    public isAdded(datasetId: string, datasetIds: string[]): boolean {
+        const cacheDir = __dirname + "/../../data/";
+        let isAdded = false;
+        for (let d in datasetIds) {
+            if (datasetIds[d] === datasetId) {
+                isAdded = true;
+            }
+        }
+        if (!isAdded) {
+            try {
+                const dataset = fs.readFileSync(cacheDir + datasetId + ".txt", "text");
+                isAdded = true;
+            } catch (e) {
+                isAdded = false;
+            }
+        }
+        return isAdded;
+    }
+
     public fetchQuery(query: any, datasets: any[], datasetsString: any[]): Promise<any[]> {
         return new Promise<any[]>((resolve, reject) => {
             const body = query["WHERE"];
@@ -188,5 +209,36 @@ export default class InsightQuery implements IInsightQuery {
             }
         }
         return result;
+    }
+
+    public checkKeyConsistency(datasets: any[], datasetsString: any[], datasetCalled: string): boolean {
+        let index: number = datasetsString.indexOf(datasetCalled);
+        let section = datasets[index].allSections[0];
+        section = section.info;
+        let keys = Object.keys(section);
+        let mkeys: string[] = [];
+        let skeys: string[] = [];
+        for (let i in keys) {
+            let key = keys[i];
+            if (typeof section[key] === "string") {
+                skeys = skeys.concat(key);
+            } else {
+                mkeys = mkeys.concat(key);
+            }
+        }
+        return this.isEqual(skeys, this.insightValidateHelper.sfields) &&
+            this.isEqual(mkeys, this.insightValidateHelper.mfields);
+    }
+
+    public isEqual(a: string[], b: string[]): boolean {
+        if (b.length === 0) {
+            return true;
+        }
+        for (let i in a) {
+            if (!b.includes(a[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 }

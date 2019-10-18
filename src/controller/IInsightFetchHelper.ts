@@ -19,8 +19,6 @@ export interface IInsightFetchHelper {
 
     getRegex(value: string): string;
 
-    isAdded(datasetId: string, datasetIds: string[]): boolean;
-
     getIndexes(dataset: any[], query: any): number[];
 
     getIndexesLT(dataset: any[], item: any): number[];

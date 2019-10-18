@@ -18,7 +18,7 @@ export interface IInsightQuery {
      * The promise should fulfill with a boolean value.
      * The promise should reject with an InsightError describing the error.
      */
-    validQuery(query: any, datasetIds: string[]): Promise<boolean>;
+    validQuery(query: any, datasets: any[], datasetIds: string[]): Promise<boolean>;
 
     /**
      * Validate the options of a query on UBCInsight.
