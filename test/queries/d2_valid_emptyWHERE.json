@@ -1,5 +1,5 @@
 {
-    "title": "Valid query: empty WHERE with rooms",
+    "title": "Valid query: empty WHERE with rooms dataset",
     "query": {
         "WHERE": {},
         "OPTIONS": {
