@@ -84,9 +84,9 @@ export default class InsightFacade implements IInsightFacade {
             let newDataset: Dataset = new Dataset(id, InsightDatasetKind.Rooms);
             const promises: Array<Promise<any>> = [];
             // TEMP FIX: SWITCH FILE PATH BACK TO INDEX.HTM BEFORE SUBMISSION
-            return zip.folder("rooms").file("shortTree.htm").async("text").then(function (data: string) {
+            return zip.folder("rooms").file("smallTree.htm").async("text").then(function (data: string) {
                 Log.test("Retrieved file contents, now parse !");
-                newDataset.parseRoomsDataset(data);
+                let obj = newDataset.parseRoomsDataset(data);
                 const sarr: string[] = [id];
                 return Promise.resolve(sarr);
             });

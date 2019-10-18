@@ -61,7 +61,10 @@ export class Dataset {
     }
 
     private findTableElement(document: any): JSON {
-        return this.findTableElementRecursive(document);
+        // TODO: find html element before finding body
+        let bodyElement: JSON;
+        bodyElement = this.findBodyElementRecursive(document);
+        return this.findTableElementRecursive(bodyElement);
     }
 
     private findTableElementRecursive(node: any): JSON {
@@ -75,6 +78,22 @@ export class Dataset {
             } else if (key === "childNodes") {
                 for (let element in node[key]) {
                     return this.findTableElementRecursive(node[key][element]);
+                }
+            }
+        }
+    }
+
+    private findBodyElementRecursive(node: any): JSON {
+        for (let k in node) {
+            let key: string = k;
+            if (key === "nodeName") {
+                let tmp = node[key];
+                if (node[key] === "body") {
+                    return node;
+                }
+            } else if (key === "childNodes") {
+                for (let element in node[key]) {
+                    return this.findBodyElementRecursive(node[key][element]);
                 }
             }
         }
