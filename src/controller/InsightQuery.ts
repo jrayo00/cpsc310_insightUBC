@@ -2,9 +2,11 @@ import Log from "../Util";
 import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
 import {InsightError, NotFoundError} from "./IInsightFacade";
 import {IInsightQuery} from "./IInsightQuery";
-import {IInsightQueryHelper} from "./IInsightQueryHelper";
+import {IInsightValidateHelper} from "./IInsightValidateHelper";
 import {type} from "os";
-import InsightQueryHelper from "./InsightQueryHelper";
+import InsightValidateHelper from "./InsightValidateHelper";
+import InsightFetchHelper from "./InsightFetchHelper";
+import {Dataset} from "./Dataset";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -21,13 +23,14 @@ export default class InsightQuery implements IInsightQuery {
         this.datasetCalled = "";
     }
 
-    public insightQueryHelper: InsightQueryHelper = new InsightQueryHelper();
+    public insightQueryHelper: InsightValidateHelper = new InsightValidateHelper();
+    public insightFetchHelper: InsightFetchHelper = new InsightFetchHelper();
 
     public validQuery(query: any, datasetIds: string[]): Promise <boolean> {
         return new Promise((resolve, reject) => {
             let isValid = true;
             // Check if the input is a JSON object
-            if (typeof query === "object") {
+            if (typeof query === "object" && query !== null) {
                 const allTheKeys = Object.keys(query);
                 // Check if query is empty
                 if (allTheKeys.length !== 2) {
@@ -47,6 +50,14 @@ export default class InsightQuery implements IInsightQuery {
                 // Semantic checking only if the query is syntactically valid
                 if (isValid) {
                     isValid = this.semanticCheck(query, datasetIds);
+                    if (isValid) {
+                        isValid = this.insightFetchHelper.isAdded(this.datasetCalled, datasetIds);
+                        if (!isValid) {
+                            return reject(new InsightError("Query calls dataset not added."));
+                        }
+                    } else {
+                        return reject(new InsightError("Query calls multiple datasets."));
+                    }
                 } else {
                     return reject(new InsightError("Query doesn't pass syntactic checking."));
                 }
@@ -165,30 +176,32 @@ export default class InsightQuery implements IInsightQuery {
         datasets = this.insightQueryHelper.getDatasetIDInWHERE(query["WHERE"], datasets);
         datasets = this.insightQueryHelper.getDatasetIDInOPTIONS(query["OPTIONS"], datasets);
         // Todo: Need to check if the dataset has been added, call listDatasets()
-        // let isValid = this.insightQueryHelper.isAdded(datasets[0], datasetIds);
-        // if (isValid) {} else {return isValid; }
         let isValid = !this.insightQueryHelper.areMultipleDatasets(datasets);
         this.datasetCalled = datasets[0];
         return isValid;
     }
 
-    public fetchQuery(query: any): Promise<any[]> {
+    public fetchQuery(query: any, datasets: any[], datasetsString: any[]): Promise<any[]> {
         return new Promise<any[]>((resolve, reject) => {
             const body = query["WHERE"];
             const options = query["OPTIONS"];
             let result: any[] = [];
-            if (!Object.keys(this.datasets).includes(this.datasetCalled)) {
-                this.datasets[this.datasetCalled] = this.insightQueryHelper.getDataset(this.datasetCalled);
+            let dataset: any[];
+            if (!datasetsString.includes(this.datasetCalled)) {
+                // Todo
+                datasets.push(this.insightFetchHelper.getDataset(this.datasetCalled));
+                datasetsString.push(this.datasetCalled);
             }
-            let dataset: any = this.datasets[this.datasetCalled];
-            dataset = Object.values(dataset[0])[0];
+            // let dataset: any = datasets[this.datasetCalled];
+            let index: number = datasetsString.indexOf(this.datasetCalled);
+            dataset = datasets[index].allSections;
             if (this.insightQueryHelper.isObjectEmpty(body)) {
                 result = Array.from(dataset.keys());
             } else {
                 result = this.getIndexes(dataset, body);
             }
-            result = this.insightQueryHelper.indexWithNumber(dataset, result);
-            result = this.insightQueryHelper.extractProperties(result, options["COLUMNS"], this.datasetCalled);
+            result = this.insightFetchHelper.indexWithNumber(dataset, result);
+            result = this.insightFetchHelper.extractProperties(result, options["COLUMNS"], this.datasetCalled);
             if (("ORDER" in options)) {
                 result = this.insightQueryHelper.orderByProperty(result, options["ORDER"]);
             }
@@ -207,34 +220,34 @@ export default class InsightQuery implements IInsightQuery {
                 item = query["AND"];
                 indexes = Array.from(dataset.keys());
                 for (let filter in item) {
-                    indexes = this.insightQueryHelper.intersectIndexes(indexes, this.getIndexes(dataset, item[filter]));
+                    indexes = this.insightFetchHelper.intersectIndexes(indexes, this.getIndexes(dataset, item[filter]));
                 }
                 break;
             case "OR":
                 item = query["OR"];
                 for (let filter in item) {
-                    indexes = this.insightQueryHelper.unionIndexes(indexes, this.getIndexes(dataset, item[filter]));
+                    indexes = this.insightFetchHelper.unionIndexes(indexes, this.getIndexes(dataset, item[filter]));
                 }
                 break;
             case "NOT":
                 indexes = this.getIndexes(dataset, query["NOT"]);
-                indexes = this.insightQueryHelper.filterWithNumber(Array.from(dataset.keys()), indexes);
+                indexes = this.insightFetchHelper.filterWithNumber(Array.from(dataset.keys()), indexes);
                 break;
             case "LT":
                 item = query["LT"];
-                indexes = this.insightQueryHelper.getIndexesLT(dataset, item);
+                indexes = this.insightFetchHelper.getIndexesLT(dataset, item);
                 break;
             case "GT":
                 item = query["GT"];
-                indexes = this.insightQueryHelper.getIndexesGT(dataset, item);
+                indexes = this.insightFetchHelper.getIndexesGT(dataset, item);
                 break;
             case "EQ":
                 item = query["EQ"];
-                indexes = this.insightQueryHelper.getIndexesEQ(dataset, item);
+                indexes = this.insightFetchHelper.getIndexesEQ(dataset, item);
                 break;
             case "IS":
                 item = query["IS"];
-                indexes = this.insightQueryHelper.getIndexesIS(dataset, item);
+                indexes = this.insightFetchHelper.getIndexesIS(dataset, item);
                 break;
             default:
                 indexes = [];

@@ -1,0 +1,21 @@
+{
+    "title": "SELECT avg WHERE avg > 99.5",
+    "query": {
+        "WHERE": {
+            "EQ": {
+                "courses_avg": 99.78
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_avg"
+            ],
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_avg":99.78},
+        {"courses_avg":99.78}
+    ]
+}

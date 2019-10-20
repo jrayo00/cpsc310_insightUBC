@@ -1,0 +1,30 @@
+{
+    "title": "Invalid query: APPLY must be an array",
+    "query": {
+        "WHERE": {
+            "GT": {
+                "courses_avg": 98
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_title",
+                "overallAvg"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_title"
+            ],
+            "APPLY":
+                {
+                    "overallAvg": {
+                        "AVG": "courses_avg"
+                    }
+                }
+
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

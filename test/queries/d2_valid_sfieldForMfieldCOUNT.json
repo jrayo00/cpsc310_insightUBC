@@ -1,0 +1,40 @@
+{
+    "title": "Valid query: Skey for COUNT key, still valid",
+    "query": {
+        "WHERE": {
+            "GT": {
+                "courses_avg": 98
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_title",
+                "overallAvg"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_title"
+            ],
+            "APPLY": [
+                {
+                    "overallAvg": {
+                        "COUNT": "courses_title"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_title":"career planning","overallAvg":1},
+        {"courses_title":"multimedia sys","overallAvg":1},
+        {"courses_title":"assess lrn diffi","overallAvg":1},
+        {"courses_title":"educ stds autism","overallAvg":1},
+        {"courses_title":"dev el sk df&hrd","overallAvg":1},
+        {"courses_title":"algb topology i","overallAvg":1},
+        {"courses_title":"cl pro prim care","overallAvg":1},
+        {"courses_title":"fam nrs pract","overallAvg":1},
+        {"courses_title":"work int health","overallAvg":1}
+    ]
+}

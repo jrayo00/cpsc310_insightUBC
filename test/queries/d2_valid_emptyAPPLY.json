@@ -1,0 +1,33 @@
+{
+    "title": "Valid query: Empty APPLY is still valid",
+    "query": {
+        "WHERE": {
+            "GT": {
+                "courses_avg": 98
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_title"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_title"
+            ],
+            "APPLY": []
+        }
+    },
+    "isQueryValid": true,
+    "result":[
+        {"courses_title":"career planning"},
+        {"courses_title":"multimedia sys"},
+        {"courses_title":"assess lrn diffi"},
+        {"courses_title":"educ stds autism"},
+        {"courses_title":"dev el sk df&hrd"},
+        {"courses_title":"algb topology i"},
+        {"courses_title":"cl pro prim care"},
+        {"courses_title":"fam nrs pract"},
+        {"courses_title":"work int health"}
+    ]
+}

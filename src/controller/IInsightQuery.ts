@@ -1,6 +1,7 @@
 import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
 import {InsightError, NotFoundError, ResultTooLargeError} from "./IInsightFacade";
-import InsightQueryHelper from "./InsightQueryHelper";
+import InsightValidateHelper from "./InsightValidateHelper";
+import InsightFetchHelper from "./InsightFetchHelper";
 
 /*
  * This is the primary high-level API for the project.
@@ -11,7 +12,8 @@ import InsightQueryHelper from "./InsightQueryHelper";
 export interface IInsightQuery {
     // datasets: { [id: string]: any[] };
     // datasetCalled: string;
-    insightQueryHelper: InsightQueryHelper;
+    insightQueryHelper: InsightValidateHelper;
+    insightFetchHelper: InsightFetchHelper;
     /**
      * Validate a query on UBCInsight.
      *
@@ -105,5 +107,5 @@ export interface IInsightQuery {
      * The promise should fulfill with an array of results.
      * The promise should reject with a ResultTooLargeError when the result exceeds 5000.
      */
-    fetchQuery(query: any): Promise<any[]>;
+    fetchQuery(query: any, datasets: any[], datasetsString: any[]): Promise<any[]>;
 }

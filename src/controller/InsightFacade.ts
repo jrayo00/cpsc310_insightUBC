@@ -1,6 +1,12 @@
 import Log from "../Util";
-import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
-import {NotFoundError, ResultTooLargeError} from "./IInsightFacade";
+import {
+    IInsightFacade,
+    InsightDataset,
+    InsightDatasetKind,
+    InsightError,
+    NotFoundError,
+    ResultTooLargeError
+} from "./IInsightFacade";
 import * as JSZip from "jszip";
 import {Dataset} from "./Dataset";
 import * as fs from "fs";
@@ -35,7 +41,7 @@ export default class InsightFacade implements IInsightFacade {
             return Promise.reject(new InsightError("id cannot be all whitespaces"));
         }
         if (kind === InsightDatasetKind.Rooms) {
-            return Promise.reject("Not implemented");
+            return this.addRoomsDataset(id, content);
         }
         // Reference variables used b/c Promise.all can't find the member variables.
         let datasetsReference: Dataset[] = this.datasets;
@@ -64,14 +70,28 @@ export default class InsightFacade implements IInsightFacade {
                 // Write to file only after all promises have been resolved
                 if (newDataset.writeToFile()) {
                      return Promise.resolve(datasetsStringReference);
-                 } else {
-                     return Promise.reject(new InsightError("Could not write dataset to file"));
                  }
             }).catch((err: any) => {
                 return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
             });
         }).catch((err: any) => {
                 return Promise.reject(new InsightError("invalid zip file"));
+        });
+    }
+
+    private addRoomsDataset(id: string, content: string): Promise<any> {
+        return JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
+            let newDataset: Dataset = new Dataset(id, InsightDatasetKind.Rooms);
+            const promises: Array<Promise<any>> = [];
+            // TEMP FIX: SWITCH FILE PATH BACK TO INDEX.HTM BEFORE SUBMISSION
+            return zip.folder("rooms").file("smallTree.htm").async("text").then(function (data: string) {
+                Log.test("Retrieved file contents, now parse !");
+                let obj = newDataset.parseRoomsDataset(data);
+                const sarr: string[] = [id];
+                return Promise.resolve(sarr);
+            });
+        }).catch((err: any) => {
+            return Promise.reject(new InsightError("invalid zip file"));
         });
     }
 
@@ -94,7 +114,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     public removeDataset(id: string): Promise<string> {
-        return Promise.reject("Not implemented");
+        // return Promise.reject("Not implemented");
         if (id == null || id === undefined) {
             return Promise.reject(new InsightError("id cannot be null or undefined"));
         }
@@ -119,8 +139,14 @@ export default class InsightFacade implements IInsightFacade {
 
     public listDatasets(): Promise<InsightDataset[]> {
         // return Promise.reject("Not implemented");
-        return Promise.resolve(this.datasets);
+        let insightDatasets: InsightDataset[] = new Array();
+        for (let dset of this.datasets) {
+            let tmp = {id : dset.id, kind: dset.kind, numRows: dset.numRows};
+            insightDatasets.push(tmp);
+        }
+        return Promise.resolve(insightDatasets);
     }
+
     private allWhitespaces(id: string): boolean {
         for (let i: number = 0; i < id.length; i++) {
             if (id.charAt(i) !== " ") {
@@ -129,6 +155,7 @@ export default class InsightFacade implements IInsightFacade {
         }
         return true;
     }
+
 
     public performQuery(query: any): Promise <any[]> {
         // Construct helper class
@@ -139,7 +166,7 @@ export default class InsightFacade implements IInsightFacade {
             Log.info(`In performQuery ${result}`);
             if (result) {
                 // Return fetched query result if the input query is valid
-                return insightQuery.fetchQuery(query);
+                return insightQuery.fetchQuery(query, this.datasets, this.datasetsString);
             } else {
                 return Promise.reject(new InsightError("Invalid query"));
             }
