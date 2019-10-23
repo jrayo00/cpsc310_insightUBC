@@ -3,15 +3,18 @@ import {Section} from "./Section";
 import {Room} from "./Room";
 import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
 import * as fs from "fs";
+import * as JSZip from "jszip";
 
 export class Dataset {
     public allSections: any[] = [];
     public id: string;
     public numRows: number = 0;
     public kind: InsightDatasetKind;
-    private bodyElement  = {};
-    private htmlElement = {};
-    private tableElement = {};
+    private bodyElement: any;
+    private htmlElement: any;
+    private tableElement: any;
+    private zipFile: JSZip;
+    private buildingFiles: string[] = [];
     constructor(id: string, datasetType: InsightDatasetKind) {
         Log.trace("Dataset::init()");
         this.id = id;
@@ -55,12 +58,14 @@ export class Dataset {
         return true;
     }
 
-    public parseRoomsDataset(data: string) {
+    public parseRoomsDataset(data: string, zip: JSZip): Promise<any> {
+        this.zipFile = zip;
         const parse5 = require("parse5");
         const document = parse5.parse(data);
         this.findTableElement(document);
         // Log.test(JSON.stringify(this.tableElement));
         this.parseTableElement(this.tableElement);
+        return this.parseBuildingFiles();
     }
 
     private findTableElement(document: any) {
@@ -119,17 +124,89 @@ export class Dataset {
         }
         for (let obj of tbody.childNodes) {
             if (obj.nodeName === "tr") {
-                this.extractRoomInfo(obj);
+                this.extractBuildingPath(obj);
                 count++;
             }
         }
         Log.test(count + "");
     }
 
-    private extractRoomInfo(obj: any) {
+    private extractBuildingPath(obj: any) {
+        for (let tag of obj.childNodes) {
+            if (tag.nodeName === "td") {
+                if (tag.attrs[0].value === "views-field views-field-nothing") {
+                    this.extractHREF(tag);
+                    break;
+                }
+            }
+        }
+    }
+
+    private extractHREF(tag: any) {
+        for (let obj of tag.childNodes) {
+            if (obj.nodeName === "a") {
+                this.buildingFiles.push(obj.attrs[0].value);
+                break;
+            }
+        }
+    }
+
+    private parseBuildingFiles(): Promise<any> {
+        const promises: Array<Promise<any>> = [];
+        for (let path of this.buildingFiles) {
+            promises.push(this.zipFile.file(path).async("text").then(function (building: string) {
+                // extract the relevant room information for each building
+                this.extractRoomsFromBuilding(building);
+            }));
+        }
+        return Promise.all(promises).then(function () {
+            return Promise.resolve();
+        }).catch((err: any) => {
+            return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
+        });
+    }
+
+    private extractRoomsFromBuilding(building: string) {
+        this.findTableElement(building);
+        let tbody: any;
+        for (let obj of this.tableElement) {
+            if (obj.nodeName === "tbody") {
+                tbody = obj;
+                break;
+            }
+        }
+        this.extractRoomInfo(tbody);
+    }
+
+    private extractRoomInfo(tbody: any) {
         // TODO: Check if hardcoding is applicable here
+        // inside of "more info"
+        // let newRoom: Room = new Room();
+        // newRoom.info.shortname = obj.childNodes[3].childNodes[0].value.trimStart();
+        // newRoom.info.fullname = obj.childNodes[5].childNodes[1].childNodes[0].value.trimStart();
+        for (let row of tbody.childNodes) {
+            if (row.nodeName === "tr") {
+                this.addRoomToDataset(row);
+            }
+        }
+    }
+
+    private addRoomToDataset(row: any) {
         let newRoom: Room = new Room();
-        newRoom.info.shortname = obj.childNodes[3].childNodes[0].value.trimStart();
-        newRoom.info.fullname = obj.childNodes[5].childNodes[1].childNodes[0].value.trimStart();
+        for (let col of row.childNodes) {
+            if (col.nodeName === "td") {
+                switch (col.attrs[0].value) {
+                    case "views-field views-field-field-room-capacity":
+                        newRoom.info.seats = col.childNodes[0].value.trim();
+                        break;
+                    case "views-field views-field-field-room-furniture":
+                        newRoom.info.furniture = col.childNodes[0].value.trim();
+                        break;
+                    case "views-field views-field-field-room-type":
+                        newRoom.info.type = col.childNodes[0].value.trim();
+                        break;
+                }
+            }
+        }
     }
 }
