@@ -126,8 +126,10 @@ export class Dataset {
         Log.test(count + "");
     }
 
-    private extractRoomInfo(obj: ChildNode) {
+    private extractRoomInfo(obj: any) {
+        // TODO: Check if hardcoding is applicable here
         let newRoom: Room = new Room();
-
+        newRoom.info.shortname = obj.childNodes[3].childNodes[0].value.trimStart();
+        newRoom.info.fullname = obj.childNodes[5].childNodes[1].childNodes[0].value.trimStart();
     }
 }
