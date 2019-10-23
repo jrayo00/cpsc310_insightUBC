@@ -70,9 +70,9 @@ export class Dataset {
 
     private findTableElement(document: any) {
         // TODO: find html element before finding body
-        this.findHTMLTagRecursive(document, "html");
-        this.findHTMLTagRecursive(this.htmlElement, "body");
-        this.findHTMLTagRecursive(this.bodyElement, "table");
+        // this.findHTMLTagRecursive(document, "html");
+        // this.findHTMLTagRecursive(this.htmlElement, "body");
+        this.findHTMLTagRecursive(document, "table");
     }
 
     private findHTMLTagRecursive(node: any, tagName: string) {
@@ -145,7 +145,9 @@ export class Dataset {
     private extractHREF(tag: any) {
         for (let obj of tag.childNodes) {
             if (obj.nodeName === "a") {
-                this.buildingFiles.push(obj.attrs[0].value);
+                let path: string = obj.attrs[0].value;
+                path = path.replace(".", "rooms");
+                this.buildingFiles.push(path);
                 break;
             }
         }
@@ -153,32 +155,38 @@ export class Dataset {
 
     private parseBuildingFiles(): Promise<any> {
         const promises: Array<Promise<any>> = [];
-        for (let path of this.buildingFiles) {
-            promises.push(this.zipFile.file(path).async("text").then(function (building: string) {
+        let datasetRef = new Dataset(this.id, this.kind);
+        datasetRef = this;
+        // for (let path of this.buildingFiles) {
+        let path = this.buildingFiles[1];
+        return this.zipFile.file(path).async("text").then(function (building: string) {
                 // extract the relevant room information for each building
-                this.extractRoomsFromBuilding(building);
-            }));
-        }
-        return Promise.all(promises).then(function () {
-            return Promise.resolve();
-        }).catch((err: any) => {
-            return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
+            return datasetRef.extractRoomsFromBuilding(building);
         });
+        // }
+        // return Promise.all(promises).then(function () {
+        //     // write to disk
+        //     return Promise.resolve();
+        // }).catch((err: any) => {
+        //     return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
+        // });
     }
 
-    private extractRoomsFromBuilding(building: string) {
-        this.findTableElement(building);
+    private extractRoomsFromBuilding(building: string): Promise<any> {
+        const parse5 = require("parse5");
+        const document = parse5.parse(building);
+        this.findTableElement(document);
         let tbody: any;
-        for (let obj of this.tableElement) {
+        for (let obj of this.tableElement.childNodes) {
             if (obj.nodeName === "tbody") {
                 tbody = obj;
                 break;
             }
         }
-        this.extractRoomInfo(tbody);
+        return this.extractRoomInfo(tbody);
     }
 
-    private extractRoomInfo(tbody: any) {
+    private extractRoomInfo(tbody: any): Promise<any> {
         // TODO: Check if hardcoding is applicable here
         // inside of "more info"
         // let newRoom: Room = new Room();
@@ -186,12 +194,12 @@ export class Dataset {
         // newRoom.info.fullname = obj.childNodes[5].childNodes[1].childNodes[0].value.trimStart();
         for (let row of tbody.childNodes) {
             if (row.nodeName === "tr") {
-                this.addRoomToDataset(row);
+                return this.addRoomToDataset(row);
             }
         }
     }
 
-    private addRoomToDataset(row: any) {
+    private addRoomToDataset(row: any): Promise<any> {
         let newRoom: Room = new Room();
         for (let col of row.childNodes) {
             if (col.nodeName === "td") {
@@ -208,5 +216,8 @@ export class Dataset {
                 }
             }
         }
+        // after keys validated, push to array
+        this.allSections.push(newRoom);
+        return Promise.resolve();
     }
 }
