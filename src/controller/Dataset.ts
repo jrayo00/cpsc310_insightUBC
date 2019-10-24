@@ -239,16 +239,54 @@ export class Dataset {
                     case "views-field views-field-field-room-type":
                         newRoom.info.type = col.childNodes[0].value.trim();
                         break;
+                    case "views-field views-field-field-room-number":
+                        newRoom.info.href = col.childNodes[1].attrs[0].value.trim();
+                        newRoom.info.number = col.childNodes[1].childNodes[0].value.trim();
+                        break;
                 }
             }
         }
         newRoom.info.shortname = buildAttributes.shortname;
         newRoom.info.fullname = buildAttributes.fullname;
         newRoom.info.address = buildAttributes.address;
+        newRoom.info.name = newRoom.info.shortname + "_" + newRoom.info.number;
         // TODO: after keys validated, push to array and find geolocation
+        // this.findGeoLocation(newRoom);
         this.allSections.push(newRoom);
         this.numRows++;
     }
 
 
+    private findGeoLocation(room: Room) {
+        const request = require("https");
+        const p = "/api/v1/project_team253/"
+            + encodeURIComponent(room.info.address);
+        const req = request({
+                hostname: "http://cs310.students.cs.ubc.ca",
+                port: 11316,
+                path: p,
+                method: "GET"},
+            ((response: any)  => {
+                if (Object.keys(response).length === 1) {
+                    throw new InsightError("No valid geolocation for this building");
+                } else {
+                    room.info.lat = response.lat;
+                    room.info.lon = response.lon;
+                }
+            })
+        );
+        req.end();
+
+        // const chai = require("chai");
+        // const chaiHttp = require("chai-http");
+        // chai.use(chaiHttp);
+        // let lon = chai.request(URL).get("");
+        // Log.test(lon);
+        // if (Object.keys(res).length === 1) {
+        //     throw new InsightError("No valid geolocation for this building");
+        // } else {
+        //     room.info.lat = res.lat;
+        //     room.info.lon = res.lon;
+        // }
+    }
 }
