@@ -70,7 +70,7 @@ export default class InsightFacade implements IInsightFacade {
                 // Write to file only after all promises have been resolved
                 if (newDataset.writeToFile()) {
                      return Promise.resolve(datasetsStringReference);
-                 }
+                }
             }).catch((err: any) => {
                 return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
             });
@@ -83,10 +83,23 @@ export default class InsightFacade implements IInsightFacade {
         return JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
             let newDataset: Dataset = new Dataset(id, InsightDatasetKind.Rooms);
             const promises: Array<Promise<any>> = [];
-            // TEMP FIX: SWITCH FILE PATH BACK TO INDEX.HTM BEFORE SUBMISSION
+            let datasetsReference: Dataset[] = this.datasets;
+            let datasetsStringReference: string[] = this.datasetsString;
             return zip.folder("rooms").file("index.htm").async("text").then(function (data: string) {
                 Log.test("Retrieved file contents, now parse !");
-                return newDataset.parseRoomsDataset(data, zip);
+                promises.push(newDataset.parseRoomsDataset(data, zip));
+                return Promise.all(promises).then(function () {
+                    if (newDataset.numRows > 0) {
+                        datasetsStringReference.push(id);
+                        datasetsReference.push(newDataset);
+                    } else {
+                        return Promise.reject(new InsightError("No valid sections were found in given zip"));
+                    }
+                    // Write to file only after all promises have been resolved
+                    if (newDataset.writeToFile()) {
+                        return Promise.resolve(datasetsStringReference);
+                    }
+                });
             });
         }).catch((err: any) => {
             return Promise.reject(new InsightError("invalid zip file"));

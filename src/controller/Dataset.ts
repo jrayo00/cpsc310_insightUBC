@@ -10,8 +10,6 @@ export class Dataset {
     public id: string;
     public numRows: number = 0;
     public kind: InsightDatasetKind;
-    private bodyElement: any;
-    private htmlElement: any;
     private tableElement: any;
     private zipFile: JSZip;
     private buildingFiles: string[] = [];
@@ -69,13 +67,10 @@ export class Dataset {
     }
 
     private findTableElement(document: any) {
-        // TODO: find html element before finding body
-        // this.findHTMLTagRecursive(document, "html");
-        // this.findHTMLTagRecursive(this.htmlElement, "body");
-        this.findHTMLTagRecursive(document, "table");
+        this.findTableElementRecursive(document, "table");
     }
 
-    private findHTMLTagRecursive(node: any, tagName: string) {
+    private findTableElementRecursive(node: any, tagName: string) {
         // for (let k in node) {
         //     let key: string = k;
         //     if (key === "nodeName") {
@@ -94,13 +89,8 @@ export class Dataset {
         // }
         if (node.nodeName === tagName) {
             switch (tagName) {
-                case "html":
-                    this.htmlElement = node;
-                    break;
-                case "body":
-                    this.bodyElement = node;
-                    break;
                 case "table":
+                    // TODO: Check if table class="views-table cols-5 table"
                     this.tableElement = node;
                     break;
             }
@@ -108,7 +98,7 @@ export class Dataset {
         }
         if (node.childNodes !== undefined) {
             for (let obj of node.childNodes) {
-                this.findHTMLTagRecursive(obj, tagName);
+                this.findTableElementRecursive(obj, tagName);
             }
         }
     }
@@ -147,6 +137,7 @@ export class Dataset {
             if (obj.nodeName === "a") {
                 let path: string = obj.attrs[0].value;
                 path = path.replace(".", "rooms");
+                // TODO: Parse building data here
                 this.buildingFiles.push(path);
                 break;
             }
@@ -157,19 +148,22 @@ export class Dataset {
         const promises: Array<Promise<any>> = [];
         let datasetRef = new Dataset(this.id, this.kind);
         datasetRef = this;
-        // for (let path of this.buildingFiles) {
-        let path = this.buildingFiles[1];
-        return this.zipFile.file(path).async("text").then(function (building: string) {
+        for (let path of this.buildingFiles) {
+            return this.zipFile.file(path).async("text").then(function (building: string) {
                 // extract the relevant room information for each building
-            return datasetRef.extractRoomsFromBuilding(building);
+                // TODO: surround in try/catch if no table was found in room file
+                 datasetRef.extractRoomsFromBuilding(building);
+            }).catch((err: any) => {
+                // HTML file didnt contain a table with room data, but that's okay
+                Log.error("Building didn't have any rooms table");
+            });
+        }
+        return Promise.all(promises).then(function () {
+            // write to disk
+            return Promise.resolve();
+        }).catch((err: any) => {
+            return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
         });
-        // }
-        // return Promise.all(promises).then(function () {
-        //     // write to disk
-        //     return Promise.resolve();
-        // }).catch((err: any) => {
-        //     return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
-        // });
     }
 
     private extractRoomsFromBuilding(building: string): Promise<any> {
@@ -187,11 +181,6 @@ export class Dataset {
     }
 
     private extractRoomInfo(tbody: any): Promise<any> {
-        // TODO: Check if hardcoding is applicable here
-        // inside of "more info"
-        // let newRoom: Room = new Room();
-        // newRoom.info.shortname = obj.childNodes[3].childNodes[0].value.trimStart();
-        // newRoom.info.fullname = obj.childNodes[5].childNodes[1].childNodes[0].value.trimStart();
         for (let row of tbody.childNodes) {
             if (row.nodeName === "tr") {
                 return this.addRoomToDataset(row);
@@ -216,8 +205,9 @@ export class Dataset {
                 }
             }
         }
-        // after keys validated, push to array
+        // TODO: after keys validated, push to array and find geolocation
         this.allSections.push(newRoom);
+        this.numRows++;
         return Promise.resolve();
     }
 }
