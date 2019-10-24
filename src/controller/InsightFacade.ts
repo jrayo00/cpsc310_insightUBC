@@ -80,14 +80,20 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     private addRoomsDataset(id: string, content: string): Promise<any> {
+        let datasetsReference: Dataset[] = this.datasets;
+        let datasetsStringReference: string[] = this.datasetsString;
         return JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
             let newDataset: Dataset = new Dataset(id, InsightDatasetKind.Rooms);
             const promises: Array<Promise<any>> = [];
-            let datasetsReference: Dataset[] = this.datasets;
-            let datasetsStringReference: string[] = this.datasetsString;
             return zip.folder("rooms").file("index.htm").async("text").then(function (data: string) {
                 Log.test("Retrieved file contents, now parse !");
-                promises.push(newDataset.parseRoomsDataset(data, zip));
+                promises.push(newDataset.parseRoomsDataset(data, zip).then(function (data2: string) {
+                    Log.test("got here");
+                }).catch((err: any) => {
+                    Log.error("error thrown, file not valid JSON!");
+                    Promise.resolve();
+                    // Promise.reject("Not valid json");
+                }));
                 return Promise.all(promises).then(function () {
                     if (newDataset.numRows > 0) {
                         datasetsStringReference.push(id);
@@ -99,6 +105,8 @@ export default class InsightFacade implements IInsightFacade {
                     if (newDataset.writeToFile()) {
                         return Promise.resolve(datasetsStringReference);
                     }
+                }).catch((err: any) => {
+                    return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
                 });
             });
         }).catch((err: any) => {

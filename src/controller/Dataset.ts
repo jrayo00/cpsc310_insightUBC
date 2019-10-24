@@ -12,7 +12,7 @@ export class Dataset {
     public kind: InsightDatasetKind;
     private tableElement: any;
     private zipFile: JSZip;
-    private buildingFiles: string[] = [];
+    private buildingFiles: any[] = [];
     constructor(id: string, datasetType: InsightDatasetKind) {
         Log.trace("Dataset::init()");
         this.id = id;
@@ -51,7 +51,13 @@ export class Dataset {
     }
 
     public writeToFile(): boolean {
-        fs.writeFileSync(__dirname + "/../../data/" + this.id + ".txt", JSON.stringify(this));
+        let obj = {
+            allSections: this.allSections,
+            id: this.id,
+            numRows: this.numRows,
+            kind: this.kind
+        };
+        fs.writeFileSync(__dirname + "/../../data/" + this.id + ".txt", JSON.stringify(obj));
         Log.test("The file has been saved!");
         return true;
     }
@@ -90,8 +96,9 @@ export class Dataset {
         if (node.nodeName === tagName) {
             switch (tagName) {
                 case "table":
-                    // TODO: Check if table class="views-table cols-5 table"
-                    this.tableElement = node;
+                    if (node.attrs[0].value === "views-table cols-5 table") {
+                        this.tableElement = node;
+                    }
                     break;
             }
             return;
@@ -114,32 +121,58 @@ export class Dataset {
         }
         for (let obj of tbody.childNodes) {
             if (obj.nodeName === "tr") {
-                this.extractBuildingPath(obj);
+                this.extractBuildingAttributes(obj);
                 count++;
             }
         }
         Log.test(count + "");
     }
 
-    private extractBuildingPath(obj: any) {
+    private extractBuildingAttributes(obj: any) {
+        let buildingInfo = {
+            path : "",
+            shortname : "",
+            fullname : "",
+            address : ""
+        };
         for (let tag of obj.childNodes) {
             if (tag.nodeName === "td") {
-                if (tag.attrs[0].value === "views-field views-field-nothing") {
-                    this.extractHREF(tag);
-                    break;
+                switch (tag.attrs[0].value) {
+                    case "views-field views-field-nothing":
+                        buildingInfo.path = this.extractFilePath(tag);
+                        break;
+                    case "views-field views-field-field-building-code":
+                        buildingInfo.shortname = tag.childNodes[0].value.trim();
+                        break;
+                    case "views-field views-field-title":
+                        buildingInfo.fullname = this.extractBuildingFullName(tag);
+                        break;
+                    case "views-field views-field-field-building-address":
+                        buildingInfo.address = tag.childNodes[0].value.trim();
+                        break;
                 }
+            }
+        }
+        this.buildingFiles.push(buildingInfo);
+    }
+
+    private extractBuildingFullName(tag: any) {
+        for (let obj of tag.childNodes) {
+            if (obj.nodeName === "a") {
+                let fullName: string = obj.childNodes[0].value.trim();
+                return fullName;
             }
         }
     }
 
-    private extractHREF(tag: any) {
+    private extractFilePath(tag: any): string {
         for (let obj of tag.childNodes) {
             if (obj.nodeName === "a") {
                 let path: string = obj.attrs[0].value;
                 path = path.replace(".", "rooms");
                 // TODO: Parse building data here
-                this.buildingFiles.push(path);
-                break;
+                // this.buildingFiles.push(path);
+                return path;
             }
         }
     }
@@ -148,27 +181,31 @@ export class Dataset {
         const promises: Array<Promise<any>> = [];
         let datasetRef = new Dataset(this.id, this.kind);
         datasetRef = this;
-        for (let path of this.buildingFiles) {
-            return this.zipFile.file(path).async("text").then(function (building: string) {
+        for (let obj of this.buildingFiles) {
+            // let path = this.buildingFiles[1];
+            promises.push(this.zipFile.file(obj.path).async("text").then(function (buildingHTML: string) {
                 // extract the relevant room information for each building
                 // TODO: surround in try/catch if no table was found in room file
-                 datasetRef.extractRoomsFromBuilding(building);
+                 datasetRef.extractRoomsFromBuilding(buildingHTML, obj);
             }).catch((err: any) => {
                 // HTML file didnt contain a table with room data, but that's okay
                 Log.error("Building didn't have any rooms table");
-            });
+            }));
         }
         return Promise.all(promises).then(function () {
             // write to disk
+            let tmp = datasetRef;
+            Log.test("Writing...");
             return Promise.resolve();
         }).catch((err: any) => {
             return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
         });
     }
 
-    private extractRoomsFromBuilding(building: string): Promise<any> {
+    private extractRoomsFromBuilding(building: string, buildAttributes: any) {
         const parse5 = require("parse5");
         const document = parse5.parse(building);
+        this.tableElement = null;
         this.findTableElement(document);
         let tbody: any;
         for (let obj of this.tableElement.childNodes) {
@@ -177,18 +214,18 @@ export class Dataset {
                 break;
             }
         }
-        return this.extractRoomInfo(tbody);
+        this.extractRoomInfo(tbody, buildAttributes);
     }
 
-    private extractRoomInfo(tbody: any): Promise<any> {
+    private extractRoomInfo(tbody: any, buildAttributes: any) {
         for (let row of tbody.childNodes) {
             if (row.nodeName === "tr") {
-                return this.addRoomToDataset(row);
+                this.addRoomToDataset(row, buildAttributes);
             }
         }
     }
 
-    private addRoomToDataset(row: any): Promise<any> {
+    private addRoomToDataset(row: any, buildAttributes: any) {
         let newRoom: Room = new Room();
         for (let col of row.childNodes) {
             if (col.nodeName === "td") {
@@ -205,9 +242,13 @@ export class Dataset {
                 }
             }
         }
+        newRoom.info.shortname = buildAttributes.shortname;
+        newRoom.info.fullname = buildAttributes.fullname;
+        newRoom.info.address = buildAttributes.address;
         // TODO: after keys validated, push to array and find geolocation
         this.allSections.push(newRoom);
         this.numRows++;
-        return Promise.resolve();
     }
+
+
 }
