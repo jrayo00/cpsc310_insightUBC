@@ -221,7 +221,7 @@ export class Dataset {
             if (col.nodeName === "td") {
                 switch (col.attrs[0].value) {
                     case "views-field views-field-field-room-capacity":
-                        newRoom.info.seats = col.childNodes[0].value.trim();
+                        newRoom.info.seats = Number(col.childNodes[0].value.trim());
                         break;
                     case "views-field views-field-field-room-furniture":
                         newRoom.info.furniture = col.childNodes[0].value.trim();

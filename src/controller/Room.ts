@@ -9,7 +9,7 @@ export class Room {
         address : "",
         lat : -1,
         lon : -1,
-        seats : -1,
+        seats : 0,
         type : "",
         furniture : "",
         href : "",
