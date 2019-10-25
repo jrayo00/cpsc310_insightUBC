@@ -13,6 +13,7 @@ export class Dataset {
     private tableElement: any;
     private zipFile: JSZip;
     private buildingFiles: any[] = [];
+    private geoPromises: Array<Promise<any>> = [];
     constructor(id: string, datasetType: InsightDatasetKind) {
         Log.trace("Dataset::init()");
         this.id = id;
@@ -47,7 +48,6 @@ export class Dataset {
         } catch (err) {
             throw new SyntaxError("invalid JSON");
         }
-        // Log.test("STOP");
     }
 
     public writeToFile(): boolean {
@@ -77,22 +77,6 @@ export class Dataset {
     }
 
     private findTableElementRecursive(node: any, tagName: string) {
-        // for (let k in node) {
-        //     let key: string = k;
-        //     if (key === "nodeName") {
-        //         let tmp = node[key];
-        //         if (node[key] === tagName) {
-        //             return node;
-        //         }
-        //     } else if (key === "childNodes") {
-        //         for (let element of node[key]) {
-        //             let cNode = node[key];
-        //             let obj = node[key].element;
-        //             Log.test(obj);
-        //             return this.findHTMLTagRecursive(element, tagName);
-        //         }
-        //     }
-        // }
         if (node.nodeName === tagName) {
             switch (tagName) {
                 case "table":
@@ -133,7 +117,9 @@ export class Dataset {
             path : "",
             shortname : "",
             fullname : "",
-            address : ""
+            address : "",
+            lat: -1,
+            lon: -1
         };
         for (let tag of obj.childNodes) {
             if (tag.nodeName === "td") {
@@ -153,7 +139,11 @@ export class Dataset {
                 }
             }
         }
-        this.buildingFiles.push(buildingInfo);
+        try {
+            this.findGeoLocation(buildingInfo);
+        } catch (err) {
+            Log.error("geolocation API is down");
+        }
     }
 
     private extractBuildingFullName(tag: any) {
@@ -170,8 +160,6 @@ export class Dataset {
             if (obj.nodeName === "a") {
                 let path: string = obj.attrs[0].value;
                 path = path.replace(".", "rooms");
-                // TODO: Parse building data here
-                // this.buildingFiles.push(path);
                 return path;
             }
         }
@@ -181,22 +169,22 @@ export class Dataset {
         const promises: Array<Promise<any>> = [];
         let datasetRef = new Dataset(this.id, this.kind);
         datasetRef = this;
-        for (let obj of this.buildingFiles) {
-            // let path = this.buildingFiles[1];
-            promises.push(this.zipFile.file(obj.path).async("text").then(function (buildingHTML: string) {
-                // extract the relevant room information for each building
-                // TODO: surround in try/catch if no table was found in room file
-                 datasetRef.extractRoomsFromBuilding(buildingHTML, obj);
-            }).catch((err: any) => {
-                // HTML file didnt contain a table with room data, but that's okay
-                Log.error("Building didn't have any rooms table");
-            }));
-        }
-        return Promise.all(promises).then(function () {
-            // write to disk
-            let tmp = datasetRef;
-            Log.test("Writing...");
-            return Promise.resolve();
+        return Promise.all(this.geoPromises).then(function () {
+            for (let obj of this.buildingFiles) {
+                promises.push(this.zipFile.file(obj.path).async("text").then(function (buildingHTML: string) {
+                    // extract the relevant room information for each building
+                     datasetRef.extractRoomsFromBuilding(buildingHTML, obj);
+                }).catch((err: any) => {
+                    // HTML file didnt contain a table with room data, but that's okay
+                    Log.error("Building didn't have any rooms table");
+                }));
+            }
+            return Promise.all(promises).then(function () {
+                // write to disk
+                let tmp = datasetRef;
+                Log.test("All rooms have been parsed. Writing...");
+                return Promise.resolve();
+            });
         }).catch((err: any) => {
             return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
         });
@@ -256,37 +244,32 @@ export class Dataset {
         this.numRows++;
     }
 
+    private findGeoLocation(building: any) {
+        let addr = "http://cs310.students.cs.ubc.ca:11316/api/v1/project_team253/";
+        const http = require("http");
+        // Code based off of https://www.twilio.com/blog/2017/08/http-requests-in-node-js.html
+        this.geoPromises.push(http.get(addr + encodeURIComponent(building.address),
+            (resp: any) => {
+            let data = "";
 
-    private findGeoLocation(room: Room) {
-        const request = require("https");
-        const p = "/api/v1/project_team253/"
-            + encodeURIComponent(room.info.address);
-        const req = request({
-                hostname: "http://cs310.students.cs.ubc.ca",
-                port: 11316,
-                path: p,
-                method: "GET"},
-            ((response: any)  => {
-                if (Object.keys(response).length === 1) {
-                    throw new InsightError("No valid geolocation for this building");
-                } else {
-                    room.info.lat = response.lat;
-                    room.info.lon = response.lon;
+            // A chunk of data has been recieved.
+            resp.on("data", (chunk: any) => {
+                data += chunk;
+            });
+
+            // The whole response has been received. Print out the result.
+            resp.on("end", () => {
+                let obj = JSON.parse(data);
+                if (Object.keys(data).length > 1) {
+                    building.lat = obj.lat;
+                    building.lon = obj.lon;
+                    this.buildingFiles.push(building);
                 }
-            })
-        );
-        req.end();
+                return Promise.resolve();
+            });
 
-        // const chai = require("chai");
-        // const chaiHttp = require("chai-http");
-        // chai.use(chaiHttp);
-        // let lon = chai.request(URL).get("");
-        // Log.test(lon);
-        // if (Object.keys(res).length === 1) {
-        //     throw new InsightError("No valid geolocation for this building");
-        // } else {
-        //     room.info.lat = res.lat;
-        //     room.info.lon = res.lon;
-        // }
+        }).on("error", (err: any) => {
+            Log.error("Error: " + err.message);
+        }));
     }
 }
