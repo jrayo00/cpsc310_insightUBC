@@ -275,6 +275,7 @@ describe("InsightFacade Add/Remove Dataset", function () {
 describe("InsightFacade PerformQuery", () => {
     const datasetsToQuery: { [id: string]: any } = {
         courses: {id: "courses", path: "./test/data/courses.zip", kind: InsightDatasetKind.Courses},
+        rooms123: {id: "rooms123", path: "./test/data/rooms.zip", kind: InsightDatasetKind.Rooms},
         rooms: {id: "rooms", path: "./test/data/rooms.zip", kind: InsightDatasetKind.Rooms},
     };
     let insightFacade: InsightFacade = new InsightFacade();
