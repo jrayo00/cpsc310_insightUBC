@@ -140,7 +140,7 @@ export class Dataset {
             }
         }
         try {
-            this.findGeoLocation(buildingInfo);
+            this.geoPromises.push(this.findGeoLocation(buildingInfo));
         } catch (err) {
             Log.error("geolocation API is down");
         }
@@ -169,9 +169,10 @@ export class Dataset {
         const promises: Array<Promise<any>> = [];
         let datasetRef = new Dataset(this.id, this.kind);
         datasetRef = this;
+        let that = this;
         return Promise.all(this.geoPromises).then(function () {
-            for (let obj of this.buildingFiles) {
-                promises.push(this.zipFile.file(obj.path).async("text").then(function (buildingHTML: string) {
+            for (let obj of that.buildingFiles) {
+                promises.push(datasetRef.zipFile.file(obj.path).async("text").then(function (buildingHTML: string) {
                     // extract the relevant room information for each building
                      datasetRef.extractRoomsFromBuilding(buildingHTML, obj);
                 }).catch((err: any) => {
@@ -186,6 +187,7 @@ export class Dataset {
                 return Promise.resolve();
             });
         }).catch((err: any) => {
+            Log.error(err);
             return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
         });
     }
@@ -248,7 +250,8 @@ export class Dataset {
         let addr = "http://cs310.students.cs.ubc.ca:11316/api/v1/project_team253/";
         const http = require("http");
         // Code based off of https://www.twilio.com/blog/2017/08/http-requests-in-node-js.html
-        const myNewPromise = new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
+            Log.trace("after resolve");
             let buildingRef = building;
             let buildingFilesRef: any[] = this.buildingFiles;
             http.get(addr + encodeURIComponent(building.address),
@@ -280,6 +283,5 @@ export class Dataset {
         }).catch((err: any) => {
             Log.error("Fetch request failed");
         });
-        this.geoPromises.push(myNewPromise);
     }
 }
