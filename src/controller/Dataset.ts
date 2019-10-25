@@ -248,28 +248,34 @@ export class Dataset {
         let addr = "http://cs310.students.cs.ubc.ca:11316/api/v1/project_team253/";
         const http = require("http");
         // Code based off of https://www.twilio.com/blog/2017/08/http-requests-in-node-js.html
-        this.geoPromises.push(http.get(addr + encodeURIComponent(building.address),
-            (resp: any) => {
-            let data = "";
+        const myNewPromise = new Promise((resolve, reject) => {
+            http.get(addr + encodeURIComponent(building.address),
+                (resp: any) => {
+                    let data = "";
+                    Log.test("API CALLBACK");
+                    let buildingRef = building;
+                    let buildingFilesRef: any[] = this.buildingFiles;
+                    // A chunk of data has been received.
+                    resp.on("data", (chunk: any) => {
+                        data += chunk;
+                        let obj = JSON.parse(data);
+                        if (Object.keys(data).length > 1) {
+                            buildingRef.lat = obj.lat;
+                            buildingRef.lon = obj.lon;
+                            buildingFilesRef.push(buildingRef);
+                        }
+                        return Promise.resolve();
+                    });
 
-            // A chunk of data has been recieved.
-            resp.on("data", (chunk: any) => {
-                data += chunk;
+                    // The whole response has been received. Print out the result.
+                    resp.on("end", () => {
+                        Log.test("closing http connection");
+                    });
+
+                }).on("error", (err: any) => {
+                Log.error("Error: " + err.message);
             });
-
-            // The whole response has been received. Print out the result.
-            resp.on("end", () => {
-                let obj = JSON.parse(data);
-                if (Object.keys(data).length > 1) {
-                    building.lat = obj.lat;
-                    building.lon = obj.lon;
-                    this.buildingFiles.push(building);
-                }
-                return Promise.resolve();
-            });
-
-        }).on("error", (err: any) => {
-            Log.error("Error: " + err.message);
-        }));
+        });
+        this.geoPromises.push(myNewPromise);
     }
 }
