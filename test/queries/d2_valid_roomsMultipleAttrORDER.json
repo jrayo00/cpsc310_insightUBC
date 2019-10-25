@@ -1,5 +1,5 @@
 {
-    "title": "Valid query: Empty APPLY and multiple columns in ORDER",
+    "title": "Valid query: Empty APPLY and multiple columns in ORDER for rooms",
     "query": {
         "WHERE": {
             "GT": {

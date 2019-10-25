@@ -1,0 +1,12 @@
+{
+    "title": "Invalid query: Null in COLUMNS.",
+    "query": {
+        "WHERE": {},
+        "OPTIONS": {
+            "COLUMNS": null,
+            "ORDER": "courses_avg"
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

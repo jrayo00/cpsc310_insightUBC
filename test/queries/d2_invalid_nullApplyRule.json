@@ -1,0 +1,27 @@
+{
+    "title": "Invalid query: Null for apply rule",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_dept": "cpsc"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_dept",
+                "courses_id"
+            ],
+            "APPLY": [
+                null
+            ]
+        }
+    },
+    "isQueryValid": false,
+    "result": "InsightError"
+}

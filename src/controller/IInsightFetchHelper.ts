@@ -1,16 +1,10 @@
-import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
-import {InsightError, NotFoundError, ResultTooLargeError} from "./IInsightFacade";
-import InsightValidateHelper from "./InsightValidateHelper";
-
 /*
  * This is the primary high-level API for the project.
  * On top of InsightFacade, in this folder we add:
- * A class called InsightQuery, this should be in a file called InsightQuery.ts.
+ * A class called InsightFetchHelper, this should be in a file called InsightFetchHelper.ts.
  */
 
 export interface IInsightFetchHelper {
-    // insightQueryHelper: InsightValidateHelper;
-    // Helpers for fetching starts here
     getDataset(datasetName: string): any;
 
     intersectIndexes(a: number[], b: number[]): number[];
@@ -21,13 +15,11 @@ export interface IInsightFetchHelper {
 
     filterWithNumber(result: any[], indexes: number[]): any[];
 
-    // orderByProperty(result: any[], property: string): any[];
-
     extractProperties(result: any[], properties: string[], datasetCalled: string): any[];
 
     getRegex(value: string): string;
 
-    isAdded(datasetId: string, datasetIds: string[]): boolean;
+    getIndexes(dataset: any[], query: any): number[];
 
     getIndexesLT(dataset: any[], item: any): number[];
 
