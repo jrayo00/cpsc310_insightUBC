@@ -130,8 +130,10 @@ export default class InsightQuery implements IInsightQuery {
                 applyKeys = applyKeys.concat(Object.keys(apply[item])[0]);
             }
             const transKeys = group.concat(applyKeys);
-            return this.insightValidateHelper.isSubarray(cols, group) &&
-                this.insightValidateHelper.isSubarray(transKeys, cols) &&
+            // return this.insightValidateHelper.isSubarray(cols, group) &&
+            //     this.insightValidateHelper.isSubarray(transKeys, cols) &&
+            //     !this.insightValidateHelper.hasDuplicates(applyKeys);
+            return this.insightValidateHelper.isSubarray(transKeys, cols) &&
                 !this.insightValidateHelper.hasDuplicates(applyKeys);
         }
         return true;
