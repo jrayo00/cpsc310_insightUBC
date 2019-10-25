@@ -237,9 +237,9 @@ export class Dataset {
         newRoom.info.shortname = buildAttributes.shortname;
         newRoom.info.fullname = buildAttributes.fullname;
         newRoom.info.address = buildAttributes.address;
+        newRoom.info.lat = buildAttributes.lat;
+        newRoom.info.lon = buildAttributes.lon;
         newRoom.info.name = newRoom.info.shortname + "_" + newRoom.info.number;
-        // TODO: after keys validated, push to array and find geolocation
-        // this.findGeoLocation(newRoom);
         this.allSections.push(newRoom);
         this.numRows++;
     }
