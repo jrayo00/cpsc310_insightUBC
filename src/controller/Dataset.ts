@@ -177,7 +177,7 @@ export class Dataset {
                      datasetRef.extractRoomsFromBuilding(buildingHTML, obj);
                 }).catch((err: any) => {
                     // HTML file didnt contain a table with room data, but that's okay
-                    Log.error("Building didn't have any rooms table");
+                    Log.error("Building's html didn't have a rooms table");
                 }));
             }
             return Promise.all(promises).then(function () {
