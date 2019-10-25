@@ -249,22 +249,24 @@ export class Dataset {
         const http = require("http");
         // Code based off of https://www.twilio.com/blog/2017/08/http-requests-in-node-js.html
         const myNewPromise = new Promise((resolve, reject) => {
+            let buildingRef = building;
+            let buildingFilesRef: any[] = this.buildingFiles;
             http.get(addr + encodeURIComponent(building.address),
                 (resp: any) => {
                     let data = "";
                     Log.test("API CALLBACK");
-                    let buildingRef = building;
-                    let buildingFilesRef: any[] = this.buildingFiles;
+                    let buildingRef2 = buildingRef;
+                    let buildingFilesRef2: any[] = buildingFilesRef;
                     // A chunk of data has been received.
                     resp.on("data", (chunk: any) => {
                         data += chunk;
                         let obj = JSON.parse(data);
                         if (Object.keys(data).length > 1) {
-                            buildingRef.lat = obj.lat;
-                            buildingRef.lon = obj.lon;
-                            buildingFilesRef.push(buildingRef);
+                            buildingRef2.lat = obj.lat;
+                            buildingRef2.lon = obj.lon;
+                            buildingFilesRef2.push(buildingRef2);
                         }
-                        return Promise.resolve();
+                        resolve();
                     });
 
                     // The whole response has been received. Print out the result.
@@ -275,6 +277,8 @@ export class Dataset {
                 }).on("error", (err: any) => {
                 Log.error("Error: " + err.message);
             });
+        }).catch((err: any) => {
+            Log.error("Fetch request failed");
         });
         this.geoPromises.push(myNewPromise);
     }
