@@ -1,10 +1,10 @@
 {
-    "title": "Valid query: empty WHERE with rooms dataset",
+    "title": "Valid query: empty WHERE with rooms123 dataset",
     "query": {
         "WHERE": {},
         "OPTIONS": {
             "COLUMNS": [
-                "rooms_address"
+                "rooms123_address"
             ]
         }
     },

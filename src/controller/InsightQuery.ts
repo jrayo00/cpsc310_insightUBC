@@ -234,8 +234,8 @@ export default class InsightQuery implements IInsightQuery {
         if (b.length === 0) {
             return true;
         }
-        for (let i in a) {
-            if (!b.includes(a[i])) {
+        for (let i in b) {
+            if (!a.includes(b[i])) {
                 return false;
             }
         }
