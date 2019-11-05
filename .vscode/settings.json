@@ -16,9 +16,5 @@
             ],
             "url": "/test/query.schema.json"
         }
-    ],
-    "eslint.enable": true,
-    "eslint.validate": [
-        "typescript"
     ]
 }

@@ -1,33 +1,22 @@
 import Log from "../Util";
-import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
-import {InsightError, NotFoundError} from "./IInsightFacade";
 import {IInsightFetchHelper} from "./IInsightFetchHelper";
-import {IInsightQuery} from "./IInsightQuery";
-import {type} from "os";
-import InsightQuery from "./InsightQuery";
-import InsightFacade from "./InsightFacade";
 import * as fs from "fs-extra";
 import {Section} from "./Section";
 import {Dataset} from "./Dataset";
-import InsightValidateHelper from "./InsightValidateHelper";
 
 /**
- * This is the main programmatic entry point for the project.
- * Method documentation is in IInsightFacade
- *
+ * This is the data fetching helper class for InsightQuery.
+ * Method documentation is in IInsightValidateHelper
  */
 export default class InsightFetchHelper implements IInsightFetchHelper {
 
     constructor() {
-        Log.trace("InsightQueryHelperImpl::init()");
+        Log.trace("InsightQueryFetchHelperImpl::init()");
     }
-
-    // public insightQueryHelper: InsightValidateHelper = new InsightValidateHelper();
 
     // Helpers for fetching starts here
     public getDataset(datasetId: string): any {
         const cacheDir = __dirname + "/../../data/";
-        // Todo: Go to cache dir "/../data" and call JSON.parse(obj)
         const dataset = fs.readFileSync(cacheDir + datasetId + ".txt", "text");
         let obj = JSON.parse(dataset);
         let sections = [];
@@ -80,12 +69,25 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
         let copy;
         let newKey: string;
         for (let section in result) {
+            // Get the object with info key
             let temp: any = Object.values(result[section])[0];
+            let idKeys = Object.keys(temp).map((v: any) => {
+                // Append the dataset id as prefix
+                return datasetCalled.concat("_", v);
+            });
             copy = temp.constructor();
+            // First, handle existing columns
             for (let key in temp) {
                 if (properties.includes(datasetCalled.concat("_", key))) {
                     newKey = datasetCalled.concat("_", key);
                     copy[newKey] = temp[key];
+                }
+            }
+            // Then, handle the applyKey case
+            for (let p in properties) {
+                let applyKey = properties[p];
+                if (!idKeys.includes(applyKey)) {
+                    copy[applyKey] = temp[applyKey];
                 }
             }
             results.push(copy);
@@ -99,23 +101,40 @@ export default class InsightFetchHelper implements IInsightFetchHelper {
         return value.replace(/[*]/g, ".*");
     }
 
-    public isAdded(datasetId: string, datasetIds: string[]): boolean {
-        const cacheDir = __dirname + "/../../data/";
-        let isAdded = false;
-        for (let d in datasetIds) {
-            if (datasetIds[d] === datasetId) {
-                isAdded = true;
-            }
+    public getIndexes(dataset: any[], query: any): number[] {
+        let indexes: number[] = [];
+        let item: any;
+        const allTheKeys = Object.keys(query);
+        switch (allTheKeys[0]) {
+            case "AND":
+                item = query["AND"];
+                indexes = Array.from(dataset.keys());
+                for (let filter in item) {
+                    indexes = this.intersectIndexes(indexes, this.getIndexes(dataset, item[filter]));
+                }
+                return indexes;
+            case "OR":
+                item = query["OR"];
+                for (let filter in item) {
+                    indexes = this.unionIndexes(indexes, this.getIndexes(dataset, item[filter]));
+                }
+                return indexes;
+            case "NOT":
+                indexes = this.getIndexes(dataset, query["NOT"]);
+                return this.filterWithNumber(Array.from(dataset.keys()), indexes);
+            case "LT":
+                item = query["LT"];
+                return this.getIndexesLT(dataset, item);
+            case "GT":
+                item = query["GT"];
+                return this.getIndexesGT(dataset, item);
+            case "EQ":
+                item = query["EQ"];
+                return this.getIndexesEQ(dataset, item);
+            case "IS":
+                item = query["IS"];
+                return this.getIndexesIS(dataset, item);
         }
-        if (!isAdded) {
-            try {
-                const dataset = fs.readFileSync(cacheDir + datasetId + ".txt", "text");
-                isAdded = true;
-            } catch (e) {
-                isAdded = false;
-            }
-        }
-        return isAdded;
     }
 
     public getIndexesLT(dataset: any[], item: any): number[] {

@@ -70,7 +70,7 @@ export default class InsightFacade implements IInsightFacade {
                 // Write to file only after all promises have been resolved
                 if (newDataset.writeToFile()) {
                      return Promise.resolve(datasetsStringReference);
-                 }
+                }
             }).catch((err: any) => {
                 return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
             });
@@ -80,11 +80,34 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     private addRoomsDataset(id: string, content: string): Promise<any> {
+        let datasetsReference: Dataset[] = this.datasets;
+        let datasetsStringReference: string[] = this.datasetsString;
         return JSZip.loadAsync(content, { base64: true }).then(function (zip: JSZip) {
             let newDataset: Dataset = new Dataset(id, InsightDatasetKind.Rooms);
             const promises: Array<Promise<any>> = [];
             return zip.folder("rooms").file("index.htm").async("text").then(function (data: string) {
                 Log.test("Retrieved file contents, now parse !");
+                promises.push(newDataset.parseRoomsDataset(data, zip).then(function (data2: string) {
+                    Log.test("got here");
+                }).catch((err: any) => {
+                    Log.error("error thrown, file not valid JSON!");
+                    Promise.resolve();
+                    // Promise.reject("Not valid json");
+                }));
+                return Promise.all(promises).then(function () {
+                    if (newDataset.numRows > 0) {
+                        datasetsStringReference.push(id);
+                        datasetsReference.push(newDataset);
+                    } else {
+                        return Promise.reject(new InsightError("No valid sections were found in given zip"));
+                    }
+                    // Write to file only after all promises have been resolved
+                    if (newDataset.writeToFile()) {
+                        return Promise.resolve(datasetsStringReference);
+                    }
+                }).catch((err: any) => {
+                    return Promise.reject(new InsightError("Promise.all returned one or more Promise.reject"));
+                });
             });
         }).catch((err: any) => {
             return Promise.reject(new InsightError("invalid zip file"));
@@ -158,13 +181,11 @@ export default class InsightFacade implements IInsightFacade {
         let insightQuery: InsightQuery;
         insightQuery = new InsightQuery();
         // Validate the input query
-        return insightQuery.validQuery(query, this.datasetsString).then((result: boolean) => {
+        return insightQuery.validQuery(query, this.datasets, this.datasetsString).then((result: boolean) => {
             Log.info(`In performQuery ${result}`);
             if (result) {
                 // Return fetched query result if the input query is valid
                 return insightQuery.fetchQuery(query, this.datasets, this.datasetsString);
-            } else {
-                return Promise.reject(new InsightError("Invalid query"));
             }
         }).then((result: any[]) => {
             // Check if the result is too large

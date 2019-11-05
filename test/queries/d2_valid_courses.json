@@ -1,0 +1,50 @@
+{
+    "title": "Valid query: A very complex query with courses",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_dept": "cpsc"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "courses_id",
+                "overallSum",
+                "overallCount",
+                "overallMin",
+                "overallMax"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_dept",
+                "courses_id"
+            ],
+            "APPLY": [
+                {
+                    "overallCount": {
+                        "COUNT": "courses_instructor"
+                    }
+                },
+                {
+                    "overallSum": {
+                        "SUM": "courses_fail"
+                    }
+                },
+                {
+                    "overallMin": {
+                        "MIN": "courses_avg"
+                    }
+                },
+                {
+                    "overallMax": {
+                        "MAX": "courses_avg"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_dept":"cpsc","courses_id":"110","overallSum":1576,"overallCount":12,"overallMin":67.79,"overallMax":85.46},{"courses_dept":"cpsc","courses_id":"121","overallSum":592,"overallCount":12,"overallMin":67.13,"overallMax":84.56},{"courses_dept":"cpsc","courses_id":"210","overallSum":588,"overallCount":9,"overallMin":68.13,"overallMax":86.15},{"courses_dept":"cpsc","courses_id":"213","overallSum":354,"overallCount":8,"overallMin":64.62,"overallMax":81.76},{"courses_dept":"cpsc","courses_id":"221","overallSum":392,"overallCount":12,"overallMin":65.1,"overallMax":86.47},{"courses_dept":"cpsc","courses_id":"259","overallSum":144,"overallCount":3,"overallMin":72.4,"overallMax":75.82},{"courses_dept":"cpsc","courses_id":"261","overallSum":102,"overallCount":3,"overallMin":67.91,"overallMax":71.45},{"courses_dept":"cpsc","courses_id":"301","overallSum":62,"overallCount":3,"overallMin":71,"overallMax":88},{"courses_dept":"cpsc","courses_id":"302","overallSum":28,"overallCount":5,"overallMin":68.64,"overallMax":79.46},{"courses_dept":"cpsc","courses_id":"303","overallSum":46,"overallCount":5,"overallMin":68.35,"overallMax":77.62},{"courses_dept":"cpsc","courses_id":"304","overallSum":88,"overallCount":7,"overallMin":71.89,"overallMax":85.5},{"courses_dept":"cpsc","courses_id":"310","overallSum":84,"overallCount":9,"overallMin":72.27,"overallMax":84.6},{"courses_dept":"cpsc","courses_id":"311","overallSum":52,"overallCount":6,"overallMin":72.83,"overallMax":84.39},{"courses_dept":"cpsc","courses_id":"312","overallSum":26,"overallCount":5,"overallMin":76.52,"overallMax":85.13},{"courses_dept":"cpsc","courses_id":"313","overallSum":252,"overallCount":7,"overallMin":70.46,"overallMax":82.27},{"courses_dept":"cpsc","courses_id":"314","overallSum":76,"overallCount":8,"overallMin":67.85,"overallMax":82.58},{"courses_dept":"cpsc","courses_id":"317","overallSum":140,"overallCount":6,"overallMin":68.54,"overallMax":76.87},{"courses_dept":"cpsc","courses_id":"319","overallSum":4,"overallCount":4,"overallMin":78.93,"overallMax":88.39},{"courses_dept":"cpsc","courses_id":"320","overallSum":402,"overallCount":8,"overallMin":66.34,"overallMax":73.38},{"courses_dept":"cpsc","courses_id":"322","overallSum":186,"overallCount":8,"overallMin":67.48,"overallMax":78.34},{"courses_dept":"cpsc","courses_id":"340","overallSum":66,"overallCount":6,"overallMin":68.4,"overallMax":82.66},{"courses_dept":"cpsc","courses_id":"344","overallSum":16,"overallCount":5,"overallMin":73.3,"overallMax":81.18},{"courses_dept":"cpsc","courses_id":"404","overallSum":86,"overallCount":4,"overallMin":68.76,"overallMax":81.82},{"courses_dept":"cpsc","courses_id":"410","overallSum":16,"overallCount":6,"overallMin":74.04,"overallMax":80.18},{"courses_dept":"cpsc","courses_id":"411","overallSum":6,"overallCount":4,"overallMin":72.24,"overallMax":86},{"courses_dept":"cpsc","courses_id":"415","overallSum":86,"overallCount":2,"overallMin":68.79,"overallMax":73.37},{"courses_dept":"cpsc","courses_id":"416","overallSum":18,"overallCount":4,"overallMin":71.75,"overallMax":81.18},{"courses_dept":"cpsc","courses_id":"418","overallSum":6,"overallCount":2,"overallMin":75.61,"overallMax":86.04},{"courses_dept":"cpsc","courses_id":"420","overallSum":70,"overallCount":4,"overallMin":68.77,"overallMax":78.32},{"courses_dept":"cpsc","courses_id":"421","overallSum":22,"overallCount":3,"overallMin":69.47,"overallMax":79.88},{"courses_dept":"cpsc","courses_id":"422","overallSum":34,"overallCount":4,"overallMin":66.13,"overallMax":78.3},{"courses_dept":"cpsc","courses_id":"425","overallSum":26,"overallCount":4,"overallMin":71.8,"overallMax":77.68},{"courses_dept":"cpsc","courses_id":"430","overallSum":10,"overallCount":6,"overallMin":72.75,"overallMax":80.55},{"courses_dept":"cpsc","courses_id":"444","overallSum":2,"overallCount":3,"overallMin":77.43,"overallMax":80.62},{"courses_dept":"cpsc","courses_id":"445","overallSum":6,"overallCount":5,"overallMin":73.18,"overallMax":91.25},{"courses_dept":"cpsc","courses_id":"449","overallSum":2,"overallCount":3,"overallMin":83.08,"overallMax":93.5},{"courses_dept":"cpsc","courses_id":"490","overallSum":0,"overallCount":3,"overallMin":84.5,"overallMax":92.4},{"courses_dept":"cpsc","courses_id":"500","overallSum":4,"overallCount":4,"overallMin":78.87,"overallMax":86.33},{"courses_dept":"cpsc","courses_id":"501","overallSum":0,"overallCount":3,"overallMin":83.8,"overallMax":94},{"courses_dept":"cpsc","courses_id":"502","overallSum":0,"overallCount":5,"overallMin":81.06,"overallMax":86.2},{"courses_dept":"cpsc","courses_id":"503","overallSum":2,"overallCount":2,"overallMin":79.25,"overallMax":94.5},{"courses_dept":"cpsc","courses_id":"507","overallSum":0,"overallCount":3,"overallMin":82.5,"overallMax":91.79},{"courses_dept":"cpsc","courses_id":"509","overallSum":0,"overallCount":2,"overallMin":84.25,"overallMax":88},{"courses_dept":"cpsc","courses_id":"513","overallSum":4,"overallCount":4,"overallMin":64,"overallMax":89.09},{"courses_dept":"cpsc","courses_id":"515","overallSum":0,"overallCount":2,"overallMin":79.88,"overallMax":83.36},{"courses_dept":"cpsc","courses_id":"521","overallSum":2,"overallCount":3,"overallMin":82.65,"overallMax":87.78},{"courses_dept":"cpsc","courses_id":"522","overallSum":0,"overallCount":2,"overallMin":82.55,"overallMax":90.71},{"courses_dept":"cpsc","courses_id":"527","overallSum":0,"overallCount":4,"overallMin":83.78,"overallMax":91.22},{"courses_dept":"cpsc","courses_id":"540","overallSum":0,"overallCount":5,"overallMin":81.12,"overallMax":91.22},{"courses_dept":"cpsc","courses_id":"543","overallSum":0,"overallCount":2,"overallMin":82.07,"overallMax":89.75},{"courses_dept":"cpsc","courses_id":"544","overallSum":0,"overallCount":5,"overallMin":81.64,"overallMax":88},{"courses_dept":"cpsc","courses_id":"547","overallSum":0,"overallCount":2,"overallMin":88.47,"overallMax":88.68},{"courses_dept":"cpsc","courses_id":"589","overallSum":0,"overallCount":1,"overallMin":75,"overallMax":95}]
+}

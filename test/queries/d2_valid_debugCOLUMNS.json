@@ -1,0 +1,38 @@
+{
+    "title": "Valid query: a key in GROUP but not in COLUMNS",
+    "query": {
+        "WHERE": {
+            "IS": {
+                "courses_dept": "cpsc"
+            }
+        },
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_dept",
+                "overallCount",
+                "overallMin",
+                "overallMin"
+            ]
+        },
+        "TRANSFORMATIONS": {
+            "GROUP": [
+                "courses_dept",
+                "courses_id"
+            ],
+            "APPLY": [
+                {
+                    "overallCount": {
+                        "COUNT": "courses_instructor"
+                    }
+                },
+                {
+                    "overallMin": {
+                        "MIN": "courses_avg"
+                    }
+                }
+            ]
+        }
+    },
+    "isQueryValid": true,
+    "result":[{"courses_dept":"cpsc","overallCount":12,"overallMin":67.79},{"courses_dept":"cpsc","overallCount":12,"overallMin":67.13},{"courses_dept":"cpsc","overallCount":9,"overallMin":68.13},{"courses_dept":"cpsc","overallCount":8,"overallMin":64.62},{"courses_dept":"cpsc","overallCount":12,"overallMin":65.1},{"courses_dept":"cpsc","overallCount":3,"overallMin":72.4},{"courses_dept":"cpsc","overallCount":3,"overallMin":67.91},{"courses_dept":"cpsc","overallCount":3,"overallMin":71},{"courses_dept":"cpsc","overallCount":5,"overallMin":68.64},{"courses_dept":"cpsc","overallCount":5,"overallMin":68.35},{"courses_dept":"cpsc","overallCount":7,"overallMin":71.89},{"courses_dept":"cpsc","overallCount":9,"overallMin":72.27},{"courses_dept":"cpsc","overallCount":6,"overallMin":72.83},{"courses_dept":"cpsc","overallCount":5,"overallMin":76.52},{"courses_dept":"cpsc","overallCount":7,"overallMin":70.46},{"courses_dept":"cpsc","overallCount":8,"overallMin":67.85},{"courses_dept":"cpsc","overallCount":6,"overallMin":68.54},{"courses_dept":"cpsc","overallCount":4,"overallMin":78.93},{"courses_dept":"cpsc","overallCount":8,"overallMin":66.34},{"courses_dept":"cpsc","overallCount":8,"overallMin":67.48},{"courses_dept":"cpsc","overallCount":6,"overallMin":68.4},{"courses_dept":"cpsc","overallCount":5,"overallMin":73.3},{"courses_dept":"cpsc","overallCount":4,"overallMin":68.76},{"courses_dept":"cpsc","overallCount":6,"overallMin":74.04},{"courses_dept":"cpsc","overallCount":4,"overallMin":72.24},{"courses_dept":"cpsc","overallCount":2,"overallMin":68.79},{"courses_dept":"cpsc","overallCount":4,"overallMin":71.75},{"courses_dept":"cpsc","overallCount":2,"overallMin":75.61},{"courses_dept":"cpsc","overallCount":4,"overallMin":68.77},{"courses_dept":"cpsc","overallCount":3,"overallMin":69.47},{"courses_dept":"cpsc","overallCount":4,"overallMin":66.13},{"courses_dept":"cpsc","overallCount":4,"overallMin":71.8},{"courses_dept":"cpsc","overallCount":6,"overallMin":72.75},{"courses_dept":"cpsc","overallCount":3,"overallMin":77.43},{"courses_dept":"cpsc","overallCount":5,"overallMin":73.18},{"courses_dept":"cpsc","overallCount":3,"overallMin":83.08},{"courses_dept":"cpsc","overallCount":3,"overallMin":84.5},{"courses_dept":"cpsc","overallCount":4,"overallMin":78.87},{"courses_dept":"cpsc","overallCount":3,"overallMin":83.8},{"courses_dept":"cpsc","overallCount":5,"overallMin":81.06},{"courses_dept":"cpsc","overallCount":2,"overallMin":79.25},{"courses_dept":"cpsc","overallCount":3,"overallMin":82.5},{"courses_dept":"cpsc","overallCount":2,"overallMin":84.25},{"courses_dept":"cpsc","overallCount":4,"overallMin":64},{"courses_dept":"cpsc","overallCount":2,"overallMin":79.88},{"courses_dept":"cpsc","overallCount":3,"overallMin":82.65},{"courses_dept":"cpsc","overallCount":2,"overallMin":82.55},{"courses_dept":"cpsc","overallCount":4,"overallMin":83.78},{"courses_dept":"cpsc","overallCount":5,"overallMin":81.12},{"courses_dept":"cpsc","overallCount":2,"overallMin":82.07},{"courses_dept":"cpsc","overallCount":5,"overallMin":81.64},{"courses_dept":"cpsc","overallCount":2,"overallMin":88.47},{"courses_dept":"cpsc","overallCount":1,"overallMin":75}]
+}

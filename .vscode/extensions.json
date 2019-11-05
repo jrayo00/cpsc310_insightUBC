@@ -3,6 +3,6 @@
     // for the documentation about the extensions.json format
     "recommendations": [
         "EditorConfig.EditorConfig",
-        "dbaeumer.vscode-eslint"
+        "eg2.tslint"
     ]
 }
