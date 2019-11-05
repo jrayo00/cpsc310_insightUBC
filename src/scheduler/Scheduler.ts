@@ -1,8 +1,8 @@
-import {IScheduler, ISchedRoom, ISchedSection, TimeSlot} from "./IScheduler";
+import {IScheduler, SchedRoom, SchedSection, TimeSlot} from "./IScheduler";
 
 export default class Scheduler implements IScheduler {
 
-    public schedule(sections: ISchedSection[], rooms: ISchedRoom[]): Array<[ISchedRoom, ISchedSection, TimeSlot]> {
+    public schedule(sections: SchedSection[], rooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
         // TODO Implement this
         return [];
     }

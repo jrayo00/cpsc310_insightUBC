@@ -1,4 +1,4 @@
-export interface ISchedSection {
+export interface SchedSection {
     courses_dept: string;
     courses_id: string;
     courses_uuid: string;
@@ -11,7 +11,7 @@ export interface ISchedSection {
     courses_year?: number;
 }
 
-export interface ISchedRoom {
+export interface SchedRoom {
     rooms_shortname: string;
     rooms_number: string;
     rooms_seats: number;
@@ -46,5 +46,5 @@ export interface IScheduler {
      * @return Array<[SchedRoom, SchedSection, TimeSlot]>
      * return a timetable, which is an array of [room, section, time slot] assignment tuples
      */
-    schedule(sections: ISchedSection[], rooms: ISchedRoom[]): Array<[ISchedRoom, ISchedSection, TimeSlot]>;
+    schedule(sections: SchedSection[], rooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]>;
 }
