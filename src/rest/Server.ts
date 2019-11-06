@@ -57,7 +57,6 @@ export default class Server {
         return new Promise(function (fulfill, reject) {
             try {
                 Log.info("Server::start() - start");
-
                 that.rest = restify.createServer({
                     name: "insightUBC",
                 });
@@ -68,29 +67,29 @@ export default class Server {
                         res.header("Access-Control-Allow-Headers", "X-Requested-With");
                         return next();
                     });
-                // This is an example endpoint that you can invoke by accessing this URL in your browser:
-                // http://localhost:4321/echo/hello
-                that.rest.get("/echo/:msg", Server.echo);
 
+                // TODO: my implementation
                 that.rest.put("/dataset/:id/:kind", (req: restify.Request, res: restify.Response,
                                                      next: restify.Next) => {
                     that.putHandler(req, res, next).then((r) => {
                         return next();
                     });
                 });
-                // that.rest.del("/dataset/:id", (req: restify.Request, res: restify.Response, next: restify.Next) => {
-                //     return next();
-                // });
-
+                that.rest.del("/dataset/:id", (req: restify.Request, res: restify.Response, next: restify.Next) => {
+                    that.delHandler(req, res, next).then((r) => {
+                        return next();
+                    });
+                });
                 that.rest.post("/query", (req: restify.Request, res: restify.Response, next: restify.Next) => {
                     that.postHandler(req, res, next).then((r) => {
                         return next();
                     });
                 });
-
-                // that.rest.get("/datasets", (req: restify.Request, res: restify.Response, next: restify.Next) => {
-                //     return next();
-                // });
+                that.rest.get("/datasets", (req: restify.Request, res: restify.Response, next: restify.Next) => {
+                    that.getHandler(req, res, next).then((r) => {
+                        return next();
+                    });
+                });
 
                 // This must be the last endpoint!
                 that.rest.get("/.*", Server.getStatic);
@@ -126,15 +125,31 @@ export default class Server {
             datasetType = null;
         }
         return this.insightFacade.addDataset(datasetId, content, datasetType).then((arr: string[]) => {
-            Log.info(`Returned by addDataset ${arr}`);
             res.send(200, {
                 result: arr
             });
         }).catch((err: any) => {
-            Log.info(`In addDataset ${err}`);
             res.json(400, {
                 error: `Failed to add dataset with id = ${req.params.id} because ${err}.`
             });
+        });
+    }
+
+    private delHandler(req: restify.Request, res: restify.Response, next: restify.Next) {
+        return this.insightFacade.removeDataset(req.params.id).then((arr: string) => {
+            res.send(200, {
+                result: arr
+            });
+        }).catch((err: any) => {
+            if (err instanceof NotFoundError) {
+                res.json(404, {
+                    error: `Failed to remove dataset with id = ${req.params.id} because ${err}.`
+                });
+            } else {
+                res.json(400, {
+                    error: `Failed to remove dataset with id = ${req.params.id} because ${err}.`
+                });
+            }
         });
     }
 
@@ -146,6 +161,18 @@ export default class Server {
         }).catch((err: any) => {
             res.json(400, {
                 error: `Failed in performQuery() because ${err}.`
+            });
+        });
+    }
+
+    private getHandler(req: restify.Request, res: restify.Response, next: restify.Next) {
+        return this.insightFacade.listDatasets().then((arr: InsightDataset[]) => {
+            res.send(200, {
+                result: arr
+            });
+        }).catch((err: any) => {
+            res.json(400, {
+                error: `Failed in listDatasets() because ${err}.`
             });
         });
     }
