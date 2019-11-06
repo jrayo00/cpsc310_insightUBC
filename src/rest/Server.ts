@@ -68,46 +68,40 @@ export default class Server {
                         res.header("Access-Control-Allow-Headers", "X-Requested-With");
                         return next();
                     });
-
                 // This is an example endpoint that you can invoke by accessing this URL in your browser:
                 // http://localhost:4321/echo/hello
                 that.rest.get("/echo/:msg", Server.echo);
 
-                // TODO: your endpoints should go here
                 that.rest.put("/dataset/:id/:kind", (req: restify.Request, res: restify.Response,
                                                      next: restify.Next) => {
                     that.putHandler(req, res, next).then((r) => {
                         return next();
                     });
                 });
-
                 that.rest.del("/dataset/:id", (req: restify.Request, res: restify.Response, next: restify.Next) => {
                     // Todo
+                    return next();
                 });
-
                 that.rest.post("/query", (req: restify.Request, res: restify.Response, next: restify.Next) => {
                     // Todo
+                    return next();
                 });
-
                 that.rest.get("/datasets", (req: restify.Request, res: restify.Response, next: restify.Next) => {
                     // Todo
+                    return next();
                 });
-
                 // This must be the last endpoint!
                 that.rest.get("/.*", Server.getStatic);
-
                 that.rest.listen(that.port, function () {
                     Log.info("Server::start() - restify listening: " + that.rest.url);
                     fulfill(true);
                 });
-
                 that.rest.on("error", function (err: string) {
                     // catches errors in restify start; unusual syntax due to internal
                     // node not using normal exceptions here
                     Log.info("Server::start() - restify ERROR: " + err);
                     reject(err);
                 });
-
             } catch (err) {
                 Log.error("Server::start() - ERROR: " + err);
                 reject(err);
