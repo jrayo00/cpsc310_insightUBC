@@ -79,15 +79,16 @@ export default class Server {
                     });
                 });
                 // that.rest.del("/dataset/:id", (req: restify.Request, res: restify.Response, next: restify.Next) => {
-                //     // Todo
                 //     return next();
                 // });
-                // that.rest.post("/query", (req: restify.Request, res: restify.Response, next: restify.Next) => {
-                //     // Todo
-                //     return next();
-                // });
+
+                that.rest.post("/query", (req: restify.Request, res: restify.Response, next: restify.Next) => {
+                    that.postHandler(req, res, next).then((r) => {
+                        return next();
+                    });
+                });
+
                 // that.rest.get("/datasets", (req: restify.Request, res: restify.Response, next: restify.Next) => {
-                //     // Todo
                 //     return next();
                 // });
 
@@ -133,6 +134,18 @@ export default class Server {
             Log.info(`In addDataset ${err}`);
             res.json(400, {
                 error: `Failed to add dataset with id = ${req.params.id} because ${err}.`
+            });
+        });
+    }
+
+    private postHandler(req: restify.Request, res: restify.Response, next: restify.Next) {
+        return this.insightFacade.performQuery(req.body).then((arr: any[]) => {
+            res.send(200, {
+                result: arr
+            });
+        }).catch((err: any) => {
+            res.json(400, {
+                error: `Failed in performQuery() because ${err}.`
             });
         });
     }

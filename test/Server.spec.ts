@@ -7,6 +7,8 @@ import Response = ChaiHttp.Response;
 import {expect} from "chai";
 import Log from "../src/Util";
 import * as fs from "fs-extra";
+import {ITestQuery} from "./InsightFacade.spec";
+import TestUtil from "./TestUtil";
 
 describe("Facade D3", function () {
 
@@ -43,6 +45,11 @@ describe("Facade D3", function () {
     beforeEach(function () {
         // might want to add some process logging here to keep track of what"s going on
         Log.test(`BeforeTest: ${this.currentTest.title}`);
+    });
+
+    afterEach(function () {
+        // might want to add some process logging here to keep track of what"s going on
+        Log.test(`AfterTest: ${this.currentTest.title}`);
         try {
             fs.removeSync(cacheDir);
             fs.mkdirSync(cacheDir);
@@ -50,11 +57,6 @@ describe("Facade D3", function () {
         } catch (err) {
             Log.error(err);
         }
-    });
-
-    afterEach(function () {
-        // might want to add some process logging here to keep track of what"s going on
-        Log.test(`AfterTest: ${this.currentTest.title}`);
     });
 
     // TODO: read your courses and rooms datasets here once!
@@ -66,14 +68,18 @@ describe("Facade D3", function () {
         rooms: fs.readFileSync("./test/data/rooms.zip"),
     };
 
+    // Read queries
+    const testQueries: ITestQuery[] = TestUtil.readTestQueries("test/serverQueries");
+
     // Sample on how to format PUT requests
     it("Success PUT test for courses dataset", function () {
         const endpointURL = "/dataset/courses0/courses";
         const expected: string[] = ["courses0"];
+        const bufferId = "courses";
         try {
             return chai.request(serverURL)
                 .put(endpointURL)
-                .send(buffers["courses"])
+                .send(buffers[bufferId])
                 .set("Content-Type", "application/x-zip-compressed")
                 .then(function (res: Response) {
                     // some logging here please!
@@ -89,5 +95,45 @@ describe("Facade D3", function () {
         }
     });
 
-    // The other endpoints work similarly. You should be able to find all instructions at the chai-http documentation
+    it("Failed PUT test for courses dataset", function () {
+        const endpointURL = "/dataset/courses0/courses";
+        const expected = Error;
+        const bufferId = "novalidsections";
+        try {
+            return chai.request(serverURL)
+                .put(endpointURL)
+                .send(buffers[bufferId])
+                .set("Content-Type", "application/x-zip-compressed")
+                .then(function (res: Response) {
+                    expect.fail();
+                })
+                .catch(function (err) {
+                    expect(err).to.be.instanceOf(expected);
+                });
+        } catch (err) {
+            // and some more logging here!
+        }
+    });
+
+    it("POST tests for datasets", function () {
+        const endpointURL = "/query";
+        for (const test of testQueries) {
+            it(`[${test.filename}] ${test.title}`, function (done) {
+                try {
+                    return chai.request(serverURL)
+                        .put(endpointURL)
+                        .send(test.query)
+                        .set("Content-Type", "application/x-zip-compressed")
+                        .then(function (res: Response) {
+                            TestUtil.checkQueryResult(test, res.body["result"], done);
+                        })
+                        .catch(function (err) {
+                            TestUtil.checkQueryResult(test, err, done);
+                        });
+                } catch (err) {
+                    // and some more logging here!
+                }
+            });
+        }
+    });
 });
