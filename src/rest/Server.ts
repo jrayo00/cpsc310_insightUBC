@@ -78,18 +78,19 @@ export default class Server {
                         return next();
                     });
                 });
-                that.rest.del("/dataset/:id", (req: restify.Request, res: restify.Response, next: restify.Next) => {
-                    // Todo
-                    return next();
-                });
-                that.rest.post("/query", (req: restify.Request, res: restify.Response, next: restify.Next) => {
-                    // Todo
-                    return next();
-                });
-                that.rest.get("/datasets", (req: restify.Request, res: restify.Response, next: restify.Next) => {
-                    // Todo
-                    return next();
-                });
+                // that.rest.del("/dataset/:id", (req: restify.Request, res: restify.Response, next: restify.Next) => {
+                //     // Todo
+                //     return next();
+                // });
+                // that.rest.post("/query", (req: restify.Request, res: restify.Response, next: restify.Next) => {
+                //     // Todo
+                //     return next();
+                // });
+                // that.rest.get("/datasets", (req: restify.Request, res: restify.Response, next: restify.Next) => {
+                //     // Todo
+                //     return next();
+                // });
+
                 // This must be the last endpoint!
                 that.rest.get("/.*", Server.getStatic);
                 that.rest.listen(that.port, function () {
