@@ -257,7 +257,7 @@ export class Dataset {
             http.get(addr + encodeURIComponent(building.address),
                 (resp: any) => {
                     let data = "";
-                    Log.test("API CALLBACK");
+                    // Log.test("API CALLBACK");
                     let buildingRef2 = buildingRef;
                     let buildingFilesRef2: any[] = buildingFilesRef;
                     // A chunk of data has been received.
@@ -274,7 +274,7 @@ export class Dataset {
 
                     // The whole response has been received. Print out the result.
                     resp.on("end", () => {
-                        Log.test("closing http connection");
+                        // Log.test("closing http connection");
                     });
 
                 }).on("error", (err: any) => {

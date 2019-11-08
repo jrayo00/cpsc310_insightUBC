@@ -9,3 +9,16 @@
  */
 
 // TODO: implement!
+const buttonElement = document.getElementById('submit-button');
+
+buttonElement.addEventListener("click",function () {
+    console.log("submit button clicked");
+    const query = CampusExplorer.buildQuery();
+    const myPromise = CampusExplorer.sendQuery(query);
+
+    myPromise.then((result) => {
+        CampusExplorer.renderResult(result);
+    }).catch((error) => {
+        console.log(`In catch: ${error}`);
+    })
+});
