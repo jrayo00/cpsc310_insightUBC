@@ -8,28 +8,50 @@
  */
 CampusExplorer.buildQuery = function() {
     let query = {};
-    // TODO: implement!
-    query.WHERE = extractWhereObject();
-    query.OPTIONS = extractOptionsObject();
-
-    query.TRANSFORMATIONS = extractTransformationObject();
+    // TODO: figure out how to extract data-type value from tag!
+    const activeTab = document.getElementsByClassName('tab-panel active')[0];
+    const dataset = activeTab.getAttribute('data-type');
+    query.WHERE = extractWhereObject(activeTab,dataset);
+    query.OPTIONS = extractOptionsObject(activeTab,dataset);
+    query.TRANSFORMATIONS = extractTransformationObject(activeTab,dataset);
     console.log(JSON.stringify(query));
     return query;
 };
 
-function extractWhereObject() {
+function extractWhereObject(element,dataset) {
     let obj = {};
 
     return obj;
 }
 
-function extractOptionsObject() {
+
+
+function extractOptionsObject(element,dataset) {
     let obj = {};
 
+    const colElement = element.getElementsByClassName('form-group columns')[0];
+    const columns = extractColumns(colElement,dataset);
+    if (typeof columns !== 'undefined' ){
+        obj.COLUMNS = columns;
+    }
     return obj;
 }
 
-function extractTransformationObject() {
+function extractColumns(colElement,dataset) {
+    let columns = [];
+    const ele = colElement.getElementsByClassName('control field');
+    for (const div of ele){
+        const checkbox = div.getElementsByTagName('input')[0];
+        if(checkbox.checked) {
+            columns.push(dataset + "_" + checkbox.value);
+        }
+    }
+    if (columns.length > 0)
+        return columns;
+    return undefined;
+}
+
+function extractTransformationObject(element,dataset) {
     let obj = {};
 
     return obj;
