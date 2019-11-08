@@ -8,7 +8,7 @@
  */
 CampusExplorer.buildQuery = function() {
     let query = {};
-    // TODO: figure out how to extract data-type value from tag!
+    // TODO: FINISH TRANSFORMATION PARSING
     const activeTab = document.getElementsByClassName('tab-panel active')[0];
     const dataset = activeTab.getAttribute('data-type');
     query.WHERE = extractWhereObject(activeTab,dataset);
@@ -18,11 +18,46 @@ CampusExplorer.buildQuery = function() {
     return query;
 };
 
-function extractWhereObject(element,dataset) {
-    let obj = {};
-
-    return obj;
+function extractWhereConditions(element, dataset) {
+    const conditionContainer = element.getElementsByClassName('conditions-container')[0];
+    const conditions = conditionContainer.getElementsByClassName('control-group condition');
+    for (const condition in conditions) {
+        // TODO: PARSE EACH CONDITIONS
+    }
+    return undefined;
 }
+
+function extractWhereObject(element,dataset) {
+    let where = {};
+
+    const radioGroup = element.getElementsByClassName('control-group condition-type')[0];
+    const selectedInput = getSelectedRadioButton(radioGroup);
+    switch (selectedInput.value) {
+        case "all":
+            where.AND = extractWhereConditions(element,dataset);
+            break;
+        case "any":
+            where.OR = extractWhereConditions(element,dataset);
+            break;
+        case "none":
+            const notObj = {};
+            notObj.OR = extractWhereConditions(element,dataset);
+            where.NOT = notObj;
+            break;
+    }
+    return where;
+}
+
+function getSelectedRadioButton(radioGroup) {
+    const buttons = radioGroup.getElementsByTagName('input');
+    for (const button in buttons) {
+        if (button.checked) {
+            return button;
+        }
+    }
+    return undefined;
+}
+
 
 function extractOptionsObject(element,dataset) {
     let options = {};
