@@ -6,4 +6,8 @@ export default class Scheduler implements IScheduler {
         // TODO Implement this
         return [];
     }
+
+    private getDistance(lat0: number, lon0: number, lat1: number, lon1: number): number {
+        return 0;
+    }
 }
