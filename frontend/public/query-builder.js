@@ -19,12 +19,13 @@ CampusExplorer.buildQuery = function() {
 };
 
 function extractWhereConditions(element, dataset) {
+    const condArr = [];
     const conditionContainer = element.getElementsByClassName('conditions-container')[0];
     const conditions = conditionContainer.getElementsByClassName('control-group condition');
     for (const condition in conditions) {
         // TODO: PARSE EACH CONDITIONS
     }
-    return undefined;
+    return condArr;
 }
 
 function extractWhereObject(element,dataset) {
@@ -50,7 +51,7 @@ function extractWhereObject(element,dataset) {
 
 function getSelectedRadioButton(radioGroup) {
     const buttons = radioGroup.getElementsByTagName('input');
-    for (const button in buttons) {
+    for (const button of buttons) {
         if (button.checked) {
             return button;
         }
