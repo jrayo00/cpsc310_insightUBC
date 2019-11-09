@@ -92,8 +92,8 @@ describe("Tests for Scheduler", function () {
     it("Sample Scheduler test", function () {
         sections = [section0, section1, section2, section3];
         rooms = [room0, room1, room2, room3];
-        let expected = [[section0, room2, "MWF 0800-0900"], [section1, room2, "MWF 0900-1000"],
-            [section2, room1, "MWF 0800-0900"], [section3, room1, "MWF 0900-1000"]];
+        let expected = [[room2, section0, "MWF 0800-0900"], [room2, section1, "MWF 0900-1000"],
+            [room1, section2, "MWF 0800-0900"], [room1, section3, "MWF 0900-1000"]];
         expect(scheduler.schedule(sections, rooms)).to.deep.equal(expected);
     });
 });
