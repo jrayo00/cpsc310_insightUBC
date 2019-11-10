@@ -23,9 +23,21 @@ export default class Scheduler implements IScheduler {
         let combo: [SchedRoom, SchedSection, TimeSlot];
         for (let i in schedule) {
             // First, clone section and cast it to interface
-            let section: SchedSection = this.makeSchedSection(schedule[i][0]);
+            // let section: SchedSection = this.makeSchedSection(schedule[i][0]);
+            let section = schedule[i][0].constructor();
+            for (let key of Object.keys(schedule[i][0])) {
+                if (key.includes("courses")) {
+                    section[key] = schedule[i][0][key];
+                }
+            }
             // Then, clone room and cast to interface
-            let room: SchedRoom = this.makeSchedRoom(schedule[i][1]);
+            // let room: SchedRoom = this.makeSchedRoom(schedule[i][1]);
+            let room = schedule[i][1].constructor();
+            for (let key of Object.keys(schedule[i][1])) {
+                if (key.includes("rooms")) {
+                    room[key] = schedule[i][1][key];
+                }
+            }
             let timeslot: TimeSlot = schedule[i][2];
             combo = [room, section, timeslot];
             results.push(combo);
