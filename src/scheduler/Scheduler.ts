@@ -45,91 +45,6 @@ export default class Scheduler implements IScheduler {
         return results;
     }
 
-    private makeSchedSection(section: any): SchedSection {
-        let schedSection = {} as SchedSection;
-        for (let key of Object.keys(section)) {
-            if (key.includes("courses")) {
-                switch (key) {
-                    case "courses_dept":
-                        schedSection.courses_dept = section[key];
-                        break;
-                    case "courses_id":
-                        schedSection.courses_id = section[key];
-                        break;
-                    case "courses_uuid":
-                        schedSection.courses_uuid = section[key];
-                        break;
-                    case "courses_pass":
-                        schedSection.courses_pass = section[key];
-                        break;
-                    case "courses_fail":
-                        schedSection.courses_fail = section[key];
-                        break;
-                    case "courses_audit":
-                        schedSection.courses_audit = section[key];
-                        break;
-                    case "courses_avg":
-                        schedSection.courses_avg = section[key];
-                        break;
-                    case "courses_instructor":
-                        schedSection.courses_instructor = section[key];
-                        break;
-                    case "courses_title":
-                        schedSection.courses_title = section[key];
-                        break;
-                    case "courses_year":
-                        schedSection.courses_year = section[key];
-                        break;
-                }
-            }
-        }
-        return schedSection;
-    }
-
-    private makeSchedRoom(room: any): SchedRoom {
-        let schedRoom = {} as SchedRoom;
-        for (let key of Object.keys(room)) {
-            if (key.includes("rooms")) {
-                switch (key) {
-                    case "rooms_shortname":
-                        schedRoom.rooms_shortname = room[key];
-                        break;
-                    case "rooms_number":
-                        schedRoom.rooms_number = room[key];
-                        break;
-                    case "rooms_seats":
-                        schedRoom.rooms_seats = room[key];
-                        break;
-                    case "rooms_lat":
-                        schedRoom.rooms_lat = room[key];
-                        break;
-                    case "rooms_lon":
-                        schedRoom.rooms_lon = room[key];
-                        break;
-                    case "rooms_name":
-                        schedRoom.rooms_name = room[key];
-                        break;
-                    case "rooms_fullname":
-                        schedRoom.rooms_fullname = room[key];
-                        break;
-                    case "rooms_address":
-                        schedRoom.rooms_address = room[key];
-                        break;
-                    case "rooms_type":
-                        schedRoom.rooms_type = room[key];
-                        break;
-                    case "rooms_furniture":
-                        schedRoom.rooms_furniture = room[key];
-                        break;
-                    case "rooms_href":
-                        schedRoom.rooms_href = room[key];
-                        break;
-                }
-            }
-        }
-        return schedRoom;
-    }
-
     private makeSched(groupedSections: any[][], groupedRooms: any[][]): any[][] {
         let schedule: any[][] = [[]];
         // Keep track of the number of times a room gets scheduled
@@ -160,11 +75,11 @@ export default class Scheduler implements IScheduler {
         let room;
         let combos = [];
         for (let i in groupedRooms) {
-            if (section > sections.length) {
+            if (section >= sections.length) {
                 return combos;
             }
             for (let j in groupedRooms[i]) {
-                if (section > sections.length) {
+                if (section >= sections.length) {
                     return combos;
                 }
                 room = groupedRooms[i][j];
