@@ -148,7 +148,13 @@ export default class Scheduler implements IScheduler {
         let room;
         let combos = [];
         for (let i in groupedRooms) {
+            if (section > sections.length) {
+                return combos;
+            }
             for (let j in groupedRooms[i]) {
+                if (section > sections.length) {
+                    return combos;
+                }
                 room = groupedRooms[i][j];
                 if (room["rooms_seats"] >= size && roomCount[i][j] < 15) {
                     while (section < sections.length) {
