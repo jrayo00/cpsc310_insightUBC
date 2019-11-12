@@ -10,11 +10,11 @@ export default class Scheduler implements IScheduler {
     public schedule(sections: SchedSection[], rooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
         this.queryHelpers = new InsightQuery();
         // Preprocess rooms, return rooms grouped by rooms_dist (I made up) and ordered by rooms_seats
-        let processedRooms: SchedRoom[] = this.processRooms(rooms);
+        // let processedRooms: SchedRoom[] = this.processRooms(rooms);
         // Preprocess sections
         let processedSections = this.processSections(sections);
         // Make schedule with processed items
-        let schedule = this.makeSched(processedSections, processedRooms);
+        let schedule = this.makeSched(processedSections, rooms);
         return schedule;
     }
 
@@ -28,8 +28,7 @@ export default class Scheduler implements IScheduler {
             // Find a good room for the whole course
             let section = 0;
             while (section < sections.length) {
-                let combos: Array<[SchedRoom, SchedSection, TimeSlot]> =
-                    this.findRoom(sections, section, groupedRooms);
+                let combos: Array<[SchedRoom, SchedSection, TimeSlot]> = this.findRoom(sections, section, groupedRooms);
                 section += combos.length;
                 schedule = schedule.concat(combos);
             }
@@ -132,6 +131,18 @@ export default class Scheduler implements IScheduler {
         return newSections;
     }
 
+    private sortByProperties(items: any[], properties: string[]): any[] {
+        // Sort by a list of properties
+        items.sort((a, b) => {
+            let flag = 0;
+            for (let p in properties) {
+                flag = flag || this.queryHelpers.insightValidateHelper.compareTo(a, b, properties[p]);
+            }
+            return flag;
+        });
+        return items;
+    }
+
     // Should return an array of arrays of objects (e.g., courses or rooms)
     private getGroupedItems(items: any[], groupedCols: any[]): any[] {
         return this.queryHelpers.insightTransformHelper.groupBy(items, (info: any) => {
@@ -163,17 +174,5 @@ export default class Scheduler implements IScheduler {
         const latDiff = lat0 - lat1;
         const lonDiff = lon0 - lon1;
         return Math.sqrt(Math.pow(latDiff, 2) + Math.pow(lonDiff, 2));
-    }
-
-    private sortByProperties(items: any[], properties: string[]): any[] {
-        // Sort by a list of properties
-        items.sort((a, b) => {
-            let flag = 0;
-            for (let p in properties) {
-                flag = flag || this.queryHelpers.insightValidateHelper.compareTo(a, b, properties[p]);
-            }
-            return flag;
-        });
-        return items;
     }
 }
