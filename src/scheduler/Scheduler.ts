@@ -15,7 +15,8 @@ export default class Scheduler implements IScheduler {
         // Make schedule with processed items
         let schedule = this.makeSched(processedSections, processedRooms);
         // Extract SchedSction and SchedRoom
-        return this.extractProperties(schedule);
+        // return this.extractProperties(schedule);
+        return schedule;
     }
 
     private extractProperties(schedule: any[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
@@ -45,8 +46,8 @@ export default class Scheduler implements IScheduler {
         return results;
     }
 
-    private makeSched(groupedSections: any[][], groupedRooms: any[][]): any[][] {
-        let schedule: any[][] = [[]];
+    private makeSched(groupedSections: any[][], groupedRooms: any[][]): Array<[SchedRoom, SchedSection, TimeSlot]> {
+        let schedule: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
         // Keep track of the number of times a room gets scheduled
         let roomCount: any[][] = JSON.parse(JSON.stringify(groupedRooms));
         for (let a of roomCount) {
@@ -57,23 +58,23 @@ export default class Scheduler implements IScheduler {
             // Find a good room for the whole course
             let section = 0;
             while (section < sections.length) {
-                let combos = this.findRoom(sections, section, groupedRooms, roomCount);
+                let combos: Array<[SchedRoom, SchedSection, TimeSlot]> =
+                    this.findRoom(sections, section, groupedRooms, roomCount);
                 section += combos.length;
                 schedule = schedule.concat(combos);
             }
         }
-        // Remove the first empty element
-        schedule.shift();
         return schedule;
     }
 
-    private findRoom(sections: any, section: number, groupedRooms: any[][], roomCount: any[][]): any[][] {
+    private findRoom(sections: any, section: number, groupedRooms: any[][], roomCount: any[][]):
+        Array<[SchedRoom, SchedSection, TimeSlot]> {
         const size = sections[0]["overall_size"];
-        const timeSlot = ["MWF 0800-0900", "MWF 0900-1000", "MWF 1000-1100", "MWF 1100-1200", "MWF 1200-1300",
-            "MWF 1300-1400", "MWF 1400-1500", "MWF 1500-1600", "MWF 1600-1700", "TR  0800-0930", "TR  0930-1100",
-            "TR  1100-1230", "TR  1230-1400", "TR  1400-1530", "TR  1530-1700"];
+        const timeSlot: TimeSlot[] = ["MWF 0800-0900", "MWF 0900-1000", "MWF 1000-1100", "MWF 1100-1200",
+            "MWF 1200-1300", "MWF 1300-1400", "MWF 1400-1500", "MWF 1500-1600", "MWF 1600-1700", "TR  0800-0930",
+            "TR  0930-1100", "TR  1100-1230", "TR  1230-1400", "TR  1400-1530", "TR  1530-1700"];
         let room;
-        let combos = [];
+        let combos: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
         for (let i in groupedRooms) {
             if (section >= sections.length) {
                 return combos;
@@ -83,10 +84,12 @@ export default class Scheduler implements IScheduler {
                     return combos;
                 }
                 room = groupedRooms[i][j];
-                if (room["rooms_seats"] >= size && roomCount[i][j] < 15) {
+                let rm: SchedRoom = room["room"];
+                if (rm["rooms_seats"] >= size && roomCount[i][j] < 15) {
                     while (section < sections.length) {
                         let timeSched = roomCount[i][j];
-                        let combo = [sections[section], room, timeSlot[timeSched]];
+                        let sec = sections[section];
+                        let combo: [SchedRoom, SchedSection, TimeSlot] = [rm, sec["section"], timeSlot[timeSched]];
                         roomCount[i][j] += 1;
                         combos.push(combo);
                         section ++;
@@ -101,7 +104,16 @@ export default class Scheduler implements IScheduler {
         // Compute the class size and add to a new section object
         let processSections = this.addSectionSize(sections);
         // Group by courses_dept and courses_id
-        processSections = this.getGroupedItems(processSections, ["courses_dept", "courses_id"]);
+        // processSections = this.getGroupedItems(processSections, ["courses_dept", "courses_id"]);
+        processSections = this.queryHelpers.insightTransformHelper.groupBy(processSections, (info: any) => {
+            let result: any[] = [];
+            for (let col of ["courses_dept", "courses_id"]) {
+                let item = info["section"];
+                result = result.concat(item[col]);
+            }
+            // Return the value of the sorting properties
+            return result;
+        });
         // Get maximum size within a group
         processSections = this.applyMAX(processSections, "overall_size", "size");
         return processSections;
@@ -145,10 +157,12 @@ export default class Scheduler implements IScheduler {
     private addSectionSize(sections: SchedSection[]): any[] {
         let newSections: any[] = [];
         for (let section of sections) {
-            let clone = JSON.parse(JSON.stringify(section));
+            // let clone = JSON.parse(JSON.stringify(section));
+            let copy: {[key: string]: number | string | SchedSection, } = {};
             let size = section.courses_audit + section.courses_fail + section.courses_pass;
-            clone["size"] = size;
-            newSections.push(clone);
+            copy["section"] = section;
+            copy["size"] = size;
+            newSections.push(copy);
         }
         return newSections;
     }
@@ -170,11 +184,12 @@ export default class Scheduler implements IScheduler {
         // Rooms with added distance between itself and the centre
         let newRooms: any[] = [];
         for (let room of rooms) {
-            // Clone the ScheRoom obj and add the dist
-            let clone = JSON.parse(JSON.stringify(room));
+            // let clone = JSON.parse(JSON.stringify(room));
+            let copy: {[key: string]: number | string | SchedRoom, } = {};
             let dist = this.getDistance(centre.rooms_lat, centre.rooms_lon, room.rooms_lat, room.rooms_lon);
-            clone["dist"] = dist;
-            newRooms.push(clone);
+            copy["room"] = room;
+            copy["dist"] = dist;
+            newRooms.push(copy);
         }
         return newRooms;
     }
