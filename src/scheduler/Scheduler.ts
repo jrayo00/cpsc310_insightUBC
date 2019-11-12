@@ -8,15 +8,14 @@ export default class Scheduler implements IScheduler {
     private roomCount: any[];
 
     public schedule(sections: SchedSection[], rooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
-        // this.queryHelpers = new InsightQuery();
+        this.queryHelpers = new InsightQuery();
         // Preprocess rooms, return rooms grouped by rooms_dist (I made up) and ordered by rooms_seats
         // let processedRooms: SchedRoom[] = this.processRooms(rooms);
         // Preprocess sections
-        // let processedSections = this.processSections(sections);
+        let processedSections = this.processSections(sections);
         // Make schedule with processed items
-        // let schedule = this.makeSched(processedSections, rooms);
-        // return schedule;
-        return [];
+        let schedule = this.makeSched(processedSections, rooms);
+        return schedule;
     }
 
     private makeSched(groupedSections: any[][], groupedRooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
@@ -27,8 +26,10 @@ export default class Scheduler implements IScheduler {
         // Find a good room for each section
         for (let sections of groupedSections) {
             // Find a good room for the whole course
+            Log.info(`In makeSched Schedule with sections length: ${sections.length}`);
             let section = 0;
             while (section < sections.length) {
+                Log.info(`In while loop of makeSched with sections length: ${sections.length}`);
                 let combos: Array<[SchedRoom, SchedSection, TimeSlot]> = this.findRoom(sections, section, groupedRooms);
                 section += combos.length;
                 schedule = schedule.concat(combos);
@@ -46,12 +47,14 @@ export default class Scheduler implements IScheduler {
         let room: SchedRoom;
         let combos: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
         for (let i in groupedRooms) {
+            Log.info(`In for loop of findRoom with room: ${i}`);
             if (section >= sections.length) {
                 return combos;
             }
             room = groupedRooms[i];
             if (room["rooms_seats"] >= size && this.roomCount[i] < 15) {
                 while (section < sections.length) {
+                    Log.info(`In while loop of findRoom with section: ${section}`);
                     let timeSched = this.roomCount[i];
                     let sec = sections[section];
                     let combo: [SchedRoom, SchedSection, TimeSlot] = [room, sec["section"], timeSlot[timeSched]];

@@ -81,11 +81,11 @@ describe("Tests for Scheduler", function () {
         rooms_lon: -123.25099
     };
     const room1: SchedRoom = {
-        rooms_shortname: "ALRD",
-        rooms_number: "105",
-        rooms_seats: 94,
-        rooms_lat: 49.2699,
-        rooms_lon: -123.25318
+        rooms_shortname: "ANGU",
+        rooms_number: "099",
+        rooms_seats: 60,
+        rooms_lat: 49.26486,
+        rooms_lon: -123.25364
     };
     const room2: SchedRoom = {
         rooms_shortname: "ANGU",
