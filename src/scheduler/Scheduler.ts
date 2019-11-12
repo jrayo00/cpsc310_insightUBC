@@ -5,61 +5,31 @@ import Log from "../Util";
 export default class Scheduler implements IScheduler {
 
     private queryHelpers: InsightQuery;
+    private roomCount: any[];
 
     public schedule(sections: SchedSection[], rooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
         this.queryHelpers = new InsightQuery();
         // Preprocess rooms, return rooms grouped by rooms_dist (I made up) and ordered by rooms_seats
-        let processedRooms = this.processRooms(rooms);
+        let processedRooms: SchedRoom[] = this.processRooms(rooms);
         // Preprocess sections
         let processedSections = this.processSections(sections);
         // Make schedule with processed items
         let schedule = this.makeSched(processedSections, processedRooms);
-        // Extract SchedSction and SchedRoom
-        // return this.extractProperties(schedule);
         return schedule;
     }
 
-    private extractProperties(schedule: any[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
-        let results: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
-        let combo: [SchedRoom, SchedSection, TimeSlot];
-        for (let i in schedule) {
-            // First, clone section and cast it to interface
-            // let section: SchedSection = this.makeSchedSection(schedule[i][0]);
-            let section = schedule[i][0].constructor();
-            for (let key of Object.keys(schedule[i][0])) {
-                if (key.includes("courses")) {
-                    section[key] = schedule[i][0][key];
-                }
-            }
-            // Then, clone room and cast to interface
-            // let room: SchedRoom = this.makeSchedRoom(schedule[i][1]);
-            let room = schedule[i][1].constructor();
-            for (let key of Object.keys(schedule[i][1])) {
-                if (key.includes("rooms")) {
-                    room[key] = schedule[i][1][key];
-                }
-            }
-            let timeslot: TimeSlot = schedule[i][2];
-            combo = [room, section, timeslot];
-            results.push(combo);
-        }
-        return results;
-    }
-
-    private makeSched(groupedSections: any[][], groupedRooms: any[][]): Array<[SchedRoom, SchedSection, TimeSlot]> {
+    private makeSched(groupedSections: any[][], groupedRooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
         let schedule: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
         // Keep track of the number of times a room gets scheduled
-        let roomCount: any[][] = JSON.parse(JSON.stringify(groupedRooms));
-        for (let a of roomCount) {
-            a = a.fill(0);
-        }
+        this.roomCount = JSON.parse(JSON.stringify(groupedRooms));
+        this.roomCount = this.roomCount.fill(0);
         // Find a good room for each section
         for (let sections of groupedSections) {
             // Find a good room for the whole course
             let section = 0;
             while (section < sections.length) {
                 let combos: Array<[SchedRoom, SchedSection, TimeSlot]> =
-                    this.findRoom(sections, section, groupedRooms, roomCount);
+                    this.findRoom(sections, section, groupedRooms);
                 section += combos.length;
                 schedule = schedule.concat(combos);
             }
@@ -67,33 +37,27 @@ export default class Scheduler implements IScheduler {
         return schedule;
     }
 
-    private findRoom(sections: any, section: number, groupedRooms: any[][], roomCount: any[][]):
+    private findRoom(sections: any, section: number, groupedRooms: SchedRoom[]):
         Array<[SchedRoom, SchedSection, TimeSlot]> {
         const size = sections[0]["overall_size"];
         const timeSlot: TimeSlot[] = ["MWF 0800-0900", "MWF 0900-1000", "MWF 1000-1100", "MWF 1100-1200",
             "MWF 1200-1300", "MWF 1300-1400", "MWF 1400-1500", "MWF 1500-1600", "MWF 1600-1700", "TR  0800-0930",
             "TR  0930-1100", "TR  1100-1230", "TR  1230-1400", "TR  1400-1530", "TR  1530-1700"];
-        let room;
+        let room: SchedRoom;
         let combos: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
         for (let i in groupedRooms) {
             if (section >= sections.length) {
                 return combos;
             }
-            for (let j in groupedRooms[i]) {
-                if (section >= sections.length) {
-                    return combos;
-                }
-                room = groupedRooms[i][j];
-                let rm: SchedRoom = room["room"];
-                if (rm["rooms_seats"] >= size && roomCount[i][j] < 15) {
-                    while (section < sections.length) {
-                        let timeSched = roomCount[i][j];
-                        let sec = sections[section];
-                        let combo: [SchedRoom, SchedSection, TimeSlot] = [rm, sec["section"], timeSlot[timeSched]];
-                        roomCount[i][j] += 1;
-                        combos.push(combo);
-                        section ++;
-                    }
+            room = groupedRooms[i];
+            if (room["rooms_seats"] >= size && this.roomCount[i] < 15) {
+                while (section < sections.length) {
+                    let timeSched = this.roomCount[i];
+                    let sec = sections[section];
+                    let combo: [SchedRoom, SchedSection, TimeSlot] = [room, sec["section"], timeSlot[timeSched]];
+                    this.roomCount[i] += 1;
+                    combos.push(combo);
+                    section ++;
                 }
             }
         }
@@ -119,15 +83,16 @@ export default class Scheduler implements IScheduler {
         return processSections;
     }
 
-    private processRooms(rooms: SchedRoom[]): any[][] {
+    private processRooms(rooms: SchedRoom[]): SchedRoom[] {
         // Compute the distance
-        let processedRooms = this.addDistance(rooms);
+        // let processedRooms = this.addDistance(rooms);
         // Group by distance
-        processedRooms = this.getGroupedItems(processedRooms, ["dist"]);
+        // processedRooms = this.getGroupedItems(processedRooms, ["dist"]);
         // Order each group by rooms_size
-        for (let i in processedRooms) {
-            processedRooms[i] = this.sortByProperties(processedRooms[i], ["rooms_seats"]);
-        }
+        // for (let i in processedRooms) {
+        //     processedRooms[i] = this.sortByProperties(processedRooms[i], ["rooms_seats"]);
+        // }
+        let processedRooms: SchedRoom[] = this.sortByProperties(rooms, ["rooms_seats"]);
         return processedRooms;
     }
 
