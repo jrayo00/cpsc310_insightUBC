@@ -8,14 +8,15 @@ export default class Scheduler implements IScheduler {
     private roomCount: any[];
 
     public schedule(sections: SchedSection[], rooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
-        this.queryHelpers = new InsightQuery();
+        // this.queryHelpers = new InsightQuery();
         // Preprocess rooms, return rooms grouped by rooms_dist (I made up) and ordered by rooms_seats
         // let processedRooms: SchedRoom[] = this.processRooms(rooms);
         // Preprocess sections
-        let processedSections = this.processSections(sections);
+        // let processedSections = this.processSections(sections);
         // Make schedule with processed items
-        let schedule = this.makeSched(processedSections, rooms);
-        return schedule;
+        // let schedule = this.makeSched(processedSections, rooms);
+        // return schedule;
+        return [];
     }
 
     private makeSched(groupedSections: any[][], groupedRooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
