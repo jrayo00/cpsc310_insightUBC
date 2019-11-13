@@ -34,10 +34,10 @@ export default class Scheduler implements IScheduler {
                 let combos: Array<[SchedRoom, SchedSection, TimeSlot]> = this.findRoom(sections, section);
                 section += combos.length;
                 schedule = schedule.concat(combos);
-                // Break the loop if no room is founded
-                // if (combos.length === 0) {
-                //     break;
-                // }
+                // Skip that section if no room is founded
+                if (combos.length === 0) {
+                    section ++;
+                }
             }
         }
         return schedule;
