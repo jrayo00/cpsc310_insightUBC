@@ -90,37 +90,20 @@ export default class Scheduler implements IScheduler {
     }
 
     private processRooms(rooms: SchedRoom[]): any[] {
-        // Compute the distance
-        // let processedRooms = this.addDistance(rooms);
-        // Group by distance
-        // processedRooms = this.getGroupedItems(processedRooms, ["dist"]);
-        // Order each group by rooms_size
-        // for (let i in processedRooms) {
-        //     processedRooms[i] = this.sortByProperties(processedRooms[i], ["rooms_seats"]);
-        // }
+        const centre = rooms[0];
         let processedRooms: SchedRoom[] = this.sortByProperties(rooms, ["rooms_seats"]);
         let newRooms: any[] = [];
         for (let room of processedRooms) {
             // let clone = JSON.parse(JSON.stringify(room));
-            let copy: {[key: string]: number[] | SchedRoom, } = {};
+            let copy: {[key: string]: number[] | SchedRoom | number, } = {};
+            let dist = this.getDistance(centre.rooms_lat, centre.rooms_lon, room.rooms_lat, room.rooms_lon);
             copy["room"] = room;
             copy["roomTracker"] = new Array(15).fill(0);
+            copy["dist"] = dist;
             newRooms.push(copy);
         }
+        newRooms = this.sortByProperties(newRooms, ["dist"]);
         return newRooms;
-    }
-
-    private applyMAX(groupedItems: any[][], newKey: string, col: string): any[][] {
-        // For each group in groupedResult
-        for (let i in groupedItems) {
-            let group = groupedItems[i];
-            let max = Math.max.apply(Math, group.map((o) => {
-                return Number(o[col]);
-            }));
-            // Add the local max as a new property
-            groupedItems[i] = this.addProperty(groupedItems[i], newKey, max);
-        }
-        return groupedItems;
     }
 
     private addProperty(array: any[], newProperty: string, val: any): any[] {
@@ -168,21 +151,6 @@ export default class Scheduler implements IScheduler {
             // Return the value of the sorting properties
             return result;
         });
-    }
-
-    private addDistance(rooms: SchedRoom[]): any[] {
-        const centre = rooms[0];
-        // Rooms with added distance between itself and the centre
-        let newRooms: any[] = [];
-        for (let room of rooms) {
-            // let clone = JSON.parse(JSON.stringify(room));
-            let copy: {[key: string]: number | string | SchedRoom, } = {};
-            let dist = this.getDistance(centre.rooms_lat, centre.rooms_lon, room.rooms_lat, room.rooms_lon);
-            copy["room"] = room;
-            copy["dist"] = dist;
-            newRooms.push(copy);
-        }
-        return newRooms;
     }
 
     private getDistance(lat0: number, lon0: number, lat1: number, lon1: number): number {
