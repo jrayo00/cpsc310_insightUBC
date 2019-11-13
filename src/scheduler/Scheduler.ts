@@ -45,6 +45,7 @@ export default class Scheduler implements IScheduler {
 
     private findRoom(sections: any, section: number):
         Array<[SchedRoom, SchedSection, TimeSlot]> {
+        let secTimes = new Array(15).fill(0);
         let sec = sections[section];
         let room: SchedRoom;
         let roomTracker: number[];
@@ -57,20 +58,42 @@ export default class Scheduler implements IScheduler {
             let roomObj = this.processedRooms[i];
             room = roomObj["room"];
             roomTracker = roomObj["roomTracker"];
-            while (section < sections.length && room["rooms_seats"] >= sec["size"] && roomTracker.includes(0)) {
-                Log.info(`In while loop of findRoom with section: ${section}`);
-                let timeSched = roomTracker.indexOf(0);
+            // Find time
+            let validTimes = this.findTime(secTimes, roomTracker);
+            while (section < sections.length && room["rooms_seats"] >= sec["size"] && validTimes.length > 0) {
+                // Log.info(`In while loop of findRoom with section: ${section}`);
+                let timeSched = validTimes[0];
                 let combo: [SchedRoom, SchedSection, TimeSlot] = [room, sec["section"], this.timeSlot[timeSched]];
                 // Keep track of the number of times a room gets scheduled
                 roomTracker[timeSched] += 1;
+                secTimes[timeSched] += 1;
+                // Save result
                 combos.push(combo);
                 section ++;
+                // Update
                 if (section < sections.length) {
                     sec = sections[section];
+                    validTimes = this.findTime(secTimes, roomTracker);
                 }
             }
         }
         return combos;
+    }
+
+    private findTime(a: number[], b: number[]): number[] {
+        let secTimes = this.findAllTimes(a);
+        let roomTimes = this.findAllTimes(b);
+        return this.queryHelpers.insightFetchHelper.intersectIndexes(secTimes, roomTimes);
+    }
+
+    private findAllTimes(a: number[]): number[] {
+        let matches: number[] = [];
+        for (let i = 0; i < a.length; i++) {
+            if (a[i] === 0) {
+                matches.push(i);
+            }
+        }
+        return matches;
     }
 
     private processSections(sections: SchedSection[]): any[][] {
@@ -106,14 +129,14 @@ export default class Scheduler implements IScheduler {
         return newRooms;
     }
 
-    private addProperty(array: any[], newProperty: string, val: any): any[] {
-        array.forEach((e) => {
-            // Adapt to the data structure
-            e[newProperty] = val;
-        });
-        let result = JSON.stringify(array);
-        return JSON.parse(result);
-    }
+    // private addProperty(array: any[], newProperty: string, val: any): any[] {
+    //     array.forEach((e) => {
+    //         // Adapt to the data structure
+    //         e[newProperty] = val;
+    //     });
+    //     let result = JSON.stringify(array);
+    //     return JSON.parse(result);
+    // }
 
     // Should return an array of arrays of objects (e.g., courses or rooms)
     private addSectionSize(sections: SchedSection[]): any[] {
@@ -142,16 +165,16 @@ export default class Scheduler implements IScheduler {
     }
 
     // Should return an array of arrays of objects (e.g., courses or rooms)
-    private getGroupedItems(items: any[], groupedCols: any[]): any[] {
-        return this.queryHelpers.insightTransformHelper.groupBy(items, (info: any) => {
-            let result: any[] = [];
-            for (let col of groupedCols) {
-                result = result.concat(info[col]);
-            }
-            // Return the value of the sorting properties
-            return result;
-        });
-    }
+    // private getGroupedItems(items: any[], groupedCols: any[]): any[] {
+    //     return this.queryHelpers.insightTransformHelper.groupBy(items, (info: any) => {
+    //         let result: any[] = [];
+    //         for (let col of groupedCols) {
+    //             result = result.concat(info[col]);
+    //         }
+    //         // Return the value of the sorting properties
+    //         return result;
+    //     });
+    // }
 
     private getDistance(lat0: number, lon0: number, lat1: number, lon1: number): number {
         const latDiff = lat0 - lat1;
