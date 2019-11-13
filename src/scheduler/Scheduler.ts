@@ -15,7 +15,6 @@ export default class Scheduler implements IScheduler {
             "TR  0930-1100", "TR  1100-1230", "TR  1230-1400", "TR  1400-1530", "TR  1530-1700"];
         // Preprocess rooms, return rooms grouped by rooms_dist (I made up) and ordered by rooms_seats
         this.processedRooms = this.processRooms(rooms);
-        // this.processedRooms = this.addProperty(rooms, "timeTracker", new Array(15).fill(0));
         // Preprocess sections
         let processedSections = this.processSections(sections);
         // Make schedule with processed items
@@ -25,7 +24,6 @@ export default class Scheduler implements IScheduler {
 
     private makeSched(groupedSections: any[][]): Array<[SchedRoom, SchedSection, TimeSlot]> {
         let schedule: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
-        // Keep track of the number of times a room gets scheduled
         // Find a good room for each section
         for (let sections of groupedSections) {
             // Find a good room for the whole course
@@ -37,9 +35,9 @@ export default class Scheduler implements IScheduler {
                 section += combos.length;
                 schedule = schedule.concat(combos);
                 // Break the loop if no room is founded
-                if (combos.length === 0) {
-                    break;
-                }
+                // if (combos.length === 0) {
+                //     break;
+                // }
             }
         }
         return schedule;
@@ -62,8 +60,8 @@ export default class Scheduler implements IScheduler {
             while (section < sections.length && room["rooms_seats"] >= sec["size"] && roomTracker.includes(0)) {
                 Log.info(`In while loop of findRoom with section: ${section}`);
                 let timeSched = roomTracker.indexOf(0);
-                // sec = sections[section];
                 let combo: [SchedRoom, SchedSection, TimeSlot] = [room, sec["section"], this.timeSlot[timeSched]];
+                // Keep track of the number of times a room gets scheduled
                 roomTracker[timeSched] += 1;
                 combos.push(combo);
                 section ++;
@@ -79,7 +77,6 @@ export default class Scheduler implements IScheduler {
         // Compute the class size and add to a new section object
         let processSections = this.addSectionSize(sections);
         // Group by courses_dept and courses_id
-        // processSections = this.getGroupedItems(processSections, ["courses_dept", "courses_id"]);
         processSections = this.queryHelpers.insightTransformHelper.groupBy(processSections, (info: any) => {
             let result: any[] = [];
             for (let col of ["courses_dept", "courses_id"]) {
@@ -89,8 +86,6 @@ export default class Scheduler implements IScheduler {
             // Return the value of the sorting properties
             return result;
         });
-        // Get maximum size within a group
-        // processSections = this.applyMAX(processSections, "overall_size", "size");
         return processSections;
     }
 
