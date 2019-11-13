@@ -97,7 +97,7 @@ describe("Tests for Scheduler", function () {
     const room3: SchedRoom = {
         rooms_shortname: "BUCH",
         rooms_number: "A101",
-        rooms_seats: 170,
+        rooms_seats: 175,
         rooms_lat: 49.26826,
         rooms_lon: -123.25468
     };

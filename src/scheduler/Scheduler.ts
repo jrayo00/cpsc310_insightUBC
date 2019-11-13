@@ -5,24 +5,27 @@ import Log from "../Util";
 export default class Scheduler implements IScheduler {
 
     private queryHelpers: InsightQuery;
-    private roomCount: any[];
+    private processedRooms: any[];
+    private timeSlot: TimeSlot[];
 
     public schedule(sections: SchedSection[], rooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
         this.queryHelpers = new InsightQuery();
+        this.timeSlot = ["MWF 0800-0900", "MWF 0900-1000", "MWF 1000-1100", "MWF 1100-1200",
+            "MWF 1200-1300", "MWF 1300-1400", "MWF 1400-1500", "MWF 1500-1600", "MWF 1600-1700", "TR  0800-0930",
+            "TR  0930-1100", "TR  1100-1230", "TR  1230-1400", "TR  1400-1530", "TR  1530-1700"];
         // Preprocess rooms, return rooms grouped by rooms_dist (I made up) and ordered by rooms_seats
-        // let processedRooms: SchedRoom[] = this.processRooms(rooms);
+        this.processedRooms = this.processRooms(rooms);
+        // this.processedRooms = this.addProperty(rooms, "timeTracker", new Array(15).fill(0));
         // Preprocess sections
         let processedSections = this.processSections(sections);
         // Make schedule with processed items
-        let schedule = this.makeSched(processedSections, rooms);
+        let schedule = this.makeSched(processedSections);
         return schedule;
     }
 
-    private makeSched(groupedSections: any[][], groupedRooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
+    private makeSched(groupedSections: any[][]): Array<[SchedRoom, SchedSection, TimeSlot]> {
         let schedule: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
         // Keep track of the number of times a room gets scheduled
-        this.roomCount = JSON.parse(JSON.stringify(groupedRooms));
-        this.roomCount = this.roomCount.fill(0);
         // Find a good room for each section
         for (let sections of groupedSections) {
             // Find a good room for the whole course
@@ -30,9 +33,10 @@ export default class Scheduler implements IScheduler {
             let section = 0;
             while (section < sections.length) {
                 Log.info(`In while loop of makeSched with sections length: ${sections.length}`);
-                let combos: Array<[SchedRoom, SchedSection, TimeSlot]> = this.findRoom(sections, section, groupedRooms);
+                let combos: Array<[SchedRoom, SchedSection, TimeSlot]> = this.findRoom(sections, section);
                 section += combos.length;
                 schedule = schedule.concat(combos);
+                // Break the loop if no room is founded
                 if (combos.length === 0) {
                     break;
                 }
@@ -41,29 +45,30 @@ export default class Scheduler implements IScheduler {
         return schedule;
     }
 
-    private findRoom(sections: any, section: number, groupedRooms: SchedRoom[]):
+    private findRoom(sections: any, section: number):
         Array<[SchedRoom, SchedSection, TimeSlot]> {
-        const size = sections[0]["overall_size"];
-        const timeSlot: TimeSlot[] = ["MWF 0800-0900", "MWF 0900-1000", "MWF 1000-1100", "MWF 1100-1200",
-            "MWF 1200-1300", "MWF 1300-1400", "MWF 1400-1500", "MWF 1500-1600", "MWF 1600-1700", "TR  0800-0930",
-            "TR  0930-1100", "TR  1100-1230", "TR  1230-1400", "TR  1400-1530", "TR  1530-1700"];
+        let sec = sections[section];
         let room: SchedRoom;
+        let roomTracker: number[];
         let combos: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
-        for (let i in groupedRooms) {
+        for (let i in this.processedRooms) {
             Log.info(`In for loop of findRoom with room: ${i}`);
             if (section >= sections.length) {
                 return combos;
             }
-            room = groupedRooms[i];
-            if (room["rooms_seats"] >= size && this.roomCount[i] < 15) {
-                while (section < sections.length) {
-                    Log.info(`In while loop of findRoom with section: ${section}`);
-                    let timeSched = this.roomCount[i];
-                    let sec = sections[section];
-                    let combo: [SchedRoom, SchedSection, TimeSlot] = [room, sec["section"], timeSlot[timeSched]];
-                    this.roomCount[i] += 1;
-                    combos.push(combo);
-                    section ++;
+            let roomObj = this.processedRooms[i];
+            room = roomObj["room"];
+            roomTracker = roomObj["roomTracker"];
+            while (section < sections.length && room["rooms_seats"] >= sec["size"] && roomTracker.includes(0)) {
+                Log.info(`In while loop of findRoom with section: ${section}`);
+                let timeSched = roomTracker.indexOf(0);
+                // sec = sections[section];
+                let combo: [SchedRoom, SchedSection, TimeSlot] = [room, sec["section"], this.timeSlot[timeSched]];
+                roomTracker[timeSched] += 1;
+                combos.push(combo);
+                section ++;
+                if (section < sections.length) {
+                    sec = sections[section];
                 }
             }
         }
@@ -85,11 +90,11 @@ export default class Scheduler implements IScheduler {
             return result;
         });
         // Get maximum size within a group
-        processSections = this.applyMAX(processSections, "overall_size", "size");
+        // processSections = this.applyMAX(processSections, "overall_size", "size");
         return processSections;
     }
 
-    private processRooms(rooms: SchedRoom[]): SchedRoom[] {
+    private processRooms(rooms: SchedRoom[]): any[] {
         // Compute the distance
         // let processedRooms = this.addDistance(rooms);
         // Group by distance
@@ -99,7 +104,15 @@ export default class Scheduler implements IScheduler {
         //     processedRooms[i] = this.sortByProperties(processedRooms[i], ["rooms_seats"]);
         // }
         let processedRooms: SchedRoom[] = this.sortByProperties(rooms, ["rooms_seats"]);
-        return processedRooms;
+        let newRooms: any[] = [];
+        for (let room of processedRooms) {
+            // let clone = JSON.parse(JSON.stringify(room));
+            let copy: {[key: string]: number[] | SchedRoom, } = {};
+            copy["room"] = room;
+            copy["roomTracker"] = new Array(15).fill(0);
+            newRooms.push(copy);
+        }
+        return newRooms;
     }
 
     private applyMAX(groupedItems: any[][], newKey: string, col: string): any[][] {
