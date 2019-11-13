@@ -13,7 +13,7 @@ export default class Scheduler implements IScheduler {
         this.timeSlot = ["MWF 0800-0900", "MWF 0900-1000", "MWF 1000-1100", "MWF 1100-1200",
             "MWF 1200-1300", "MWF 1300-1400", "MWF 1400-1500", "MWF 1500-1600", "MWF 1600-1700", "TR  0800-0930",
             "TR  0930-1100", "TR  1100-1230", "TR  1230-1400", "TR  1400-1530", "TR  1530-1700"];
-        // Preprocess rooms, return rooms grouped by rooms_dist (I made up) and ordered by rooms_seats
+        // Preprocess rooms, return rooms grouped by dist and ordered by rooms_seats
         this.processedRooms = this.processRooms(rooms);
         // Preprocess sections
         let processedSections = this.processSections(sections);
@@ -99,6 +99,7 @@ export default class Scheduler implements IScheduler {
     private processSections(sections: SchedSection[]): any[][] {
         // Compute the class size and add to a new section object
         let processSections = this.addSectionSize(sections);
+        processSections = this.sortByProperties(processSections, ["size"]);
         // Group by courses_dept and courses_id
         processSections = this.queryHelpers.insightTransformHelper.groupBy(processSections, (info: any) => {
             let result: any[] = [];
