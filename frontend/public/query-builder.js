@@ -22,8 +22,30 @@ function extractWhereConditions(element, dataset) {
     const condArr = [];
     const conditionContainer = element.getElementsByClassName('conditions-container')[0];
     const conditions = conditionContainer.getElementsByClassName('control-group condition');
-    for (const condition in conditions) {
-        // TODO: PARSE EACH CONDITIONS
+    for (const condition of conditions) {
+        const obj = {};
+        const notDiv = condition.getElementsByClassName('control not')[0];
+        const notBox = notDiv.getElementsByTagName('input')[0];
+        const controlFields = condition.getElementsByClassName('control fields')[0];
+        const controlOperators = condition.getElementsByClassName('control operators')[0];
+        const controlTerm = condition.getElementsByClassName('control term')[0];
+        const selectedField = controlFields.getElementsByTagName('select')[0].value;
+        const selectedOperator = controlOperators.getElementsByTagName('select')[0].value;
+        const term = controlTerm.getElementsByTagName('input')[0].value;
+
+        if (notBox.checked) {
+            const tmp = {};
+            const key = {};
+            key[dataset + "_" + selectedField] = term;
+            tmp[selectedOperator] = key;
+            obj.NOT = tmp;
+        } else {
+            const key = {};
+            key[dataset + "_" + selectedField] = term;
+            obj[selectedOperator] = key;
+        }
+
+        condArr.push(obj);
     }
     return condArr;
 }
