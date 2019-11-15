@@ -55,16 +55,22 @@ function extractWhereObject(element,dataset) {
 
     const radioGroup = element.getElementsByClassName('control-group condition-type')[0];
     const selectedInput = getSelectedRadioButton(radioGroup);
+    const arr = extractWhereConditions(element,dataset);
+    if (arr.length == 1){
+        return arr[0];
+    } else if (arr.length == 0){
+        return where;
+    }
     switch (selectedInput.value) {
         case "all":
-            where.AND = extractWhereConditions(element,dataset);
+            where.AND = arr;
             break;
         case "any":
-            where.OR = extractWhereConditions(element,dataset);
+            where.OR = arr;
             break;
         case "none":
             const notObj = {};
-            notObj.OR = extractWhereConditions(element,dataset);
+            notObj.OR = arr;
             where.NOT = notObj;
             break;
     }
@@ -131,14 +137,39 @@ function extractCheckedBoxes(colElement,dataset) {
     return undefined;
 }
 
+function extractApply(applyObj, dataset) {
+    let rules = [];
+
+    const transList = applyObj.getElementsByClassName('control-group transformation');
+    for (const trans of transList){
+        const obj = {};
+        const apply = {};
+        const term = trans.getElementsByTagName("input")[0].value;
+        const operator = trans.getElementsByTagName("select")[0].value;
+        const field = trans.getElementsByTagName("select")[1].value;
+        apply[operator] = field;
+        obj[term] = apply;
+        rules.push(obj);
+    }
+    if (rules.length > 0){
+        return rules;
+    }
+    return undefined;
+}
+
 function extractTransformationObject(element,dataset) {
     let obj = {};
 
     const groupObj = element.getElementsByClassName('form-group groups')[0];
+    const applyObj = element.getElementsByClassName('form-group transformations')[0];
     const groups = extractCheckedBoxes(groupObj,dataset);
+    const apply = extractApply(applyObj,dataset);
 
     if (typeof groups !== 'undefined' ){
         obj.GROUP = groups;
+    }
+    if (typeof apply !== 'undefined' ){
+        obj.APPLY = apply;
     }
     if (Object.keys(obj).length > 0) {
         return obj;

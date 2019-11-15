@@ -18,7 +18,7 @@ CampusExplorer.sendQuery = function(query) {
         request.onerror = function() {
             reject('The request failed')
         }
-        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        request.setRequestHeader("Content-Type", "application/json");
         request.send(query);
     });
 };
