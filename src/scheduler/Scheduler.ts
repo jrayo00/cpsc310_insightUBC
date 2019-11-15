@@ -5,24 +5,60 @@ import Log from "../Util";
 export default class Scheduler implements IScheduler {
 
     private queryHelpers: InsightQuery;
+    private centre: SchedRoom;
     private processedRooms: any[];
     private timeSlot: TimeSlot[];
+    private maxDist1: number;
+    private totalEnrol1: number;
+    private score1: number;
+    private maxDist2: number;
+    private totalEnrol2: number;
+    private score2: number;
 
     public schedule(sections: SchedSection[], rooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
+        const schedule1: Array<[SchedRoom, SchedSection, TimeSlot]> = this.schedule1(sections, rooms);
+        // const schedule2: Array<[SchedRoom, SchedSection, TimeSlot]> = this.schedule2(sections, rooms);
+        // if (this.score2 > this.score1) {
+        //     return schedule2;
+        // }
+        return schedule1;
+    }
+
+    private schedule2(sections: SchedSection[], rooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
+        this.processedRooms = this.processRooms(rooms);
+        let processedSections = this.addSectionSize(sections);
+        processedSections = this.sortByProperties(processedSections, ["size"]).reverse();
+        // Make schedule with processed items
+        let schedule = this.makeSched2(processedSections);
+        this.score2 = (1 - this.maxDist2) * 0.3 + this.totalEnrol2 * 0.7;
+        Log.info("score is: " + this.score2.toString());
+        return schedule;
+    }
+
+    private makeSched2(sections: any[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
+        let schedule: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
+        return schedule;
+    }
+
+    private schedule1(sections: SchedSection[], rooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
+        this.maxDist1 = 0;
+        this.totalEnrol1 = 0;
         this.queryHelpers = new InsightQuery();
         this.timeSlot = ["MWF 0800-0900", "MWF 0900-1000", "MWF 1000-1100", "MWF 1100-1200",
             "MWF 1200-1300", "MWF 1300-1400", "MWF 1400-1500", "MWF 1500-1600", "MWF 1600-1700", "TR  0800-0930",
             "TR  0930-1100", "TR  1100-1230", "TR  1230-1400", "TR  1400-1530", "TR  1530-1700"];
-        // Preprocess rooms, return rooms grouped by dist and ordered by rooms_seats
-        this.processedRooms = this.processRooms(rooms);
         // Preprocess sections
         let processedSections = this.processSections(sections);
+        // Preprocess rooms, return rooms grouped by dist and ordered by rooms_seats
+        this.processedRooms = this.processRooms(rooms);
         // Make schedule with processed items
-        let schedule = this.makeSched(processedSections);
+        let schedule: Array<[SchedRoom, SchedSection, TimeSlot]> = this.makeSched1(processedSections);
+        this.score1 = (1 - this.maxDist1) * 0.3 + this.totalEnrol1 * 0.7;
+        Log.info("score is: " + this.score1.toString());
         return schedule;
     }
 
-    private makeSched(groupedSections: any[][]): Array<[SchedRoom, SchedSection, TimeSlot]> {
+    private makeSched1(groupedSections: any[][]): Array<[SchedRoom, SchedSection, TimeSlot]> {
         let schedule: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
         // Find a good room for each section
         for (let sections of groupedSections) {
@@ -58,6 +94,7 @@ export default class Scheduler implements IScheduler {
             let roomObj = this.processedRooms[i];
             room = roomObj["room"];
             roomTracker = roomObj["roomTracker"];
+            let roomDist = roomObj["dist"];
             // Find time
             let validTimes = this.findTime(secTimes, roomTracker);
             while (section < sections.length && room["rooms_seats"] >= sec["size"] && validTimes.length > 0) {
@@ -67,6 +104,11 @@ export default class Scheduler implements IScheduler {
                 // Keep track of the number of times a room gets scheduled
                 roomTracker[timeSched] += 1;
                 secTimes[timeSched] += 1;
+                // Update the maxDist1
+                if (roomDist > this.maxDist1) {
+                    this.maxDist1 = roomDist;
+                }
+                this.totalEnrol1 += sec["size"];
                 // Save result
                 combos.push(combo);
                 section ++;
@@ -130,15 +172,6 @@ export default class Scheduler implements IScheduler {
         return newRooms;
     }
 
-    // private addProperty(array: any[], newProperty: string, val: any): any[] {
-    //     array.forEach((e) => {
-    //         // Adapt to the data structure
-    //         e[newProperty] = val;
-    //     });
-    //     let result = JSON.stringify(array);
-    //     return JSON.parse(result);
-    // }
-
     // Should return an array of arrays of objects (e.g., courses or rooms)
     private addSectionSize(sections: SchedSection[]): any[] {
         let newSections: any[] = [];
@@ -165,21 +198,26 @@ export default class Scheduler implements IScheduler {
         return items;
     }
 
-    // Should return an array of arrays of objects (e.g., courses or rooms)
-    // private getGroupedItems(items: any[], groupedCols: any[]): any[] {
-    //     return this.queryHelpers.insightTransformHelper.groupBy(items, (info: any) => {
-    //         let result: any[] = [];
-    //         for (let col of groupedCols) {
-    //             result = result.concat(info[col]);
-    //         }
-    //         // Return the value of the sorting properties
-    //         return result;
-    //     });
-    // }
+    // Adapted from stack overflow
+    // https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-
+    // haversine-formula
+    private getDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+        const R = 6371; // Radius of the earth in km
+        let dLat = this.deg2rad(lat2 - lat1);  // deg2rad below
+        let dLon = this.deg2rad(lon2 - lon1);
+        let a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2)
+        ;
+        let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        // Distance in meter
+        let d = R * c * 1000;
+        // Return index
+        return d / 1372;
+    }
 
-    private getDistance(lat0: number, lon0: number, lat1: number, lon1: number): number {
-        const latDiff = lat0 - lat1;
-        const lonDiff = lon0 - lon1;
-        return Math.sqrt(Math.pow(latDiff, 2) + Math.pow(lonDiff, 2));
+    private deg2rad(deg: number): number {
+        return deg * (Math.PI / 180);
     }
 }

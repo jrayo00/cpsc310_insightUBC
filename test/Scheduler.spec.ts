@@ -45,7 +45,7 @@ describe("Tests for Scheduler", function () {
         courses_dept: "cpsc",
         courses_id: "340",
         courses_uuid: "1320",
-        courses_pass: 101,
+        courses_pass: 1010,
         courses_fail: 7,
         courses_audit: 2
     };
@@ -97,7 +97,7 @@ describe("Tests for Scheduler", function () {
     const room3: SchedRoom = {
         rooms_shortname: "BUCH",
         rooms_number: "A101",
-        rooms_seats: 175,
+        rooms_seats: 1750,
         rooms_lat: 49.26826,
         rooms_lon: -123.25468
     };
@@ -128,6 +128,21 @@ describe("Tests for Scheduler", function () {
             [room2, section4, "MWF 1000-1100"], [room2, section5, "MWF 1100-1200"],
             [room0, section2, "MWF 0800-0900"], [room0, section3, "MWF 0900-1000"],
             [room0, section6, "MWF 1000-1100"], [room0, section7, "MWF 1100-1200"]];
+        expect(scheduler.schedule(sections, rooms)).to.deep.equal(expected);
+    });
+
+    it("Sample Scheduler test extreme", function () {
+        sections = [section3, section3, section3, section3, section3, section3, section3, section3,
+            section3, section3, section3, section3, section3, section3, section3, section4];
+        rooms = [room3];
+        let expected = [[room3, section4, "MWF 0800-0900"], [room3, section3, "MWF 0900-1000"],
+            [room3, section3, "MWF 1000-1100"], [room3, section3, "MWF 1100-1200"],
+            [room3, section3, "MWF 1200-1300"], [room3, section3, "MWF 1300-1400"],
+            [room3, section3, "MWF 1400-1500"], [room3, section3, "MWF 1500-1600"],
+            [room3, section3, "MWF 1600-1700"], [room3, section3, "TR  0800-0930"],
+            [room3, section3, "TR  0930-1100"], [room3, section3, "TR  1100-1230"],
+            [room3, section3, "TR  1230-1400"], [room3, section3, "TR  1400-1530"],
+            [room3, section3, "TR  1530-1700"]];
         expect(scheduler.schedule(sections, rooms)).to.deep.equal(expected);
     });
 });
