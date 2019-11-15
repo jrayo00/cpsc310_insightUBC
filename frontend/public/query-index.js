@@ -17,6 +17,7 @@ buttonElement.addEventListener("click",function () {
     const myPromise = CampusExplorer.sendQuery(query);
 
     myPromise.then((result) => {
+        console.log(result);
         CampusExplorer.renderResult(result);
     }).catch((error) => {
         console.log(`In catch: ${error}`);

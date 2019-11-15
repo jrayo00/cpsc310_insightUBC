@@ -138,10 +138,7 @@ function extractCheckedBoxes(colElement,dataset) {
             columns.push(dataset + "_" + checkbox.value);
         }
     }
-    if (columns.length > 0){
-        return columns;
-    }
-    return undefined;
+    return columns;
 }
 
 function extractApply(applyObj, dataset) {
@@ -158,10 +155,8 @@ function extractApply(applyObj, dataset) {
         obj[term] = apply;
         rules.push(obj);
     }
-    if (rules.length > 0){
-        return rules;
-    }
-    return undefined;
+
+    return rules;
 }
 
 function extractTransformationObject(element,dataset) {
@@ -172,10 +167,8 @@ function extractTransformationObject(element,dataset) {
     const groups = extractCheckedBoxes(groupObj,dataset);
     const apply = extractApply(applyObj,dataset);
 
-    if (typeof groups !== 'undefined' ){
+    if (groups.length > 0 || apply.length > 0 ){
         obj.GROUP = groups;
-    }
-    if (typeof apply !== 'undefined' ){
         obj.APPLY = apply;
     }
     if (Object.keys(obj).length > 0) {

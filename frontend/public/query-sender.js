@@ -7,44 +7,12 @@
  */
 CampusExplorer.sendQuery = function (query) {
     return new Promise(function (fulfill, reject) {
-        // TODO: implement!
-        // const fs = require('fs-extra');
-        // const buffers = {
-        //     courses: fs.readFileSync("../../test/data/courses.zip"),
-        //     rooms: fs.readFileSync("../../test/data/rooms.zip")
-        // };
-        // const endpointURL = "/dataset/courses/courses";
-        // const endpointURL2 = "/dataset/rooms/rooms";
-        //
-        // const xhr = new XMLHttpRequest();
-        // xhr.open('PUT', endpointURL, false);
-        // xhr.onload = function() {
-        //     // const result = JSON.parse(request.responseText);
-        //     // console.log(request.responseText);
-        // };
-        //
-        // xhr.onerror = function() {
-        //     // console.log('The request failed')
-        // }
-        // xhr.setRequestHeader("Content-Type", "application/x-zip-compressed");
-        //
-        // xhr.send("../../test/data/courses.zip");
-        //
-        // const xhr2 = new XMLHttpRequest();
-        // xhr2.open('PUT', endpointURL2, false);
-        // xhr2.onload = function() {
-        //
-        // };
-        //
-        // xhr2.onerror = function() {
-        // }
-        // xhr2.setRequestHeader("Content-Type", "application/x-zip-compressed");
-        // xhr2.send(buffers["rooms"]);
+        // curl -XPUT "127.0.0.1:4321/dataset/courses/courses" -H "Content-Type: application/x-zip-compressed" --data-binary "@test/data/courses.zip"
 
         const request = new XMLHttpRequest();
         request.open('POST', '/query', true);
         request.onload = function () {
-            fulfill(request.responseText);
+            fulfill(request.response);
         };
         // asddas
         request.onerror = function () {
