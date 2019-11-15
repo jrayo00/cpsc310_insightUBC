@@ -147,7 +147,7 @@ function extractApply(applyObj, dataset) {
         const term = trans.getElementsByTagName("input")[0].value;
         const operator = trans.getElementsByTagName("select")[0].value;
         const field = trans.getElementsByTagName("select")[1].value;
-        apply[operator] = field;
+        apply[operator] = dataset + "_" + field;
         obj[term] = apply;
         rules.push(obj);
     }

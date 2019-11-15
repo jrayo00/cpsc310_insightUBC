@@ -7,18 +7,19 @@
 CampusExplorer.sendQuery = function(query) {
     return new Promise(function(fulfill, reject) {
         // TODO: implement!
+        // const URL = encodeURIComponent(JSON.stringify(query));
         const request = new XMLHttpRequest();
-        request.open('POST', 'http://localhost:4321/query' , true);
-        // request.send(query);
+        request.open('POST', '/query', true);
         request.onload = function() {
-            const result = JSON.parse(request.responseText);
-            fulfill(result);
+           // const result = JSON.parse(request.responseText);
+            fulfill(request.responseText);
         };
 
         request.onerror = function() {
             reject('The request failed')
         }
-        request.setRequestHeader("Content-Type", "application/json");
+        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        // request.send();
         request.send(query);
     });
 };
