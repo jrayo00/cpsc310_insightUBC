@@ -50,13 +50,13 @@ describe("Facade D3", function () {
     afterEach(function () {
         // might want to add some process logging here to keep track of what"s going on
         Log.test(`AfterTest: ${this.currentTest.title}`);
-        try {
-            fs.removeSync(cacheDir);
-            fs.mkdirSync(cacheDir);
-            facade = new InsightFacade();
-        } catch (err) {
-            Log.error(err);
-        }
+        // try {
+        //     fs.removeSync(cacheDir);
+        //     fs.mkdirSync(cacheDir);
+        //     facade = new InsightFacade();
+        // } catch (err) {
+        //     Log.error(err);
+        // }
     });
 
     // TODO: read your courses and rooms datasets here once!
@@ -73,8 +73,8 @@ describe("Facade D3", function () {
 
     // Sample on how to format PUT requests
     it("Success PUT test for courses dataset", function () {
-        const endpointURL = "/dataset/courses0/courses";
-        const expected: string[] = ["courses0"];
+        const endpointURL = "/dataset/courses/courses";
+        const expected: string[] = ["courses"];
         const bufferId = "courses";
         try {
             return chai.request(serverURL)
