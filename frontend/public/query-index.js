@@ -18,7 +18,7 @@ buttonElement.addEventListener("click",function () {
 
     myPromise.then((result) => {
         console.log(result);
-        CampusExplorer.renderResult(result);
+        CampusExplorer.renderResult(JSON.parse(result));
     }).catch((error) => {
         console.log(`In catch: ${error}`);
     })
