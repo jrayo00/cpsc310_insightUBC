@@ -35,7 +35,11 @@ function extractWhereConditions(element, dataset) {
 
         if (selectedOperator != "IS"){
             try {
-                term = Number(term);
+                let tmp = term;
+                tmp = Number(tmp);
+                if (!isNaN(tmp)) {
+                    term = tmp;
+                }
             }catch (e) {
                 console.log("Invalid.");
             }

@@ -40,13 +40,13 @@ export default class Scheduler implements IScheduler {
         let schedule: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
         for (const section of sections) {
             const possibleRooms = this.getAllPossibleRooms(section);
-            const pairedRoom = this.findBestRoom(section);
+            const pairedRoom = this.findBestRoom(possibleRooms, schedule);
         }
 
         return schedule;
     }
 
-    private findBestRoom(section: any) {
+    private findBestRoom(possibleRooms: any, schedule: any) {
         // asdas
     }
 
