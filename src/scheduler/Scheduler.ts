@@ -6,6 +6,7 @@ export default class Scheduler implements IScheduler {
 
     private queryHelpers: InsightQuery;
     private centre: SchedRoom;
+    private notSchedSections: SchedSection[];
     private processedRooms: any[];
     private timeSlot: TimeSlot[];
     private maxDist1: number;
@@ -47,12 +48,26 @@ export default class Scheduler implements IScheduler {
         this.timeSlot = ["MWF 0800-0900", "MWF 0900-1000", "MWF 1000-1100", "MWF 1100-1200",
             "MWF 1200-1300", "MWF 1300-1400", "MWF 1400-1500", "MWF 1500-1600", "MWF 1600-1700", "TR  0800-0930",
             "TR  0930-1100", "TR  1100-1230", "TR  1230-1400", "TR  1400-1530", "TR  1530-1700"];
+        // Set room centre
+        this.notSchedSections = [];
+        this.centre = rooms[0];
         // Preprocess sections
         let processedSections = this.processSections(sections);
         // Preprocess rooms, return rooms grouped by dist and ordered by rooms_seats
         this.processedRooms = this.processRooms(rooms);
         // Make schedule with processed items
         let schedule: Array<[SchedRoom, SchedSection, TimeSlot]> = this.makeSched1(processedSections);
+        this.score1 = (1 - this.maxDist1) * 0.3 + this.totalEnrol1 * 0.7;
+        Log.info("score is: " + this.score1.toString());
+        // Set room centre
+        this.totalEnrol1 = 0;
+        this.centre = schedule[0][0];
+        // Preprocess sections
+        processedSections = this.processSections(sections);
+        // Preprocess rooms, return rooms grouped by dist and ordered by rooms_seats
+        this.processedRooms = this.processRooms(rooms);
+        // Make schedule with processed items
+        schedule = this.makeSched1(processedSections);
         this.score1 = (1 - this.maxDist1) * 0.3 + this.totalEnrol1 * 0.7;
         Log.info("score is: " + this.score1.toString());
         return schedule;
@@ -72,6 +87,8 @@ export default class Scheduler implements IScheduler {
                 schedule = schedule.concat(combos);
                 // Skip that section if no room is founded
                 if (combos.length === 0) {
+                    let sec = sections[section];
+                    this.notSchedSections.push(sec["section"]);
                     section ++;
                 }
             }
@@ -156,13 +173,12 @@ export default class Scheduler implements IScheduler {
     }
 
     private processRooms(rooms: SchedRoom[]): any[] {
-        const centre = rooms[0];
         let processedRooms: SchedRoom[] = this.sortByProperties(rooms, ["rooms_seats"]);
         let newRooms: any[] = [];
         for (let room of processedRooms) {
             // let clone = JSON.parse(JSON.stringify(room));
             let copy: {[key: string]: number[] | SchedRoom | number, } = {};
-            let dist = this.getDistance(centre.rooms_lat, centre.rooms_lon, room.rooms_lat, room.rooms_lon);
+            let dist = this.getDistance(this.centre.rooms_lat, this.centre.rooms_lon, room.rooms_lat, room.rooms_lon);
             copy["room"] = room;
             copy["roomTracker"] = new Array(15).fill(0);
             copy["dist"] = dist;
