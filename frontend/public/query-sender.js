@@ -46,7 +46,7 @@ CampusExplorer.sendQuery = function (query) {
         request.onload = function () {
             fulfill(request.responseText);
         };
-
+        // asddas
         request.onerror = function () {
             reject('The request failed')
         }
