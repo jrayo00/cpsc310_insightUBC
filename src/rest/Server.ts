@@ -170,37 +170,12 @@ export default class Server {
             res.send(200, {
                 result: arr
             });
-        }).catch((err: any) => {
-            res.json(400, {
-                error: `Failed in listDatasets() because ${err}.`
-            });
         });
     }
 
     // The next two methods handle the echo service.
     // These are almost certainly not the best place to put these, but are here for your reference.
     // By updating the Server.echo function pointer above, these methods can be easily moved.
-    private static echo(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace("Server::echo(..) - params: " + JSON.stringify(req.params));
-        try {
-            const response = Server.performEcho(req.params.msg);
-            Log.info("Server::echo(..) - responding " + 200);
-            res.json(200, {result: response});
-        } catch (err) {
-            Log.error("Server::echo(..) - responding 400");
-            res.json(400, {error: err});
-        }
-        return next();
-    }
-
-    private static performEcho(msg: string): string {
-        if (typeof msg !== "undefined" && msg !== null) {
-            return `${msg}...${msg}`;
-        } else {
-            return "Message not provided";
-        }
-    }
-
     private static getStatic(req: restify.Request, res: restify.Response, next: restify.Next) {
         const publicDir = "frontend/public/";
         Log.trace("RoutHandler::getStatic::" + req.url);

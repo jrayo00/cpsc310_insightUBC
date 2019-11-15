@@ -19,16 +19,7 @@ export default class InsightTransformHelper implements IInsightTransformHelper {
             return v.split("_")[1];
         });
         // Group fetched result according to the GROUP clause
-        let groupedResult = this.groupBy(result, (info: any) => {
-            let items: any[] = [];
-            for (let i in groupedCols) {
-                let col = groupedCols[i];
-                let item = info.info;
-                items = items.concat(item[col]);
-            }
-            // Return the value of the sorting properties
-            return items;
-        });
+        let groupedResult = this.getGroupedResult(result, groupedCols);
         // Compute aggregation according to the APPLY clause
         let transformedResult = this.computeAgg(groupedResult, trans["APPLY"]);
         // Get the first object of each group
@@ -165,6 +156,19 @@ export default class InsightTransformHelper implements IInsightTransformHelper {
         });
         return Object.keys(groups).map((group) => {
             return groups[group];
+        });
+    }
+
+    public getGroupedResult(result: any[], groupedCols: any): any[] {
+        return this.groupBy(result, (info: any) => {
+            let items: any[] = [];
+            for (let i in groupedCols) {
+                let col = groupedCols[i];
+                let item = info.info;
+                items = items.concat(item[col]);
+            }
+            // Return the value of the sorting properties
+            return items;
         });
     }
 }
