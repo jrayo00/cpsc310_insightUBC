@@ -37,7 +37,27 @@ export default class Scheduler implements IScheduler {
 
     private makeSched2(sections: any[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
         let schedule: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
+        for (const section of sections) {
+            const possibleRooms = this.getAllPossibleRooms(section);
+            const pairedRoom = this.findBestRoom(section);
+        }
+
         return schedule;
+    }
+
+    private findBestRoom(section: any) {
+        // asdas
+    }
+
+    private getAllPossibleRooms(section: any) {
+        const copy = [];
+        for (const room of this.processedRooms) {
+            let size = section.courses_audit + section.courses_fail + section.courses_pass;
+            if (room.rooms_seats >= size) {
+                copy.push(room);
+            }
+        }
+        return copy;
     }
 
     private schedule1(sections: SchedSection[], rooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
@@ -220,4 +240,5 @@ export default class Scheduler implements IScheduler {
     private deg2rad(deg: number): number {
         return deg * (Math.PI / 180);
     }
+
 }
