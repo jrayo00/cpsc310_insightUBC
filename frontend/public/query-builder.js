@@ -6,7 +6,7 @@
  *
  * @returns query object adhering to the query EBNF
  */
-CampusExplorer.buildQuery = function() {
+CampusExplorer.buildQuery = function () {
     let query = {};
     // TODO: FINISH TRANSFORMATION PARSING
     const activeTab = document.getElementsByClassName('tab-panel active')[0];
@@ -31,8 +31,15 @@ function extractWhereConditions(element, dataset) {
         const controlTerm = condition.getElementsByClassName('control term')[0];
         const selectedField = controlFields.getElementsByTagName('select')[0].value;
         const selectedOperator = controlOperators.getElementsByTagName('select')[0].value;
-        const term = controlTerm.getElementsByTagName('input')[0].value;
+        let term = controlTerm.getElementsByTagName('input')[0].value;
 
+        if (selectedOperator != "IS"){
+            try {
+                term = Number(term);
+            }catch (e) {
+                console.log("Invalid.");
+            }
+        }
         if (notBox.checked) {
             const tmp = {};
             const key = {};
