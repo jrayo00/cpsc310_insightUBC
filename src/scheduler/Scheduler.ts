@@ -24,42 +24,42 @@ export default class Scheduler implements IScheduler {
         // }
         return schedule1;
     }
-
-    private schedule2(sections: SchedSection[], rooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
-        this.processedRooms = this.processRooms(rooms);
-        let processedSections = this.addSectionSize(sections);
-        processedSections = this.sortByProperties(processedSections, ["size"]).reverse();
-        // Make schedule with processed items
-        let schedule = this.makeSched2(processedSections);
-        this.score2 = (1 - this.maxDist2) * 0.3 + this.totalEnrol2 * 0.7;
-        Log.info("score is: " + this.score2.toString());
-        return schedule;
-    }
-
-    private makeSched2(sections: any[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
-        let schedule: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
-        for (const section of sections) {
-            const possibleRooms = this.getAllPossibleRooms(section);
-            const pairedRoom = this.findBestRoom(possibleRooms, schedule);
-        }
-
-        return schedule;
-    }
-
-    private findBestRoom(possibleRooms: any, schedule: any) {
-        // asdas
-    }
-
-    private getAllPossibleRooms(section: any) {
-        const copy = [];
-        for (const room of this.processedRooms) {
-            let size = section.courses_audit + section.courses_fail + section.courses_pass;
-            if (room.rooms_seats >= size) {
-                copy.push(room);
-            }
-        }
-        return copy;
-    }
+    //
+    // private schedule2(sections: SchedSection[], rooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
+    //     this.processedRooms = this.processRooms(rooms);
+    //     let processedSections = this.addSectionSize(sections);
+    //     processedSections = this.sortByProperties(processedSections, ["size"]).reverse();
+    //     // Make schedule with processed items
+    //     let schedule = this.makeSched2(processedSections);
+    //     this.score2 = (1 - this.maxDist2) * 0.3 + this.totalEnrol2 * 0.7;
+    //     Log.info("score is: " + this.score2.toString());
+    //     return schedule;
+    // }
+    //
+    // private makeSched2(sections: any[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
+    //     let schedule: Array<[SchedRoom, SchedSection, TimeSlot]> = [];
+    //     for (const section of sections) {
+    //         const possibleRooms = this.getAllPossibleRooms(section);
+    //         const pairedRoom = this.findBestRoom(possibleRooms, schedule);
+    //     }
+    //
+    //     return schedule;
+    // }
+    //
+    // private findBestRoom(possibleRooms: any, schedule: any) {
+    //     // asdas
+    // }
+    //
+    // private getAllPossibleRooms(section: any) {
+    //     const copy = [];
+    //     for (const room of this.processedRooms) {
+    //         let size = section.courses_audit + section.courses_fail + section.courses_pass;
+    //         if (room.rooms_seats >= size) {
+    //             copy.push(room);
+    //         }
+    //     }
+    //     return copy;
+    // }
 
     private schedule1(sections: SchedSection[], rooms: SchedRoom[]): Array<[SchedRoom, SchedSection, TimeSlot]> {
         this.maxDist1 = 0;
