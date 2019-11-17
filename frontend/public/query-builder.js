@@ -142,6 +142,13 @@ function extractCheckedBoxes(colElement,dataset) {
             columns.push(dataset + "_" + checkbox.value);
         }
     }
+    const transformCols = colElement.getElementsByClassName('control transformation');
+    for (const div of transformCols){
+        const checkbox = div.getElementsByTagName('input')[0];
+        if(checkbox.checked) {
+            columns.push(checkbox.value);
+        }
+    }
     return columns;
 }
 
