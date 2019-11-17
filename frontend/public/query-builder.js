@@ -128,7 +128,11 @@ function extractSelectedFromList(orderElement, dataset) {
     const selected = orderElement.getElementsByTagName('select')[0].selectedOptions;
     for(let i = 0; i < selected.length; i++ ){
         const element = selected.item(i);
-        keys.push(dataset + "_" + element.value)
+        if (element.className === "transformation") {
+            keys.push(element.value);
+        }else {
+            keys.push(dataset + "_" + element.value);
+        }
     }
     return keys;
 }
